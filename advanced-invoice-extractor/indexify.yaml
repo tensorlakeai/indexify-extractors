@@ -1,0 +1,23 @@
+name: yenicelik/advanced-invoice-parser
+version: 1
+description: "Extracts the text from a PDF-invoice using Nougat"
+module: advanced_invoice_parser:AdvancedInvoiceParsersExtractor
+gpu: true
+python_dependencies:
+  - tf2onnx
+  - transformers
+  # - git+https://github.com/huggingface/transformers.git # will come back to debugging this
+  - accelerate
+  - pymupdf
+  - python-Levenshtein
+  - nltk
+  - deepdoctection[pt]
+  - pdf2image
+  - huggingface-hub
+  - ctransformers[cuda]
+  # - python-poppler  # This is causing problems, let's skip it for now?
+system_dependencies:
+  - tesseract-ocr
+  - libpoppler-dev
+  - poppler-utils
+  - tesseract-ocr-eng  # Should be for more / all if we want to support more languages
