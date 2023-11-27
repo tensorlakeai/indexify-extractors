@@ -6,7 +6,6 @@ gpu: true
 python_dependencies:
   - tf2onnx
   - transformers
-  # - git+https://github.com/huggingface/transformers.git # will come back to debugging this
   - accelerate
   - pymupdf
   - python-Levenshtein
@@ -15,7 +14,6 @@ python_dependencies:
   - pdf2image
   - huggingface-hub
   - ctransformers[cuda]
-  # - python-poppler  # This is causing problems, let's skip it for now?
 system_dependencies:
   - tesseract-ocr
   - libpoppler-dev
@@ -24,4 +22,3 @@ system_dependencies:
   - ffmpeg # this may not be needed
   - libsm6 # could probably use the lighter libgl1
   - libxext6
-  - vim # Install this for debugging purposes inside the container
