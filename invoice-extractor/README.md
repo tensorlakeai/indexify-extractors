@@ -3,7 +3,7 @@
 This extractor parses some invoice-related data from a PDF.
 It uses the pre-trained [donut model from huggingface](https://huggingface.co/docs/transformers/model_doc/donut).
 
-Content[String] -> Content[Empty] + Features[JSON metadata of invoice].
+Content[PDF] -> Content[Empty] + Features[JSON metadata of invoice].
 
 Example input:
 
@@ -41,5 +41,5 @@ indexify extractor extract --file invoice.pdf
 * The container is not published yet. *
 
 ```bash
-docker run  -it yenicelik/simple-invoice-parser --file invoice.pdf
+docker run --rm --mount type=bind,source="$HOME/.cache/huggingface/hub",target=/indexify/.cache/huggingface/hub --mount type=bind,source="$(pwd)/data/",target=/indexify/data/ yenicelik/simple-invoice-parser extractor extract --file invoice.pdf
 ```

@@ -1,25 +1,17 @@
 from collections import defaultdict
 import io
 import tempfile
-
-import cv2
-from pathlib import Path
-from matplotlib import pyplot as plt
-from IPython.core.display import HTML
+import json
+from pdf2image import convert_from_bytes
 
 import deepdoctection as dd
+from pydantic import BaseModel
 
 import torch
 from transformers import AutoProcessor, StoppingCriteria, StoppingCriteriaList, VisionEncoderDecoderModel
 
 from typing import Optional, List
 import fitz
-from pathlib import Path
-
-from PIL import Image
-from io import BytesIO
-import requests
-
 
 from ctransformers import AutoModelForCausalLM, AutoConfig
 import time
@@ -28,8 +20,9 @@ from indexify_extractor_sdk import (
     Extractor,
     Feature,
     ExtractorSchema,
-    Content,
+    Content
 )
+from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
 
 # I could let the user decide which model to use. the 7B model will run very fast, we can go with this one for now (for debugging)
 def get_airoboros_M_7B_312():
@@ -52,6 +45,7 @@ def get_airoboros_M_7B_312():
 def get_airoboros_L2_70B_312():
     # Got parameter recommendations from https://www.reddit.com/r/LocalLLaMA/comments/1343bgz/what_model_parameters_is_everyone_using/
     config = AutoConfig.from_pretrained('TheBloke/Airoboros-L2-70B-3.1.2-GGUF')
+    # TODO: Move these to input parameters
     print('Config is', config)
     config.config.max_new_tokens = 512
     config.config.context_length = 4096 #96 # Could even be 8192 as I understand
@@ -162,18 +156,21 @@ def rasterize_pdf(
             page_bytes: bytes = pdf[i].get_pixmap(dpi=dpi).pil_tobytes(format="PNG")
             pillow_images.append(io.BytesIO(page_bytes))
     except Exception as e:
-        print("Exception: ", e)
+        print("Exception occured: ", e)
         pass
     return pillow_images
 
-class AdvancedInvoiceParsersExtractor(BaseModel):
+class AdvancedInvoiceParserInputParams(BaseModel):
     # No input except the file itself
     ...
 
-class AdvancedInvoiceParsersExtractor(BaseEmbeddingExtractor):
+class AdvancedInvoiceParserExtractor(Extractor):
 
-    def __init__(self, max_context_length: int = 512, language = 'en'):
-        super(PdfRawTextExtractor, self).__init__(max_context_length=512)
+    # TODO input arguments are not required here, can consider these later
+    # , max_context_length: int = 512, language = 'en'
+    # max_context_length=512
+    def __init__(self):
+        super(AdvancedInvoiceParserExtractor, self).__init__()
         # TODO: Must also make sure that we have >50GB of VRAM!
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -193,9 +190,9 @@ class AdvancedInvoiceParsersExtractor(BaseEmbeddingExtractor):
         # Finally, load the prompt
         self.prompt_prefix = """
             <|system|>
-            Your goal is to extract structured information from the user's input 
-            that matches the form described below. When extracting information 
-            please make sure it matches the type information exactly. 
+            Your goal is to extract structured information from the user's input
+            that matches the form described below. When extracting information
+            please make sure it matches the type information exactly.
             Do not add any attributes that do not appear in the schema shown below.
 
             {
@@ -223,19 +220,22 @@ class AdvancedInvoiceParsersExtractor(BaseEmbeddingExtractor):
 
             Output MUST be a valid JSON object with the schema above.
             The following fields cannot be null: ["ToName", "ToAddress", "Description", "Amount", "Currency", "ConfidenceScore"]
-            Do NOT add any clarifying information. 
+            Do NOT add any clarifying information.
+            Do NOT add any newlines.
+            Do NOT escape any characters.
             Do NOT add any fields that do not appear in the schema.
-            Add a confidence score according to how confident you are with your JSON generation. 
+            Add a confidence score according to how confident you are with your JSON generation.
             </s>\n<|user|>
         """
 
-    def _get_deepdoctection_text_and_table(self, pdf_bytestring):
+    def _extract_deepdoctection_text(self, content: Content):
+        pdf_bytestring = content.data
         # Currently just a blurb of what we need
         # TODO: Figure out how to read bytes; otherwise use tempfiles
-        fp = tempfile.NamedTemporaryFile()
+        fp = tempfile.NamedTemporaryFile(suffix=".pdf")
         fp.write(pdf_bytestring)
         fp.seek(0)
-        df = self.analyzer.analyze(path=fp.name)
+        df = self.deepdoctetion_analyzer.analyze(path=fp.name)
 
         df.reset_state()  # This method m
         # Deepdoctection
@@ -244,67 +244,72 @@ class AdvancedInvoiceParsersExtractor(BaseEmbeddingExtractor):
 
         # Get the text
         dd_text = page.text
-        print(dd_text)
 
         # Also extract these into arrays for metadata
+        # TODO: Figure out how to best properly do this, right now this is very protoype-ish
         dd_tables = page.tables
-        print(dd_tables)
         fp.close()
 
-        return dd_text, dd_tables.csv
+        return dd_text, dd_tables
 
-    def _predict(self, pdf_bytestring):
-        dd_text, dd_tables = self._get_deepdoctection_text_and_table(pdf_bytestring)
+    def _extract_nougat_text(self, content: Content):
+        # Convet the pdf-bytestring to an image
+        # TODO: Right now it only looks at the first image! We should probably flatten it and do it for each page!
+        # Let's extract text for each page
+        images = convert_from_bytes(content.data)
+        # At this point, we have a couple of image objects
+        images = [x.convert("RGB") for x in images]
 
-        images = rasterize_paper(pdf=pdf_bytestring, return_pil=True)
-        print(images)
+        # For each image, let's process the pixel values
+        pixel_values = [self.nougat_processor(images=x, return_tensors="pt").pixel_values for x in images]
 
-        # TODO: Again, support multi-page documents!
-        image = Image.open(images[0])
-
-        pixel_values = self.processor(images=image, return_tensors="pt").pixel_values
-
-        # autoregressively generate tokens, with custom stopping criteria (as defined by the Nougat authors)
-        self.outputs = self.model.generate(
-            pixel_values.to(self.device),
+        outputs = [self.nougat_model.generate(
+            x.to(self.device),
             min_length=1,
             max_length=3584,
-            bad_words_ids=[[self.processor.tokenizer.unk_token_id]],
+            bad_words_ids=[[self.nougat_processor.tokenizer.unk_token_id]],
             return_dict_in_generate=True,
             output_scores=True,
             stopping_criteria=StoppingCriteriaList([StoppingCriteriaScores()]),
-        )
+        ) for x in pixel_values]
 
-        nougat_generated = self.processor.batch_decode(outputs[0], skip_special_tokens=True)[0]
-        print(nougat_generated)
-        nougat_generated = self.processor.post_process_generation(nougat_generated, fix_markdown=False)
-        print(nougat_generated)
+        nougat_generated = [self.nougat_processor.batch_decode(x[0], skip_special_tokens=True)[0] for x in outputs]
+        nougat_generated = [self.nougat_processor.post_process_generation(x, fix_markdown=False) for x in nougat_generated]
 
-        # Generate the prompt
-        prompt = self.prompt_prefix + dd_text + "\n" + generated + """</s>\n<|assistant|>\n"""
+        # Finally, join all the texts
+        nougat_generated = "\n".join(nougat_generated)
 
+        return nougat_generated
+
+    def _extract_structured_json(self, invoice_text):
+        prompt = self.prompt_prefix + invoice_text + """</s>\n<|assistant|>\n"""
+        # For benchmarking purposes, we also record the time that the extractor runs in
         start = time.time()
-        extracted_json = llm(prompt)
+        extracted_json = self.llm_model(prompt)
+        print("Extracted json is")
         print(extracted_json)
         print(f"Took {time.time() - start} seconds")
-        return dd_text, nougat_generated, extracted_json
+        # Turn the json string into valid json. Watch out, the extractor may error here! Not super robust! Better to use lmql, guidance or similar!
+        extracted_json = json.loads(extracted_json)
+        return extracted_json
 
     def extract(
-        self, content: List[Content], params: SimpleInvoiceParserInputParams
+        self, content: List[Content], params: AdvancedInvoiceParserInputParams
     ) -> List[List[Content]]:
-        content_filebytes = [c.data for c in content]
-
-        # TODO: Right now it only looks at the first image! We should probably flatten it and do it for each page!
-        images = [convert_from_bytes(x)[0].convert("RGB") for x in content_filebytes]
-
         out = []
         for i, x in enumerate(content):
-            print("i, x are: ", i, x)
-            data = self._process_document(images[i])[0]  # Key 1 includes the image, which we ignore in this case
+
+            # Extract deepdoctection string
+            dd_text, dd_tables = self._extract_deepdoctection_text(x)
+            nougat_text = self._extract_nougat_text(x)
+
+            # Extract structured json
+            text = dd_text + "\n" + nougat_text
+            extracted_json = self._extract_structured_json(text)
             out.append(
                 [Content.from_text(
-                    text="",  # TODO: Diptanu, what do we do for PDFs? Do you want to save the raw bytes too, I feel like this is unnecessary? Also, I felt like these would be stored in a database _before_ processing, not after
-                    feature=Feature.metadata(value=data, name="invoice_extractor"),
+                    text=text,  # TODO: Diptanu, what do we do for PDFs? Do you want to save the raw bytes too, I feel like this is unnecessary? Also, I felt like these would be stored in a database _before_ processing, not after
+                    feature=Feature.metadata(value=extracted_json, name="invoice_extractor"),
                 )]
             )
         return out
@@ -313,7 +318,7 @@ class AdvancedInvoiceParsersExtractor(BaseEmbeddingExtractor):
         """
         Returns a list of options for indexing.
         """
-        input_params = PdfToMarkdownExtractor()
+        input_params = AdvancedInvoiceParserInputParams()
         # TODO If it's metadata, how do we extract things
         # This extractor does not return any embedding, only a dictionary!
         return ExtractorSchema(

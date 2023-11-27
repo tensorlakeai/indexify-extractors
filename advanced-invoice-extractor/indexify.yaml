@@ -1,7 +1,7 @@
 name: yenicelik/advanced-invoice-parser
 version: 1
 description: "Extracts the text from a PDF-invoice using Nougat"
-module: advanced_invoice_parser:AdvancedInvoiceParsersExtractor
+module: advanced_invoice_parser:AdvancedInvoiceParserExtractor
 gpu: true
 python_dependencies:
   - tf2onnx
@@ -21,3 +21,7 @@ system_dependencies:
   - libpoppler-dev
   - poppler-utils
   - tesseract-ocr-eng  # Should be for more / all if we want to support more languages
+  - ffmpeg # this may not be needed
+  - libsm6 # could probably use the lighter libgl1
+  - libxext6
+  - vim # Install this for debugging purposes inside the container
