@@ -10,7 +10,7 @@ from pydantic import BaseModel
 import torch
 from transformers import AutoProcessor, StoppingCriteria, StoppingCriteriaList, VisionEncoderDecoderModel
 
-from typing import Optional, List
+from typing import Optional, List, Literal
 import fitz
 
 from ctransformers import AutoModelForCausalLM, AutoConfig
@@ -22,40 +22,34 @@ from indexify_extractor_sdk import (
     ExtractorSchema,
     Content
 )
-from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
 
 # I could let the user decide which model to use. the 7B model will run very fast, we can go with this one for now (for debugging)
-def get_airoboros_M_7B_312():
+def get_airoboros_M_7B_312(batch_size: int, gpu_layers: int, top_k: int, top_p: float):
     # Got parameter recommendations from https://www.reddit.com/r/LocalLLaMA/comments/1343bgz/what_model_parameters_is_everyone_using/
     config = AutoConfig.from_pretrained('TheBloke/Airoboros-M-7B-3.1.2-GGUF')
-    print('Config is', config)
     config.config.max_new_tokens = 512
     config.config.context_length = 4096 #96 # Could even be 8192 as I understand
-    config.config.gpu_layers = 0 # TODO: This should be determined by the docker-image, or similar
+    config.config.gpu_layers = gpu_layers # TODO: This should be determined by the docker-image, or similar
     config.config.temperature = 0.7
-    config.config.top_k = 50
+    config.config.top_k = top_k
     config.config.last_n_tokens = 256
-    config.config.top_p = 0.1
-    config.config.batch_size = 1
-    # config.config.repetition_penalty = 0.85
+    config.config.top_p = top_p
+    config.config.batch_size = batch_size
     print(config)
     llm = AutoModelForCausalLM.from_pretrained("TheBloke/Airoboros-M-7B-3.1.2-GGUF", model_file="airoboros-m-7b-3.1.2.Q8_0.gguf", model_type="mistral", config=config)
     return llm
 
-def get_airoboros_L2_70B_312():
+def get_airoboros_L2_70B_312(batch_size: int, gpu_layers: int, top_k: int, top_p: float):
     # Got parameter recommendations from https://www.reddit.com/r/LocalLLaMA/comments/1343bgz/what_model_parameters_is_everyone_using/
     config = AutoConfig.from_pretrained('TheBloke/Airoboros-L2-70B-3.1.2-GGUF')
-    # TODO: Move these to input parameters
-    print('Config is', config)
     config.config.max_new_tokens = 512
     config.config.context_length = 4096 #96 # Could even be 8192 as I understand
-    config.config.gpu_layers = 9
+    config.config.gpu_layers = gpu_layers
     config.config.temperature = 0.7
-    config.config.top_k = 50
+    config.config.top_k = top_k
     config.config.last_n_tokens = 256
-    config.config.top_p = 0.1
-    config.config.batch_size = 1
-    # config.config.repetition_penalty = 0.85
+    config.config.top_p = top_p
+    config.config.batch_size = batch_size
     print(config)
     llm = AutoModelForCausalLM.from_pretrained("TheBloke/Airoboros-L2-70B-3.1.2-GGUF", model_file="airoboros-l2-70b-3.1.2.Q4_K_M.gguf", model_type="mistral", config=config)
     print(llm)
@@ -161,8 +155,14 @@ def rasterize_pdf(
     return pillow_images
 
 class AdvancedInvoiceParserInputParams(BaseModel):
-    # No input except the file itself
-    ...
+    # These parameters should be set according to the machine used
+    gpu_layers: int = 0  # On my machine / 8GB machine, 9 layers fit
+    batch_size: int = 1
+    top_k: int = 50
+    top_p: float = 0.1
+    model_type: Literal["7B", "70B"] = "7B"
+    # I could add the json structure (as a string),
+    # and the required fields (as a string!) as well
 
 class AdvancedInvoiceParserExtractor(Extractor):
 
