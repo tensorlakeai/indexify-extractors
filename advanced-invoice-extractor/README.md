@@ -42,7 +42,7 @@ Try out the extractor. Download your favorite invoice(!).
 
 ```
 cd whisper-asr
-indexify extractor extract --file twiml-ai-podcast.mp3
+indexify extractor extract --file data/invoice.pdf
 ```
 
 ## Container
