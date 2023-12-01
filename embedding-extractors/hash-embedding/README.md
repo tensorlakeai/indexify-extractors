@@ -15,13 +15,27 @@ The quick brown fox jumps over the lazy dog.
 Example output:
 
 ```json
-{
-    "embedding": [
-            510.3,
-            240.2,
-            ...
-    ]
-}
+[
+  {
+    "content_type": "text/plain",
+    "source": [
+      84,
+      104,
+      ...
+      46
+    ],
+    "feature": {
+      "feature_type": "Embedding",
+      "name": "embedding",
+      "data": [
+        -17,
+        83,
+        ...
+        108
+      ]
+    }
+  }
+]
 ```
 
 ## Usage
@@ -38,5 +52,5 @@ indexify extractor extract --text "The quick brown fox jumps over the lazy dog."
 * The container is not published yet. *
 
 ```bash
-docker run  -it yenicelik/identity-hash-extractor --text "The quick brown fox jumps over the lazy dog."
+docker run --mount type=bind,source="$HOME/.cache/huggingface/hub",target=/root/.cache/huggingface/hub yenicelik/identity-hash-extractor extractor extract --text "The quick brown fox jumps over the lazy dog."
 ```

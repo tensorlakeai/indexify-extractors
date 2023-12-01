@@ -4,6 +4,7 @@ import re
 import requests
 import timeit
 from typing import List, Literal
+import logging
 
 from PIL import Image
 from pdf2image import convert_from_bytes
@@ -85,11 +86,22 @@ class SimpleInvoiceParserExtractor(Extractor):
         """
         Returns a list of options for indexing.
         """
-        input_params = SimpleInvoiceParserExtractor()
+        print("Getting schemas!")
+        input_params = SimpleInvoiceParserInputParams()
         # TODO If it's metadata, how do we extract things
+        logging.warning("Input params are: ")
+        logging.warning(input_params)
+        logging.warning("Input params schema is: ")
+        logging.warning(input_params.model_json_schema())
+        logging.warning("Next")
+        logging.warning(json.dumps(input_params.model_json_schema()))
         # This extractor does not return any embedding, only a dictionary!
-        return ExtractorSchema(
-            embedding_schemas={},
+        out = ExtractorSchema(
+            embedding_schemas=dict(),
+            output_schemas=dict(),
             input_params=json.dumps(input_params.model_json_schema()),
         )
+        logging.warning("out is")
+        logging.warning(out)
+        return out
 

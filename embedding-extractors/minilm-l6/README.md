@@ -14,13 +14,27 @@ The quick brown fox jumps over the lazy dog.
 Example output:
 
 ```json
-{
-    "embedding": [
-            510.3,
-            240.2,
-            ...
-    ]
-}
+[
+  {
+    "content_type": "text/plain",
+    "source": [
+      84,
+      104,
+      ...
+      46
+    ],
+    "feature": {
+      "feature_type": "Embedding",
+      "name": "embedding",
+      "data": [
+        0.04393356665968895,
+        0.05893441289663315,
+        ...
+        0.10206394642591476
+      ]
+    }
+  }
+]
 ```
 
 ## Usage
@@ -37,5 +51,5 @@ indexify extractor extract --text "The quick brown fox jumps over the lazy dog."
 * The container is not published yet. *
 
 ```bash
-docker run  -it diptanu/minilm-l6-extractor --text "The quick brown fox jumps over the lazy dog."
+docker run --mount type=bind,source="$HOME/.cache/huggingface/hub",target=/root/.cache/huggingface/hub diptanu/minilm-l6-extractor extractor extract --text "The quick brown fox jumps over the lazy dog."
 ```

@@ -14,13 +14,25 @@ The quick brown fox jumps over the lazy dog.
 Example output:
 
 ```json
-{
-    {
-        "language": {
-            "language": "ENGLISH", "score": 0.9
-        }
+[
+  {
+    "content_type": "text/plain",
+    "source": [
+      84,
+      104,
+      ...
+      46
+    ],
+    "feature": {
+      "feature_type": "Metadata",
+      "name": "language",
+      "data": {
+        "language": "ENGLISH",
+        "score": "0.1780954573167577"
+      }
     }
-}
+  }
+]
 ```
 
 ## Usage
@@ -37,5 +49,5 @@ indexify extractor extract --text "The quick brown fox jumps over the lazy dog."
 * The container is not published yet. *
 
 ```bash
-docker run  -it yenicelik/language-extractor --text "The quick brown fox jumps over the lazy dog."
+docker run --mount type=bind,source="$HOME/.cache/huggingface/hub",target=/root/.cache/huggingface/hub yenicelik/language-extractor extractor extract --text "The quick brown fox jumps over the lazy dog."
 ```
