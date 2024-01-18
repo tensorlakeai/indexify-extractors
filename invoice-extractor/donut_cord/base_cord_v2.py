@@ -100,16 +100,16 @@ def is_pdf(data):
 
 # Testing block
 if __name__ == "__main__":
-    pdf_file_path = "/content/ex_sa_inv.pdf"  # Replace with your PDF file path
-    image_file_path = "/content/ex_sa_inv.jpg"  # Replace with your image file path
+    #pdf_file_path = "/content/ex_sa_inv.pdf"  # Replace with your PDF file path
+    image_file_path = "/content/ex_inv_th.png"  # Replace with your image file path
 
     extractor = DonutBaseV2()
 
-    with open(pdf_file_path, "rb") as file:
-        pdf_data = file.read()
-        pdf_content = Content(data=pdf_data)
-        pdf_results = extractor.extract([pdf_content], SimpleInvoiceParserInputParams())
-        print("PDF Extraction Results:", pdf_results)
+    # with open(pdf_file_path, "rb") as file:
+    #     pdf_data = file.read()
+    #     pdf_content = Content(data=pdf_data)
+    #     pdf_results = extractor.extract([pdf_content], SimpleInvoiceParserInputParams())
+    #     print("PDF Extraction Results:", pdf_results)
 
     with open(image_file_path, "rb") as file:
         image_data = file.read()
