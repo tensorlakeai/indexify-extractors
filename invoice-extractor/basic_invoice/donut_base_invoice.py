@@ -19,8 +19,8 @@ class SimpleInvoiceParserInputParams(BaseModel):
     # No input except the file itself
     ...
 
-# DonutCordV2 definition
-class DonutCordV2(Extractor):
+# SimpleInvoiceParserExtractor definition
+class SimpleInvoiceParserExtractor(Extractor):
     def __init__(self):
         super().__init__()
         self.processor = DonutProcessor.from_pretrained(
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     pdf_file_path = "/content/sa_inv_lst.pdf"  # Replace with your PDF file path
     image_file_path = "/content/ex_sa_inv.jpg"  # Replace with your image file path
 
-    extractor = DonutCordV2()
+    extractor = SimpleInvoiceParserExtractor()
 
     # Process PDF file
     with open(pdf_file_path, "rb") as file:
