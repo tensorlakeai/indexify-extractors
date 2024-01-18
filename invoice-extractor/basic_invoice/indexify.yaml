@@ -1,0 +1,16 @@
+name: tensorlake/donut_invoice
+version: 1
+description: "Parses an invoice using the to-be/donut-base-finetuned-invoices huggingface model"
+module: simple_invoice_parser:DonutCordV2
+gpu: true
+python_dependencies:
+  - transformers
+  - torch
+  - torchvision
+  - Pillow
+  - pytesseract
+  - sentencepiece
+  - pdf2image
+  - pydantic
+system_dependencies:
+  - poppler-utils
