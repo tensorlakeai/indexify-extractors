@@ -12,5 +12,6 @@ python_dependencies:
   - sentencepiece
   - pdf2image
   - pydantic
+  - protobuf
 system_dependencies:
   - poppler-utils
