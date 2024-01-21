@@ -1,13 +1,9 @@
-name: tensorlake/wikipedia_extractor
+name: mohitraghavendra/wikipedia-extractor
 version: 1
 description: "Extract text content from wikipedia html pages"
-# Rename the file and the class name if you wish to
 module: wikipedia.py:WikipediaExtractor
 gpu: false
-# Add all the python dependencies here which are required for the extractor to work
 python_dependencies:
   - beautifulsoup4
-# Add all the system dependencies here. We use a ubuntu base image, so the package names
-# should be available in ubuntu
+  - torch
 system_dependencies:
-  - 
