@@ -14,3 +14,4 @@ python_dependencies:
   - pydantic
 system_dependencies:
   - poppler-utils
+  - protobuf-compiler

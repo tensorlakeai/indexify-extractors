@@ -94,7 +94,7 @@ class SimpleInvoiceParserExtractor(Extractor):
             )
 
         return out
-
+    @classmethod
     def schemas(self) -> ExtractorSchema:
         return ExtractorSchema(features={})
 

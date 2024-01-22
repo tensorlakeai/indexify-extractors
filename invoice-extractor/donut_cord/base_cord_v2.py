@@ -90,7 +90,8 @@ class DonutBaseV2(Extractor):
             )
 
         return out
-
+    
+    @classmethod
     def schemas(self) -> ExtractorSchema:
         return ExtractorSchema(features={})
 
@@ -101,7 +102,7 @@ def is_pdf(data):
 # Testing block
 if __name__ == "__main__":
     #pdf_file_path = "/content/ex_sa_inv.pdf"  # Replace with your PDF file path
-    image_file_path = "/content/ex_inv_th.png"  # Replace with your image file path
+    image_file_path = "C:/Users/aksha/Desktop/temp_index/indexify-extractors/invoice-extractor/donut_cord/ex_inv_th.png"  # Replace with your image file path
 
     extractor = DonutBaseV2()
 
@@ -113,6 +114,6 @@ if __name__ == "__main__":
 
     with open(image_file_path, "rb") as file:
         image_data = file.read()
-        image_content = Content(data=image_data)
+        image_content = Content(data=image_data, content_type='image/png')  # Include content_type here
         image_results = extractor.extract([image_content], SimpleInvoiceParserInputParams())
         print("Image Extraction Results:", image_results)
