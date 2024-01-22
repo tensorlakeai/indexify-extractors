@@ -39,7 +39,7 @@ class ColBERTv2Base(BaseEmbeddingExtractor):
 if __name__ == "__main__":
     extractor = ColBERTv2Base()
     print(extractor.schemas())
-    # How is EmbeddingInputParams() and Content.from_text() defined in the SDK
+    # EmbeddingInputParams() and Content.from_text() defined in the SDK
     embedding_input_params = EmbeddingInputParams()
     contents = [Content.from_text(text="Hello World")]
     print(extractor.extract(contents, embedding_input_params))
