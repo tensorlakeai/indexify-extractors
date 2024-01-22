@@ -91,7 +91,8 @@ class DonutBaseV2(Extractor):
 
         return out
 
-    def schemas(self) -> ExtractorSchema:
+    @classmethod
+    def schemas(cls) -> ExtractorSchema:
         return ExtractorSchema(features={})
 
 # Function to determine if the content is a PDF

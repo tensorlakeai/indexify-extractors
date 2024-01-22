@@ -1,0 +1,34 @@
+name: Detect Extractors in the Repo
+
+on: push
+
+jobs:
+  # Don't recursively run the workflow. If the last file that was changed was just publish-extractor.yml, then don't do anything
+  check-if-job-needs-to-be-run:
+    runs-on: ubuntu-latest
+    outputs:
+      to-run-or-not-to-run: ${{ steps.should-run.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: should-run
+        run: |
+          if [[ $(git log -1 --name-only --pretty='' --first-parent -m | sed 's/\.github\/workflows\/publish-extractor\.yml//') == '' ]]; then
+            echo "should_run=no-run" >> "$GITHUB_OUTPUT";
+          else
+            echo "should_run=run" >> "$GITHUB_OUTPUT";
+          fi
+
+  detect-extractors:
+    runs-on: ubuntu-latest
+    needs: check-if-job-needs-to-be-run
+    if: needs.check-if-job-needs-to-be-run.outputs.to-run-or-not-to-run == 'run'
+    outputs:
+      extractors: ${{ steps.list-extractors.outputs.extractors }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list-extractors
+        run: echo "extractors=$(find . -type f -name indexify.yaml -exec dirname {} \; | sed 's/.\//          - /')" >> "$GITHUB_VERSION"
+      - run: sed 's/{{options}}/${{ steps.list-extractors.outputs.extractors }}/' .github/workflows/publish-extractor.template > .github/workflows/publish-extractor.yml
+      - run: git add .github/workflows/publish-extractor.template
+      - run: git commit -m "Updated extractor list for publishing"
+      - run: git push

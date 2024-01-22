@@ -1,16 +1,13 @@
-name: tensorlake/whisper-asr
+name: tensorlake/wikipedia_extractor
 version: 1
-description: "Whisper ASR extracts transcription from audio files"
+description: "Extract text content from wikipedia html pages"
 # Rename the file and the class name if you wish to
-module: whisper_extractor.py:WhisperExtractor
+module: wikipedia.py:WikipediaExtractor
 gpu: false
 # Add all the python dependencies here which are required for the extractor to work
 python_dependencies:
-  - librosa
-  - soundfile
-  - torch
-  - accelerate[cpu]
+  - beautifulsoup4
 # Add all the system dependencies here. We use a ubuntu base image, so the package names
 # should be available in ubuntu
 system_dependencies:
-  -
+  - 
