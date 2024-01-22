@@ -95,7 +95,7 @@ class SimpleInvoiceParserExtractor(Extractor):
 
         return out
     @classmethod
-    def schemas(self) -> ExtractorSchema:
+    def schemas(cls) -> ExtractorSchema:
         return ExtractorSchema(features={})
 
 # Function to determine if the content is a PDF
