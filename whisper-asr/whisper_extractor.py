@@ -26,7 +26,7 @@ class WhisperExtractor(Extractor):
         super().__init__()
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
         torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-        model_id = "openai/whisper-large-v3"
+        model_id = "distil-whisper/distil-large-v2"
         model = AutoModelForSpeechSeq2Seq.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
@@ -41,7 +41,7 @@ class WhisperExtractor(Extractor):
             tokenizer=processor.tokenizer,
             feature_extractor=processor.feature_extractor,
             max_new_tokens=128,
-            chunk_length_s=30,
+            chunk_length_s=15,
             batch_size=16,
             return_timestamps=True,
             torch_dtype=torch_dtype,
@@ -56,14 +56,12 @@ class WhisperExtractor(Extractor):
             if content.content_type not in ["audio", "audio/mpeg"]:
                 continue
             result = self._pipe(content.data)
-            feature = Feature.metadata(value=json.dumps(result), name="transcription")
-            content = Content(
-                content_type="text/plain", data=bytes("", "utf-8"), feature=feature
-            )
-            out.append([content])
+            text = result['text']
+            out.append([Content(content_type="text/plain", data=bytes(text, "utf-8"))])
         return out
 
-    def schemas(self) -> ExtractorSchema:
+    @classmethod
+    def schemas(cls) -> ExtractorSchema:
         """
         Returns a list of options for indexing.
         """

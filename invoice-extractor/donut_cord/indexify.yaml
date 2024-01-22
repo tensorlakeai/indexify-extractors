@@ -2,7 +2,7 @@ name: tensorlake/donut_cord
 version: 1
 description: "Parses an invoice using the naver-clova-ix/donut-base-finetuned-cord-v2 huggingface model"
 module: base_cord_v2.py:DonutBaseV2
-gpu: True
+gpu: false
 python_dependencies:
   - transformers
   - torch
