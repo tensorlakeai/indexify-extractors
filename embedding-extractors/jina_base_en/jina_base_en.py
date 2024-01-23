@@ -1,9 +1,5 @@
 from typing import List
-from indexify_extractor_sdk import (
-    ExtractorSchema,
-    EmbeddingSchema,
-    Content,
-)
+from indexify_extractor_sdk import Content
 from indexify_extractor_sdk.base_embedding import (
     BaseEmbeddingExtractor,
     EmbeddingInputParams,
@@ -17,14 +13,6 @@ class JinaEmbeddingsBase(BaseEmbeddingExtractor):
 
     def extract_embeddings(self, texts: List[str]) -> List[List[float]]:
         return self._model.encode(texts).tolist()
-
-    @classmethod
-    def schemas(cls) -> ExtractorSchema:
-        return ExtractorSchema(
-            features={
-                "embedding": EmbeddingSchema(distance_metric="cosine", dim=2048)
-            },
-        )
 
 
 if __name__ == "__main__":

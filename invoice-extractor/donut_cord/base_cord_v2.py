@@ -9,7 +9,6 @@ from transformers import DonutProcessor, VisionEncoderDecoderModel
 from indexify_extractor_sdk import (
     Extractor,
     Feature,
-    ExtractorSchema,
     Content,
 )
 
@@ -21,6 +20,8 @@ class SimpleInvoiceParserInputParams(BaseModel):
 
 # DonutBaseV2 definition
 class DonutBaseV2(Extractor):
+    input_mimes = ["application/pdf", "image/jpeg", "image/png"]
+
     def __init__(self):
         super().__init__()
         self.processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base-finetuned-cord-v2")
@@ -67,33 +68,24 @@ class DonutBaseV2(Extractor):
         return self.processor.token2json(sequence), image
 
     def extract(
-        self, content: List[Content], params: SimpleInvoiceParserInputParams
-    ) -> List[List[Content]]:
-        out = []
+        self, content: Content, params: SimpleInvoiceParserInputParams
+    ) -> List[Content]:
+        if is_pdf(content.data):
+            image = self._convert_pdf_to_image(content.data)
+        else:
+            image = self._convert_image_data_to_image(content.data)
 
-        for c in content:
-            if is_pdf(c.data):
-                image = self._convert_pdf_to_image(c.data)
-            else:
-                image = self._convert_image_data_to_image(c.data)
-
-            data = self._process_document(image)[0]
-            out.append(
-                [
-                    Content.from_text(
-                        text="",
-                        feature=Feature.metadata(
-                            value=data, name="invoice_simple_donut"
-                        ),
-                    )
-                ]
-            )
+        data = self._process_document(image)[0]
+        return [
+                Content.from_text(
+                    text="",
+                    feature=Feature.metadata(
+                        value=data, name="invoice_simple_donut"
+                    ),
+                )
+            ]
 
         return out
-
-    @classmethod
-    def schemas(cls) -> ExtractorSchema:
-        return ExtractorSchema(features={})
 
 # Function to determine if the content is a PDF
 def is_pdf(data):
