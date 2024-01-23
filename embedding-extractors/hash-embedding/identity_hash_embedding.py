@@ -25,16 +25,6 @@ class IdentityHashEmbedding(BaseEmbeddingExtractor):
     def extract_embeddings(self, texts: List[str]) -> List[List[float]]:
         return [self._embed(text) for text in texts]
 
-    def extract_query_embeddings(self, query: str) -> List[float]:
-        return self._embed(query)
-
-    def schemas(self) -> ExtractorSchema:
-        return ExtractorSchema(
-            features={
-                "embedding": EmbeddingSchema(distance_metric="cosine", dim=32)
-            },
-        )
-
     def _embed(self, text) -> List[float]:
         model = hashlib.sha256()
         model.update(bytes(text, "utf-8"))

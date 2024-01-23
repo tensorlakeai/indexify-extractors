@@ -1,9 +1,5 @@
 from typing import List
-from indexify_extractor_sdk import (
-    ExtractorSchema,
-    EmbeddingSchema,
-    Content,
-)
+from indexify_extractor_sdk import Content
 from indexify_extractor_sdk.base_embedding import (
     BaseEmbeddingExtractor,
     EmbeddingInputParams,
@@ -29,14 +25,6 @@ class E5SmallEmbeddings(BaseEmbeddingExtractor):
     def _average_pool(self, last_hidden_states: Tensor, attention_mask: Tensor) -> Tensor:
         last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
         return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
-
-    @classmethod
-    def schemas(cls) -> ExtractorSchema:
-        return ExtractorSchema(
-            features={
-                "embedding": EmbeddingSchema(distance_metric="cosine", dim=384)
-            },
-        )
 
 if __name__ == "__main__":
     extractor = E5SmallEmbeddings()

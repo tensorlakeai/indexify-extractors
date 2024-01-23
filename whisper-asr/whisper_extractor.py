@@ -5,9 +5,6 @@ from typing import List
 from indexify_extractor_sdk import (
     Extractor,
     Content,
-    Feature,
-    EmbeddingSchema,
-    ExtractorSchema,
 )
 
 import json
@@ -22,6 +19,7 @@ class InputParams(BaseModel):
 
 
 class WhisperExtractor(Extractor):
+    input_mimes = ["audio", "audio/mpeg"]
     def __init__(self):
         super().__init__()
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -49,26 +47,18 @@ class WhisperExtractor(Extractor):
         )
 
     def extract(
-        self, content_list: List[Content], params: InputParams
-    ) -> List[List[Content]]:
-        out: List[List[Content]] = []
-        for content in content_list:
-            if content.content_type not in ["audio", "audio/mpeg"]:
-                continue
-            result = self._pipe(content.data)
-            text = result['text']
-            out.append([Content(content_type="text/plain", data=bytes(text, "utf-8"))])
-        return out
+        self, content: Content, params: InputParams) -> List[Content]:
+        result = self._pipe(content.data)
+        text = result['text']
+        return [Content.from_text(text)]
 
-    @classmethod
-    def schemas(cls) -> ExtractorSchema:
-        """
-        Returns a list of options for indexing.
-        """
-        return ExtractorSchema(
-            features={},
-        )
-
+    def sample_input(self) -> Content:
+        import os
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, "SDS_746.mp3")
+        with open(filename, "rb") as f:
+            data = f.read()
+        return Content(content_type="audio/mpeg", data=data)
 
 if __name__ == "__main__":
     extractor = WhisperExtractor()
