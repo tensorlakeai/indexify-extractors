@@ -1,4 +1,4 @@
-name: tensorlake/wikipedia_extractor
+name: mohitraghavendra/wikipedia-extractor
 version: 1
 description: "Extract text content from wikipedia html pages"
 # Rename the file and the class name if you wish to
