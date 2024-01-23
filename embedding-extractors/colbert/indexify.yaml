@@ -1,6 +1,6 @@
 name: tensorlake/colbert
 version: 1
-description: "This ColBERTv2-based extractor is a Python class that encapsulates the functionality to convert text inputs into vector embeddings using the ColBERTv2 model. It leverages ColBERTv2's transformer-based architecture to generate context-aware embeddings suitable for various natural language processing tasks."
+description: "This ColBERTv2-based extractor converts text inputs into vector embeddings using the ColBERTv2 model. It leverages ColBERTv2's transformer-based architecture to generate context-aware embeddings suitable for various natural language processing tasks."
 # Rename the file and the class name if you wish to
 module: colbertv2.py:ColBERTv2Base
 gpu: false
