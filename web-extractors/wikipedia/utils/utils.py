@@ -24,12 +24,8 @@ def parse_html_files(path: str) -> List[Content]:
     for filename in os.listdir(path):
         file_path = os.path.join(path, filename)
         if file_path.endswith(".html"):
-            labels = {"url": filename}
             with open(file_path, "r") as f:
-                document = Content.from_text(
-                    text=f.read(),
-                    labels=labels,
-                )
+                document = Content.from_text(text=f.read())
                 html_content.append(document)
 
     return html_content

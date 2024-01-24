@@ -1,14 +1,8 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
 from typing import List
-
+from indexify_extractor_sdk.base_extractor import Content, Extractor
 from pydantic import BaseModel
-
-from indexify_extractor_sdk import (
-    Content,
-    Extractor,
-    ExtractorSchema,
-)
 
 
 HTML_PARSER = "html.parser"
@@ -25,56 +19,42 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, html_content: List[Content]) -> List[List[Content]]:
+    def extract(self, content: Content) -> List[Content]:
 
-        data = []
-        for doc in html_content:
-            soup = BeautifulSoup(doc.data, HTML_PARSER)
-            page_content = soup.find("div", {"id": WIKIPEDIA_CONTENT_DIV_ID})
-            doc_labels = doc.labels
-            if page_content:
-                headlines = page_content.find_all(HEADLINE_TAG)
-                if headlines:
-                    sections = []
-                    for headline in headlines:
-                        p_tags = headline.find_all_next(TEXT_TAG)
-                        associated_content = [p_tag.text for p_tag in p_tags]
-                        content_text = " ".join(associated_content)
-                        if doc_labels:
-                            doc_labels["headline"] = headline.text
-                        sections.append(
-                            Content.from_text(content_text, labels=doc_labels)
-                        )
+        soup = BeautifulSoup(content.data, HTML_PARSER)
+        page_content = soup.find("div", {"id": WIKIPEDIA_CONTENT_DIV_ID})
 
-                data.append(sections)
+        if not page_content:
+            return []
 
-            else:
-                data.append([])
+        doc_labels = content.labels if content.labels else {}
+        sections = []
+        headlines = page_content.find_all(HEADLINE_TAG)
+        if headlines:
+            for headline in headlines:
+                p_tags = headline.find_all_next(TEXT_TAG)
+                associated_content = [p_tag.text for p_tag in p_tags]
+                content_text = " ".join(associated_content)
+                doc_labels["headline"] = headline.text
+                sections.append(Content.from_text(content_text, labels=doc_labels))
 
-        return data
+        return sections
 
-    @classmethod
-    def schemas(cls) -> ExtractorSchema:
-        ...
+    def sample_input(self) -> Content:
+        file_name = "Stephen_Curry.html"
+        path = str(Path(__file__).parent) + "/utils/" + file_name
+        with open(path, "r") as f:
+            data = f.read()
+
+        content = Content.from_text(text=data, labels={"filename": file_name})
+
+        return content
 
 
 if __name__ == "__main__":
-    from utils.utils import parse_html_files, save_html_pages
 
-    path = str(Path(__file__).parent) + "/utils/html_pages"
-
-    urls = [
-        "https://en.wikipedia.org/wiki/Stephen_Curry",
-        "https://en.wikipedia.org/wiki/Draymond_Green",
-        "https://en.wikipedia.org/wiki/Klay_Thompson",
-        "https://en.wikipedia.org/wiki/Andre_Iguodala",
-        "https://en.wikipedia.org/wiki/Andrew_Wiggins",
-    ]
-
-    save_html_pages(urls, path)
-    html_files = parse_html_files(path)
+    content = WikipediaExtractor().sample_input()
 
     extractor = WikipediaExtractor()
-    result = extractor.extract(html_files)
+    result = extractor.extract(content)
     print(result)
-    print(extractor.schemas())
