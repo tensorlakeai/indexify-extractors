@@ -16,6 +16,11 @@ class InputParams(BaseModel):
 
 
 class WikipediaExtractor(Extractor):
+    name = "mohitraghavendra/wikipedia-extractor"
+    description = "Extract text content from wikipedia html pages"
+    python_dependencies = ["beautifulsoup4"]
+    system_dependencies = []
+
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
@@ -52,9 +57,4 @@ class WikipediaExtractor(Extractor):
 
 
 if __name__ == "__main__":
-
-    content = WikipediaExtractor().sample_input()
-
-    extractor = WikipediaExtractor()
-    result = extractor.extract(content)
-    print(result)
+    WikipediaExtractor().run_sample_input()

@@ -7,6 +7,11 @@ from indexify_extractor_sdk.base_embedding import (
 from transformers import AutoModel
 
 class JinaEmbeddingsBase(BaseEmbeddingExtractor):
+    name = "tensorlake/jina-embeddings-base-en"
+    description = "Jina AI Base Embedding Model. HF Link - https://huggingface.co/jinaai/jina-embeddings-v2-base-en"
+    python_dependencies = ["torch", "transformers"]
+    system_dependencies = []
+
     def __init__(self):
         super(JinaEmbeddingsBase, self).__init__(max_context_length=512)
         self._model = AutoModel.from_pretrained('jinaai/jina-embeddings-v2-base-en', trust_remote_code=True)
@@ -16,6 +21,4 @@ class JinaEmbeddingsBase(BaseEmbeddingExtractor):
 
 
 if __name__ == "__main__":
-    extractor = JinaEmbeddingsBase()
-    print(extractor.schemas())
-    print(extractor.extract([Content.from_text(text="Hello World")], EmbeddingInputParams()))
+    JinaEmbeddingsBase().run_sample_input()

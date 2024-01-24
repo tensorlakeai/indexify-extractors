@@ -9,6 +9,11 @@ import torch.nn.functional as F
 from torch import Tensor
 
 class E5SmallEmbeddings(BaseEmbeddingExtractor):
+    name = "tensorlake/E5_Small_Embedding"
+    description = "E5 Small V2 model. HF Link - https://huggingface.co/intfloat/e5-small-v2"
+    python_dependencies = ["torch", "transformers"]
+    system_dependencies = []
+
     def __init__(self):
         super(E5SmallEmbeddings, self).__init__(max_context_length=512)
         self._tokenizer = AutoTokenizer.from_pretrained('intfloat/e5-small-v2')
@@ -27,6 +32,4 @@ class E5SmallEmbeddings(BaseEmbeddingExtractor):
         return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 if __name__ == "__main__":
-    extractor = E5SmallEmbeddings()
-    print(extractor.schemas())
-    print(extractor.extract([Content.from_text(text="Hello World")], EmbeddingInputParams()))
+    E5SmallEmbeddings().run_sample_input()
