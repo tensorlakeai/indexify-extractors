@@ -24,7 +24,7 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, content: Content) -> List[Content]:
+    def extract(self, content: Content, params: InputParams) -> List[Content]:
 
         soup = BeautifulSoup(content.data, HTML_PARSER)
         page_content = soup.find("div", {"id": WIKIPEDIA_CONTENT_DIV_ID})
