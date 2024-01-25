@@ -50,7 +50,7 @@ class WikipediaExtractor(Extractor):
         with open(path, "r") as f:
             data = f.read()
 
-        return Content(data=data, labels={"filename": file_name})
+        return Content(data=data, content_type="text/html", labels={"filename": file_name})
 
 
 if __name__ == "__main__":
