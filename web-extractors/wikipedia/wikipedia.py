@@ -25,7 +25,6 @@ class WikipediaExtractor(Extractor):
         super(WikipediaExtractor, self).__init__()
 
     def extract(self, content: Content, params: InputParams) -> List[Content]:
-
         soup = BeautifulSoup(content.data, HTML_PARSER)
         page_content = soup.find("div", {"id": WIKIPEDIA_CONTENT_DIV_ID})
 
@@ -51,9 +50,7 @@ class WikipediaExtractor(Extractor):
         with open(path, "r") as f:
             data = f.read()
 
-        content = Content.from_text(text=data, labels={"filename": file_name})
-
-        return content
+        return Content(data=data, labels={"filename": file_name})
 
 
 if __name__ == "__main__":
