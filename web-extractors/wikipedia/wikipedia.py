@@ -45,13 +45,14 @@ class WikipediaExtractor(Extractor):
         return sections
 
     def sample_input(self) -> Content:
-        file_name = "Stephen_Curry.html"
-        path = str(Path(__file__).parent) + "/utils/" + file_name
-        with open(path, "r") as f:
+        import os
+        dirname = os.path.dirname(__file__)
+        file_name = os.path.join(dirname, "utils/Stephen_Curry.html")
+        with open(file_name, "rb") as f:
             data = f.read()
 
         return Content(data=data, content_type="text/html", labels={"filename": file_name})
 
 
 if __name__ == "__main__":
-    WikipediaExtractor().run_sample_input()
+    WikipediaExtractor().extract_sample_input()
