@@ -18,6 +18,7 @@ class InputParams(BaseModel):
 class WikipediaExtractor(Extractor):
     name = "mohitraghavendra/wikipedia-extractor"
     description = "Extract text content from wikipedia html pages"
+    input_mimes = ["text/html", "text/plain"]
     python_dependencies = ["beautifulsoup4"]
     system_dependencies = []
 
