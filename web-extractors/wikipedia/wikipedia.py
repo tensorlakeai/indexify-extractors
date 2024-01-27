@@ -1,7 +1,8 @@
+import json
+
 from bs4 import BeautifulSoup
-from pathlib import Path
 from typing import List
-from indexify_extractor_sdk.base_extractor import Content, Extractor
+from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
 from pydantic import BaseModel
 
 
@@ -25,15 +26,38 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, content: Content, params: InputParams) -> List[Content]:
+    def extract_infobox(self, content: str) -> dict:
+        soup = BeautifulSoup(content.data, HTML_PARSER)
+        infobox = soup.find("table", {"class": "infobox vcard"})
+        if not infobox:
+            return {}
+
+        infobox_dict = {}
+        rows = infobox.find_all("tr")
+        for row in rows:
+            header = row.find("th")
+            if not header:
+                continue
+
+            key = header.text.strip()
+            value = row.find("td")
+            if not value:
+                continue
+
+            value = value.text.strip()
+            infobox_dict[key] = value
+
+        return infobox_dict
+
+    def extract_sections(self, content: str) -> list[Content]:
+        sections = []
         soup = BeautifulSoup(content.data, HTML_PARSER)
         page_content = soup.find("div", {"id": WIKIPEDIA_CONTENT_DIV_ID})
 
         if not page_content:
-            return []
+            return sections
 
         doc_labels = content.labels if content.labels else {}
-        sections = []
         headlines = page_content.find_all(HEADLINE_TAG)
         if headlines:
             for headline in headlines:
@@ -45,6 +69,25 @@ class WikipediaExtractor(Extractor):
 
         return sections
 
+    def extract(self, content: Content, params: InputParams) -> List[Content]:
+
+        contents = []
+
+        infobox_dict = self.extract_infobox(content)
+
+        if infobox_dict:
+            feature = Feature.metadata(json.dumps(infobox_dict), name="infobox")
+
+            infobox_content = Content.from_text(
+                text="", feature=feature, labels=content.labels
+            )
+            contents.append(infobox_content)
+
+        sections = self.extract_sections(content)
+        contents.extend(sections)
+
+        return contents
+
     def sample_input(self) -> Content:
         import os
         dirname = os.path.dirname(__file__)
@@ -52,8 +95,13 @@ class WikipediaExtractor(Extractor):
         with open(file_name, "rb") as f:
             data = f.read()
 
-        return Content(data=data, content_type="text/html", labels={"filename": file_name})
+        return Content(
+            data=data, content_type="text/html", labels={"filename": file_name}
+        )
+
+    def run_sample_input(self) -> List[Content]:
+        return self.extract(self.sample_input(), InputParams())
 
 
 if __name__ == "__main__":
-    WikipediaExtractor().extract_sample_input()
+    WikipediaExtractor().run_sample_input()
