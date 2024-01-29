@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import json
 import os
+import re
 
 from typing import List
 
@@ -111,7 +112,9 @@ def extract_infobox(content: Content) -> dict:
         if not value:
             continue
 
-        value = value.text.strip()
+        value = value.text.encode("ascii", "ignore").decode().strip()
+        value = re.sub(r"[\t]+", " ", value)
+        value = re.sub(r"[\n]+", " ", value)
         infobox_dict[key] = value
 
     return infobox_dict
