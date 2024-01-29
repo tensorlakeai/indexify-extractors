@@ -19,6 +19,10 @@ class InputParams(BaseModel):
 
 
 class WhisperExtractor(Extractor):
+    name = "tensorlake/whisper-asr"
+    description = "Whisper ASR"
+    python_dependencies = ["torch", "transformers", "librosa", "soundfile", "torch", "accelerate[cpu]"]
+    system_dependencies = ["ffmpeg"]
     input_mimes = ["audio", "audio/mpeg"]
     def __init__(self):
         super().__init__()
