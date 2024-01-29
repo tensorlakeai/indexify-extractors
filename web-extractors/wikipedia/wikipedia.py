@@ -12,7 +12,7 @@ class InputParams(BaseModel):
 
 
 class WikipediaExtractor(Extractor):
-    name = "mohitraghavendra/wikipedia-extractor"
+    name = "tensorlake/wikipedia"
     description = "Extract text content from wikipedia html pages"
     input_mime_types = ["text/html", "text/plain"]
     python_dependencies = ["beautifulsoup4"]
