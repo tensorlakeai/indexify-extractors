@@ -1,6 +1,6 @@
 import json
 
-from utils.utils import extract_images, extract_infobox, extract_sections
+from utils.utils import extract_images, extract_infobox, extract_sections, extract_title
 
 from typing import List
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
@@ -23,12 +23,13 @@ class WikipediaExtractor(Extractor):
 
     def extract(self, content: Content, params: InputParams) -> List[Content]:
 
-        contents = []
-
+        contents: List[Content] = []
+        title = extract_title(content)
         infobox_dict = extract_infobox(content)
+        doc_features = json.loads(content.feature.value) if content.feature else {}
 
         if infobox_dict:
-            feature = Feature.metadata(json.dumps(infobox_dict), name="infobox")
+            feature = Feature.metadata(infobox_dict, name="infobox")
 
             infobox_content = Content.from_text(
                 text="", feature=feature, labels=content.labels
@@ -41,18 +42,29 @@ class WikipediaExtractor(Extractor):
         contents.extend(sections)
         contents.extend(images)
 
+        for content_piece in contents:
+            feature = (
+                json.loads(content_piece.feature.value) if content_piece.feature else {}
+            )
+            feature["title"] = title
+            feature = {**feature, **doc_features}
+            content_piece.feature = Feature.metadata(feature)
         return contents
 
     def sample_input(self) -> Content:
         import os
 
         dirname = os.path.dirname(__file__)
-        file_name = os.path.join(dirname, "utils/Stephen_Curry.html")
-        with open(file_name, "rb") as f:
+        file_name = "Stephen_Curry.html"
+        file_path = os.path.join(dirname, "utils/", file_name)
+
+        with open(file_path, "rb") as f:
             data = f.read()
 
         return Content(
-            data=data, content_type="text/html", labels={"filename": file_name}
+            data=data,
+            content_type="text/html",
+            feature=Feature.metadata({"filename": file_name}),
         )
 
     def run_sample_input(self) -> List[Content]:

@@ -17,7 +17,11 @@ WIKIPEDIA_CONTENT_DIV_ID = "mw-content-text"
 HTTPS_PREFIX = "https:"
 
 HEADLINE_TAG = "h2"
+TITLE_TAG = "h1"
+TITLE_ID = "firstHeading"
 FIGURE_TAG = "figure"
+INFOBOX_CLASS = "infobox vcard"
+TABLE_TAG = "table"
 FIGURE_CAPTION_TAG = "figcaption"
 IMAGE_TAG = "img"
 IMAGE_URL_ATTR = "src"
@@ -72,7 +76,7 @@ async def get_image_content(session, url, caption):
             content_type = response.content_type
             data = await response.read()
 
-            feature = Feature.metadata(json.dumps({"caption": caption}), name="image")
+            feature = Feature.metadata({"caption": caption}, name="image")
 
             return Content(content_type=content_type, data=data, feature=feature)
 
@@ -96,7 +100,7 @@ def extract_images(content: Content):
 
 def extract_infobox(content: Content) -> dict:
     soup = BeautifulSoup(content.data, HTML_PARSER)
-    infobox = soup.find("table", {"class": "infobox vcard"})
+    infobox = soup.find(TABLE_TAG, {"class": INFOBOX_CLASS})
     if not infobox:
         return {}
 
@@ -139,3 +143,12 @@ def extract_sections(content: Content) -> list[Content]:
             sections.append(Content.from_text(content_text, labels=doc_labels))
 
     return sections
+
+
+def extract_title(content: Content) -> str:
+    soup = BeautifulSoup(content.data, HTML_PARSER)
+    title = soup.find(TITLE_TAG, {"id": TITLE_ID})
+    if not title:
+        return ""
+
+    return title.text
