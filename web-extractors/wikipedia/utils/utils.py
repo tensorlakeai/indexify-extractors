@@ -78,7 +78,7 @@ async def get_image_content(session, url, caption):
 
             feature = Feature.metadata({"caption": caption}, name="image")
 
-            return Content(content_type=content_type, data=data, feature=feature)
+            return Content(content_type=content_type, data=data, features=[feature])
 
 
 async def get_all_images(image_urls) -> List[Content]:
@@ -133,14 +133,15 @@ def extract_sections(content: Content) -> list[Content]:
         return sections
 
     doc_labels = content.labels if content.labels else {}
+    features = content.features if content.features else []
     headlines = page_content.find_all(HEADLINE_TAG)
     if headlines:
         for headline in headlines:
             p_tags = headline.find_all_next(TEXT_TAG)
             associated_content = [p_tag.text for p_tag in p_tags]
             content_text = " ".join(associated_content)
-            doc_labels["headline"] = headline.text
-            sections.append(Content.from_text(content_text, labels=doc_labels))
+            features.append(Feature.metadata(value={"headline": headline.text}))
+            sections.append(Content.from_text(content_text, features=features, labels=doc_labels))
 
     return sections
 

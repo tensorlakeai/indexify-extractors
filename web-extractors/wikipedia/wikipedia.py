@@ -22,17 +22,15 @@ class WikipediaExtractor(Extractor):
         super(WikipediaExtractor, self).__init__()
 
     def extract(self, content: Content, params: InputParams) -> List[Content]:
-
         contents: List[Content] = []
         title = extract_title(content)
         infobox_dict = extract_infobox(content)
-        doc_features = json.loads(content.feature.value) if content.feature else {}
 
         if infobox_dict:
             feature = Feature.metadata(infobox_dict, name="infobox")
 
             infobox_content = Content.from_text(
-                text="", feature=feature, labels=content.labels
+                text="", features=[feature], labels=content.labels
             )
             contents.append(infobox_content)
 
@@ -43,12 +41,12 @@ class WikipediaExtractor(Extractor):
         contents.extend(images)
 
         for content_piece in contents:
-            feature = (
-                json.loads(content_piece.feature.value) if content_piece.feature else {}
-            )
-            feature["title"] = title
-            feature = {**feature, **doc_features}
-            content_piece.feature = Feature.metadata(feature)
+            for (i, feature) in enumerate(content_piece.features):
+                feature = (
+                    json.loads(feature.value) if feature else {}
+                )
+                feature["title"] = title
+                content_piece.features[i] = Feature.metadata(feature)
         return contents
 
     def sample_input(self) -> Content:
@@ -67,9 +65,6 @@ class WikipediaExtractor(Extractor):
             feature=Feature.metadata({"filename": file_name}),
         )
 
-    def run_sample_input(self) -> List[Content]:
-        return self.extract(self.sample_input(), InputParams())
-
-
 if __name__ == "__main__":
-    WikipediaExtractor().run_sample_input()
+    contents = WikipediaExtractor().extract_sample_input()
+    print(len(contents))
