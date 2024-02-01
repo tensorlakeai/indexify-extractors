@@ -1,10 +1,9 @@
+import json
 import unittest
 
-from pathlib import Path
-from typing import List, Type
+from typing import List
 
-from indexify_extractor_sdk.base_extractor import Content, Extractor
-from parameterized import parameterized
+from indexify_extractor_sdk.base_extractor import Content, Feature
 from wikipedia import WikipediaExtractor
 
 
@@ -14,20 +13,34 @@ class TestWikipediaExtractor(unittest.TestCase):
         self.html_content = self._get_html_content()
 
     def _get_html_content(self) -> List[Content]:
+        import os
+
+        dirname = os.path.dirname(__file__)
         file_name = "Stephen_Curry.html"
-        path = str(Path(__file__).parent) + "/utils/" + file_name
-        with open(path, "r") as f:
+        file_path = os.path.join(dirname, "utils/", file_name)
+
+        with open(file_path, "rb") as f:
             data = f.read()
 
-        content = Content.from_text(text=data, labels={"filename": file_name})
+        return Content(
+            data=data, 
+            content_type="text/html",
+            feature=Feature.metadata({"filename": file_name}),
+        )
 
-        return content
+    def test_wikipedia_extraction(self):
+        extracted_content = WikipediaExtractor().run_sample_input()
+        extracted_features = json.loads(extracted_content[0].feature.value)
 
-    @parameterized.expand([WikipediaExtractor()])
-    def test_wikipedia_extraction(self, wikipedia_extractor: Type[Extractor]):
-        extracted_content = wikipedia_extractor.extract(self.html_content)
-        self.assertIsNotNone(extracted_content[0])
-        self.assertIsNotNone(extracted_content[0].labels)
+        self.assertIsNotNone(extracted_content[0], "No content extracted")
+
+        self.assertEqual(extracted_features["filename"],
+                         "Stephen_Curry.html",
+                         "Filename not correctly extracted")
+
+        self.assertEqual(extracted_features["title"],
+                         "Stephen Curry",
+                         "Title not correctly extracted")
 
 
 if __name__ == '__main__':
