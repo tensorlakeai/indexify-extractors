@@ -1,22 +1,20 @@
-from pydantic import BaseModel
-
 from typing import List
 
 from indexify_extractor_sdk import (
     Extractor,
     Content,
 )
-
-import json
-
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 
 
-class InputParams(BaseModel):
+@dataclass_json
+@dataclass
+class InputParams:
     chunk_length: int = 30
     max_new_tokens: int = 128
-
 
 class WhisperExtractor(Extractor):
     name = "tensorlake/whisper-asr"

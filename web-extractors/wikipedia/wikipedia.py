@@ -4,11 +4,8 @@ from utils.utils import extract_images, extract_infobox, extract_sections, extra
 
 from typing import List
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
-from pydantic import BaseModel
-
-
-class InputParams(BaseModel): ...
-
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 
 class WikipediaExtractor(Extractor):
     name = "tensorlake/wikipedia"
@@ -20,7 +17,7 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, content: Content) -> List[Content]:
+    def extract(self, content: Content, params: None) -> List[Content]:
         contents: List[Content] = [content]
         title = extract_title(content)
         infobox_dict = extract_infobox(content)
@@ -55,10 +52,14 @@ class WikipediaExtractor(Extractor):
         return Content(
             data=data,
             content_type="text/html",
-            feature=Feature.metadata({"filename": file_name}),
+            features=[Feature.metadata({"filename": file_name})],
         )
 
 
 if __name__ == "__main__":
     contents = WikipediaExtractor().extract_sample_input()
     print(len(contents))
+    for content in contents:
+        print(len(content.features))
+        for feature in content.features:
+            print(feature.value)
