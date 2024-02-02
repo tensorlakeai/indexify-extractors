@@ -133,15 +133,20 @@ def extract_sections(content: Content) -> list[Content]:
         return sections
 
     doc_labels = content.labels if content.labels else {}
-    features = content.features if content.features else []
     headlines = page_content.find_all(HEADLINE_TAG)
     if headlines:
         for headline in headlines:
+            features = content.features.copy() if content.features else []
             p_tags = headline.find_all_next(TEXT_TAG)
             associated_content = [p_tag.text for p_tag in p_tags]
             content_text = " ".join(associated_content)
+            content_text = content_text.encode("ascii", "ignore").decode().strip()
+            content_text = re.sub(r"[\t]+", " ", content_text)
+            content_text = re.sub(r"[\n]+", " ", content_text)
             features.append(Feature.metadata(value={"headline": headline.text}))
-            sections.append(Content.from_text(content_text, features=features, labels=doc_labels))
+            sections.append(
+                Content.from_text(content_text, features=features, labels=doc_labels)
+            )
 
     return sections
 
