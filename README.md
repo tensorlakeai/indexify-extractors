@@ -2,12 +2,13 @@
 
 Indexify Extractor SDK is for developing new extractors to extract information from any unstructured data sources.
 
-We already have a few extractors here - https://github.com/tensorlakeai/indexify If you don't find one that works for your use-case use this extractor to build one. 
+We already have a few extractors here - https://github.com/tensorlakeai/indexify If you don't find one that works for your use-case use this SDK to build one. 
 
 ## Install the SDK
 Install the SDK from PyPi
 ```
 virtualenv ve
+source ve/bin/activate
 pip install indexify-extractor-sdk
 ```
 
