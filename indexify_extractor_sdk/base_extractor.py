@@ -104,25 +104,18 @@ class Extractor(ABC):
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
-        self._module = import_module(module_name)
-        self._cls = getattr(self._module, class_name)
-        self._param_cls = get_type_hints(self._cls.extract).get("params", None)
-        self._instance: Extractor = self._cls()
+        module = import_module(module_name)
+        cls = getattr(module, class_name)
+        self._instance: Extractor = cls()
+        self._param_cls = get_type_hints(cls.extract).get("params", None)
 
-    def extract(self, content: List[Content], params: Json) -> List[List[Content]]:
+    def extract(self, content: Content, params: Json) -> List[Content]:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
         param_instance = (
             self._param_cls.model_validate(params_dict) if self._param_cls else None
         )
-
-        out = []
-        for c in content:
-            extracted_data = self._instance.extract(
-                Content(content_type=c.content_type, data=bytes(c.data)), param_instance
-            )
-            out.append(extracted_data)
-        return out
+        return self._instance.extract(content, param_instance)
 
     def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
         s_input = self._instance.sample_input()

@@ -3,13 +3,10 @@ from .base_extractor import Extractor, Content, Feature
 from typing import List
 
 import json
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from pydantic import BaseModel
 
 
-@dataclass_json
-@dataclass
-class InputParams:
+class InputParams(BaseModel):
     a: int = 0
     b: str = ""
 

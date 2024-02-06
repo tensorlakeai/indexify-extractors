@@ -13,6 +13,7 @@ import json
 from .content_downloader import download_content
 from pydantic import BaseModel
 from concurrent.futures import ProcessPoolExecutor
+from .extractor_worker import ExtractorWorker
 
 typer_app = typer.Typer()
 
@@ -38,6 +39,7 @@ class ExtractorAgent:
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(channel)
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
         self._executor_wrapper = extractor_wrapper
+        self._extractor_worker = ExtractorWorker(extractor_wrapper, 4)
 
     async def ticker(self):
         while True:
@@ -58,21 +60,9 @@ class ExtractorAgent:
         except Exception as e:
             print(f"failed to download content{e} for task {task.id}")
             return
-        tasks = []
-        with ProcessPoolExecutor as executor:
-            params = json.loads(task.input_params)
-            tasks.append(
-                asyncio.get_event_loop().run_in_executor(
-                    executor, self._executor_wrapper.extract, content, params
-                )
-            )
-
-        for done in asyncio.as_completed(tasks):
-            try:
-                result: List[Content] = await done
-                task_outcome = coordinator_service_pb2.SUCCESS
-            except Exception as e:
-                print(f"failed to complete task {task.id} {e}")
+        input_params = json.loads(task.input_params)
+        out: List[Content] = await self._extractor_worker.extract(content, input_params)
+        print(f"completed task {task.id} {out}")
 
     async def run(self):
         while True:
