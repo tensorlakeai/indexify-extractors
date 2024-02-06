@@ -7,5 +7,5 @@ __all__ = [
     "EmbeddingSchema",
     "Extractor",
     "Feature",
-    "SentenceTransformersEmbedding"
+    "SentenceTransformersEmbedding",
 ]

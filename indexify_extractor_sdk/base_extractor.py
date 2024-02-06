@@ -4,11 +4,13 @@ import json
 from importlib import import_module
 from typing import get_type_hints
 
-from pydantic import BaseModel,Json
+from pydantic import BaseModel, Json
+
 
 class EmbeddingSchema(BaseModel):
     dim: int
     distance: str
+
 
 class Embedding(BaseModel):
     values: List[float]
@@ -42,6 +44,7 @@ class Feature(BaseModel):
     @classmethod
     def metadata(cls, value: Json, name: str = "metadata"):
         return cls(feature_type="metadata", name=name, value=json.dumps(value))
+
 
 class Content(BaseModel):
     content_type: Optional[str]
@@ -84,7 +87,8 @@ class Extractor(ABC):
 
     @abstractmethod
     def extract(
-        self, content: Content, params: Type[BaseModel] = None) -> List[Content]:
+        self, content: Content, params: Type[BaseModel] = None
+    ) -> List[Content]:
         """
         Extracts information from the content.
         """
@@ -105,10 +109,12 @@ class ExtractorWrapper:
         self._param_cls = get_type_hints(self._cls.extract).get("params", None)
         self._instance: Extractor = self._cls()
 
-    def extract(self, content: List[Content], params:  Json) -> List[List[Content]]:
+    def extract(self, content: List[Content], params: Json) -> List[List[Content]]:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
-        param_instance = self._param_cls.model_validate(params_dict) if self._param_cls else None
+        param_instance = (
+            self._param_cls.model_validate(params_dict) if self._param_cls else None
+        )
 
         out = []
         for c in content:

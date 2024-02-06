@@ -9,6 +9,7 @@ from indexify_extractor_sdk.base_extractor import (
     Feature,
 )
 
+
 class EmbeddingInputParams(BaseModel):
     overlap: int = 0
     chunk_size: int = 100
@@ -53,8 +54,7 @@ class BaseEmbeddingExtractor(Extractor):
             ).split_text
 
     @abstractmethod
-    def extract_embeddings(self, texts: List[str]) -> List[List[float]]:
-        ...
+    def extract_embeddings(self, texts: List[str]) -> List[List[float]]: ...
 
     def sample_input(self) -> Content:
         return Content.from_text("hello world")
