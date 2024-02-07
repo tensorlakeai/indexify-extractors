@@ -21,6 +21,7 @@ nanoid = "^2.0.0"
 grpcio = "^1.60.1"
 uvicorn = "^0.27.0.post1"
 protobuf = "^4.25.2"
+httpx = "^0.26.0"
 
 
 [build-system]

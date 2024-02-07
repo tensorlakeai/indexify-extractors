@@ -1,3 +1,4 @@
+import httpx
 from .base_extractor import Content
 from . import coordinator_service_pb2
 
@@ -8,8 +9,10 @@ def disk_loader(file_path: str):
         return f.read()
 
 
-def s3_loader(s3_url: str):
-    raise Exception("Not implemented")
+def s3_loader(s3_url: str) -> bytes:
+    response = httpx.get(s3_url)
+    response.raise_for_status()
+    return response.content
 
 
 def download_content(
