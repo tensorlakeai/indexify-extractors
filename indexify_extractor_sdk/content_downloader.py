@@ -9,7 +9,8 @@ from google.cloud import storage
 
 
 def disk_loader(file_path: str):
-    file_path = file_path.strip("file://")
+    print(file_path)
+    file_path = file_path.removeprefix("file://")
     with open(file_path, "rb") as f:
         return f.read()
 

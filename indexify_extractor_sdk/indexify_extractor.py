@@ -4,18 +4,15 @@ import asyncio
 from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
-import typer
 from .base_extractor import ExtractorWrapper, ExtractorDescription
-from typing import Optional, List
+from typing import Optional, List, Dict
 from .base_extractor import Content
 import nanoid
 import json
 from .content_downloader import download_content
 from pydantic import BaseModel
 from concurrent.futures import ProcessPoolExecutor
-from .extractor_worker import ExtractorWorker
-
-typer_app = typer.Typer()
+from .extractor_worker import extract_content, ExtractorModule
 
 
 class CompletedTask(BaseModel):
@@ -30,16 +27,15 @@ class ExtractorAgent:
         executor_id: str,
         extractor: coordinator_service_pb2.Extractor,
         channel: grpc.aio.Channel,
-        extractor_wrapper: ExtractorWrapper,
+        extractor_module: ExtractorModule,
     ):
         self._executor_id = executor_id
-        self._has_registered = False
         self._extractor = extractor
-        self._channel = channel
+        self._extractor_module = extractor_module
+        self._has_registered = False
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(channel)
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
-        self._executor_wrapper = extractor_wrapper
-        self._extractor_worker = ExtractorWorker(extractor_wrapper, 4)
+        self._task_outcomes: Dict[str, CompletedTask] = {}
 
     async def ticker(self):
         while True:
@@ -60,9 +56,23 @@ class ExtractorAgent:
         except Exception as e:
             print(f"failed to download content{e} for task {task.id}")
             return
-        input_params = json.loads(task.input_params)
-        out: List[Content] = await self._extractor_worker.extract(content, input_params)
+        try:
+            out: List[Content] = await extract_content(
+                loop=asyncio.get_running_loop(),
+                extractor_module=self._extractor_module,
+                content=content,
+                params=task.input_params,
+            )
+        except Exception as e:
+            print(f"failed to execute task {task.id} {e}")
+            self._task_outcomes[task.id] = CompletedTask(
+                task_id=task.id, task_outcome="error", content=[]
+            )
+            return
         print(f"completed task {task.id} {out}")
+        self._task_outcomes[task.id] = CompletedTask(
+            task_id=task.id, task_outcome="ok", content=out
+        )
 
     async def run(self):
         while True:
@@ -136,6 +146,7 @@ def join(
 ):
     print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
     module, cls = extractor.split(":")
+    extractor_module = ExtractorModule(module_name=module, class_name=cls)
     wrapper = ExtractorWrapper(module, cls)
     description: ExtractorDescription = wrapper.describe()
     outputs = {}
@@ -155,5 +166,5 @@ def join(
     channel = grpc.aio.insecure_channel(coordinator)
     id = nanoid.generate()
     print(f"extractor id is {id}")
-    server = ExtractorAgent(id, api_extractor_description, channel)
+    server = ExtractorAgent(id, api_extractor_description, channel, extractor_module)
     asyncio.get_event_loop().run_until_complete(server.run())
