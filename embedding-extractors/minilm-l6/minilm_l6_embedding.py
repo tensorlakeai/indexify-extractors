@@ -1,6 +1,6 @@
 from typing import List
-from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
-from indexify_extractor_sdk.sentence_transformer import SentenceTransformersEmbedding
+from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtractor
+from indexify_extractor_sdk.embedding.sentence_transformer import SentenceTransformersEmbedding
 
 
 class MiniLML6Extractor(BaseEmbeddingExtractor):
@@ -18,4 +18,4 @@ class MiniLML6Extractor(BaseEmbeddingExtractor):
 
 
 if __name__ == "__main__":
-    MiniLML6Extractor().run_sample_input()
+    MiniLML6Extractor().extract_sample_input()
