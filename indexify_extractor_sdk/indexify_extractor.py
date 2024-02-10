@@ -72,19 +72,20 @@ class ExtractorAgent:
                     task_outcome=task_outcome.task_outcome,
                     extractor_binding=task.extractor_binding,
                 )
+                extracted_content_json = extracted_content.model_dump_json()
+                headers = {"content-type": "application/json"}
+                resp = httpx.post(
+                    f"http://{self._ingestion_addr}/write_content",
+                    headers=headers,
+                    data=extracted_content_json,
+                )
                 try:
-                    extracted_content_json = extracted_content.model_dump_json()
-                    headers = {"content-type": "application/json"}
-                    resp = httpx.post(
-                        f"http://{self._ingestion_addr}/write_content",
-                        headers=headers,
-                        data=extracted_content_json,
-                    )
+                    resp.raise_for_status()
                     print(f"reported task {task_id} with outcome {resp}")
                     self._task_outcomes.pop(task_id)
-                except httpx.HTTPError as exc:
+                except httpx.HTTPStatusError as exc:
                     print(
-                        f"failed to report task {task_id} with outcome {task_outcome} {exc} {resp.text}"
+                        f"failed to report task {task_id} with outcome {task_outcome} {exc} {exc.response.text}"
                     )
 
     async def launch_task(self, task: coordinator_service_pb2.Task):
