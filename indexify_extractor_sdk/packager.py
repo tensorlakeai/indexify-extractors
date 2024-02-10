@@ -176,7 +176,6 @@ class ExtractorPackager:
         }
         assert self.extractor_description["name"] is not None, "Extractor.name must be defined"
         assert self.extractor_description["version"] is not None, "Extractor.version must be defined"
-        self.logger.debug(self.extractor_description)
         
         # if dev, add the content of pyproject.toml - it's packaged in with resources
         if self.config.dev:    
@@ -314,6 +313,17 @@ class ExtractorPackager:
             dockerfile_bytes = dockerfile_content.encode("utf-8")
             dockerfile_info.size = len(dockerfile_bytes)
             tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile_bytes))
+
+            # add all the local files that are in the current directory
+            # add them at /extractor/*
+            local_files = [f for f in os.listdir(".") if os.path.isfile(f)]
+            for f in local_files:
+                file_info = tarfile.TarInfo(name=f"extractor/{f}")
+                file_content = open(f, "rb").read()
+                file_info.size = len(file_content)
+                file_info.mode = 0o644
+                tar.addfile(file_info, io.BytesIO(file_content))
+
             if self.config.dev:
                 self._add_dev_dependencies(tar)
         

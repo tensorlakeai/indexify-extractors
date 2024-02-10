@@ -38,4 +38,7 @@ RUN pip3 install .
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
+# test that indexify-extractor --help can run
+RUN indexify-extractor --help
+
 ENTRYPOINT [ "indexify-extractor" ]
