@@ -5,7 +5,7 @@ from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
 from .base_extractor import ExtractorWrapper, ExtractorDescription
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 from .base_extractor import Content
 import nanoid
 import json
@@ -138,6 +138,15 @@ def describe(extractor: str):
     wrapper = ExtractorWrapper(module, cls)
     print(wrapper.describe())
 
+def split_validate_extractor(name: str) -> Tuple[str, str]:
+    try:
+        module, cls = name.split(":")
+    except ValueError:
+        raise ValueError(
+            "The extractor name should be in the format 'module_name:class_name'"
+        )
+    return module, cls
+
 
 def join(
     extractor: str,
@@ -145,7 +154,7 @@ def join(
     ingestion_addr: str = "localhost:8900",
 ):
     print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
-    module, cls = extractor.split(":")
+    module, cls = split_validate_extractor(extractor)
     extractor_module = ExtractorModule(module_name=module, class_name=cls)
     wrapper = ExtractorWrapper(module, cls)
     description: ExtractorDescription = wrapper.describe()

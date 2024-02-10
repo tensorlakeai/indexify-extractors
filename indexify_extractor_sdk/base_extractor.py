@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Type, Optional, Union
+from typing import Any, Dict, List, Type, Optional, Union
 import json
 from importlib import import_module
 from typing import get_type_hints
@@ -24,7 +24,7 @@ class ExtractorDescription(BaseModel):
     python_dependencies: List[str]
     system_dependencies: List[str]
     embedding_schemas: dict[str, EmbeddingSchema]
-    metadata_schemas: dict[str, str]
+    metadata_schemas: dict[str, Any]
     input_params: Optional[str]
     input_mime_types: List[str]
 

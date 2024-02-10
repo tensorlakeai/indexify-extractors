@@ -1,8 +1,9 @@
 import typer
 from . import indexify_extractor
-from .packager import ExtractorPackager, ExtractorPackagerConfig
+from .packager import ExtractorPackager
 from typing import Optional
 import logging
+import os
 
 import sys
 
@@ -20,18 +21,23 @@ def describe(extractor: str):
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
     indexify_extractor.local(extractor, text, file)
 
+
 @typer_app.command()
 def join(
-    extractor: str,
+    # optional, default to $EXTRACTOR_PATH if not provided. If $EXTRACTOR_PATH is not set, it will raise an error.
+    extractor: str = typer.Argument(None, help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'."),
     coordinator: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
 ):
+    if not extractor:
+        extractor = os.environ.get("EXTRACTOR_PATH")
+        assert extractor, "Extractor path not provided and $EXTRACTOR_PATH not set."
+
     indexify_extractor.join(extractor, coordinator, ingestion_addr)
 
 @typer_app.command()
 def package(
-    module_name: str = typer.Argument(..., help="The name of the module."),
-    class_name: str = typer.Argument(..., help="The name of the class."),
+    extractor: str = typer.Argument(..., help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'."),
     dockerfile_template_path: str = typer.Option("../dockerfiles/Dockerfile.extractor", "--dockerfile-template-path", help="Path to the Dockerfile template."),
     verbose: bool = typer.Option(False, "--verbose", help="Run in verbose mode."),
     dev: bool = typer.Option(False, "--dev", help="Run in development mode."),
@@ -40,8 +46,9 @@ def package(
     """
     Packages an extractor into a Docker image, including Dockerfile generation and tarball creation.
     """
+    module_name, class_name = indexify_extractor.split_validate_extractor(extractor)
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-    config = ExtractorPackagerConfig(
+    packager = ExtractorPackager(
         module_name=module_name,
         class_name=class_name,
         dockerfile_template_path=dockerfile_template_path,
@@ -49,5 +56,4 @@ def package(
         dev=dev,
         gpu=gpu
     )
-    packager = ExtractorPackager(config)
     packager.package()

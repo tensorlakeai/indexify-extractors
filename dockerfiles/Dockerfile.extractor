@@ -7,25 +7,23 @@ RUN update-ca-certificates
 
 RUN echo "deb [trusted=yes] https://cf-repo.diptanu-6d5.workers.dev/repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/indexify-repo.list && \
     apt-get update -y && \
-    # apt-get install -y indexify && \
     apt-get install -y lsb-release libssl-dev apt-transport-https && \
-    apt-get install -y python3.11 python3.11-dev python3-pip && \
+    apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
     apt-get install -y  {{ system_dependencies }} && \
     apt-get -y clean
 
-# SET ENV VAR EXTRACTOR_PATH
+# SET ENV VAR EXTRACTOR_PATH. This is used by the indexify-extractor join command to find the extractor
 ENV EXTRACTOR_PATH {{ extractor_path }}
-
-# RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
-#     update-alternatives --set python3 /usr/bin/python3.11
-
-# RUN python3 --version | grep 'Python 3.11' || (echo 'Python 3.11 is required' && false)
-
-RUN pip3 install --no-input {{ additional_pip_flags }} {{ python_dependencies }}
 
 WORKDIR /indexify
 
-COPY . /indexify/
+RUN python3.11 -m venv ve
+# Use the virtualenv, to make sure we're using the right Python version
+ENV PATH="/indexify/ve/bin:$PATH"
+
+RUN pip3 install --no-input --upgrade pip && \
+    pip3 install --no-input wheel && \
+    pip3 install --no-input {{ additional_pip_flags }} {{ python_dependencies }}
 
 {% if dev %}
 COPY indexify_extractor_sdk /indexify/indexify_extractor_sdk
@@ -38,7 +36,10 @@ RUN pip3 install .
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
-# test that indexify-extractor --help can run
+# Copy over the extractor as {{module_name}}.py into /indexify/{{module_name}}.py
+COPY {{module_file_name}} /indexify/{{module_file_name}}
+
+# verify installation
 RUN indexify-extractor --help
 
 ENTRYPOINT [ "indexify-extractor" ]

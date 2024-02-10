@@ -16,36 +16,8 @@ from .base_extractor import ExtractorWrapper
 import importlib.resources as pkg_resources
 import importlib.util
 import sys
-
-class ExtractorPackagerConfig(BaseSettings):
-    """
-    Configuration settings for the extractor packager using Pydantic for environment management.
-
-    Attributes:
-        module_name (str): The name of the module where the extractor is defined.
-        class_name (str): The name of the extractor class.
-        dockerfile_template_path (str): Path to the Dockerfile Jinja2 template. Defaults to "Dockerfile.extractor".
-        verbose (bool): Enables verbose logging if set to True. Defaults to False.
-        dev (bool): Indicates if the package is being prepared for development. This affects dependency inclusion. Defaults to False.
-        gpu (bool): Indicates if the package requires GPU support. Affects how Python dependencies are installed. Defaults to False.
-    """
-    module_name: str
-    class_name: str
-
-    dockerfile_template_path: str = "../dockerfiles/Dockerfile.extractor"
-    verbose: bool = False
-    dev: bool = False
-    gpu: bool = False
-
-    # Example of using Field to customize env variable names
-    # some_other_config: str = Field(default="default_value", env="SOME_OTHER_CONFIG")
-
-    class Config:
-        # Tells Pydantic to read from environment variables as well
-        env_file = ".env"
-        env_file_encoding = 'utf-8'
-        extra = "ignore"
-
+import pathlib
+import concurrent.futures
 
 class DockerfileTemplate:
     """
@@ -60,14 +32,14 @@ class DockerfileTemplate:
     """
     def __init__(self, template_path: str):
         self.template_path = template_path
-        self.template = None
-        self._load_template()
+        self.template = self._load_template()
         self.configuration_params = {}
 
     def configure(self, extractor_path: "ExtractorPathWrapper", system_dependencies: List[str], python_dependencies: List[str], additional_pip_flags: str = "", dev: bool = False) -> "DockerfileTemplate":
         self.configuration_params = {
             "extractor_path": extractor_path.format(),
             "module_name": extractor_path.module_name,
+            "module_file_name": extractor_path.file_name(),
             "class_name": extractor_path.class_name,
             "system_dependencies": system_dependencies,
             "python_dependencies": python_dependencies,
@@ -76,21 +48,17 @@ class DockerfileTemplate:
         }
         return self
 
-    def _load_template(self):
+    def _load_template(self) -> Template:
         try:
-            template_content = pkg_resources.read_text("dockerfiles", "Dockerfile.extractor")
-            self.template = Template(template_content)
-            return
-        except Exception as e:
-            # print an error then try loading from the file system
-            print(f"Error loading template {self.template_path} from package: {e}")
-            print("Loading from file system...")
-        
-        try:
-            with open(self.template_path, "r") as f:
-                self.template = Template(f.read())
-        except Exception as e:
-            raise Exception(f"Failed to load template: {e}")
+            template_content = importlib.resources.read_text("dockerfiles", "Dockerfile.extractor")
+        except FileNotFoundError as e:
+            try:
+                with open(self.template_path, "r") as f:
+                    template_content = f.read()
+            except FileNotFoundError as e:
+                raise FileNotFoundError(f"Failed to load template: {e}")
+    
+        return Template(template_content)
 
     def render(self, **kwargs) -> str:
         return self.template.render(**self.configuration_params, **kwargs)
@@ -123,7 +91,9 @@ class ExtractorPathWrapper:
         return f"{self.module_name}:{self.class_name}"
 
     def file_name(self) -> str:
-        return f"{self.module_name}.py"
+        # convert dashes to underscores
+        file_name = self.module_name.replace("-", "_") + ".py"
+        return file_name
 
 class ExtractorPackager:
     """
@@ -141,31 +111,37 @@ class ExtractorPackager:
         _add_dev_dependencies: Adds development dependencies to the tarball if applicable.
     """
 
-    def __init__(self, config: ExtractorPackagerConfig = None):
-        # use default config if not provided
-        self.config = config if config else ExtractorPackagerConfig()
+    def __init__(self, module_name: str, class_name: str, dockerfile_template_path: str = "../dockerfiles/Dockerfile.extractor", verbose: bool = False, dev: bool = False, gpu: bool = False):
         self.docker_client = DockerClient.from_env()
         self.logger = logging.getLogger(__name__)
+        self.config = {
+            "module_name": module_name,
+            "class_name": class_name,
+            "dockerfile_template_path": dockerfile_template_path,
+            "verbose": verbose,
+            "dev": dev,
+            "gpu": gpu
+        }
         self.logger.debug(f"Config: {self.config}")
     
-        self.extractor_path = ExtractorPathWrapper(config.module_name, config.class_name).validate()
+        self.extractor_path = ExtractorPathWrapper(self.config["module_name"], self.config["class_name"]).validate()
 
         # try to load dynamically
         try:
             # change "." into "/"
-            file_name = config.module_name.replace(".", "/") + ".py"
+            file_name = self.config["module_name"].replace(".", "/") + ".py"
             # join to the current working directory using path
-            import pathlib
             cwd = pathlib.Path.cwd()
             module_path = cwd.joinpath(file_name)
             self.logger.info(f"Loading module from {module_path}")
 
-            module = DynamicModuleLoader.load_module_from_path(config.module_name, module_path)
+            module = DynamicModuleLoader.load_module_from_path(self.config["module_name"], module_path)
+            self.extractor_module = module
         except Exception as e:
-            self.logger.error(f"Failed to load extractor description for {config.module_name}:{config.class_name} from {module_path}: {e}")
+            self.logger.error(f"Failed to load extractor description for {self.extractor_path.format()} from {module_path}: {e}")
             raise
         # get the class from the module
-        extractor_cls = getattr(module, config.class_name)
+        extractor_cls = getattr(module, self.config["class_name"])
 
         # we don't need to initialize the class, just get the description
         self.extractor_description = {
@@ -178,10 +154,9 @@ class ExtractorPackager:
         assert self.extractor_description["version"] is not None, "Extractor.version must be defined"
         
         # if dev, add the content of pyproject.toml - it's packaged in with resources
-        if self.config.dev:    
+        if self.config.get("dev", False):    
             self.dev_files = {}
-            if self.config.dev:
-                self._collect_dev_files()
+            self._collect_dev_files()
 
     def _collect_dev_files(self):
         # Initialize the structure for package files
@@ -234,14 +209,11 @@ class ExtractorPackager:
             raise
 
         self.logger.info(f"Building image {self.extractor_description['name']}...")
-        self.logger.info(f"Results aren't streamed, so this may take a while.")
         self._build_image(self.extractor_description["name"], compressed_tar_stream)
 
     
     def _build_image(self, tag: str, fileobj: io.BytesIO):
         docker_client = docker.from_env()
-        # create a docker log handler that just prints to stdout
-        # create a docker err handler that just prints to stderr
         docker_stdout_handler = logging.StreamHandler(sys.stdout)
         docker_stdout_handler.setLevel(logging.DEBUG)
 
@@ -260,23 +232,6 @@ class ExtractorPackager:
                     pull=True
                 )
             )
-            # )
-            # image, build_log = docker_client.images.build(
-            #     tag=tag,
-            #     fileobj=fileobj,
-            #     custom_context=True,
-            #     encoding="gzip",
-            #     rm=True,
-            #     forcerm=True,
-            #     pull=True
-            # )
-
-            # for chunk in build_log:
-            #     if "stream" in chunk:
-            #         docker_stdout_handler.emit(logging.LogRecord("docker", logging.INFO, "docker", 0, chunk["stream"].strip(), None, None))
-            #     elif "error" in chunk:
-            #         docker_stderr_handler.emit(logging.LogRecord("docker", logging.ERROR, "docker", 0, chunk["error"].strip(), None, None))
-            
             self.logger.info(f"Successfully built image {image.tags[0]}")
         
         except docker_err.BuildError as e:
@@ -294,12 +249,12 @@ class ExtractorPackager:
             raise
 
     def _generate_dockerfile(self) -> str:
-        return DockerfileTemplate(self.config.dockerfile_template_path).configure(
+        return DockerfileTemplate(self.config["dockerfile_template_path"]).configure(
             extractor_path=self.extractor_path,
             system_dependencies=" ".join(self.extractor_description["system_dependencies"]),
             python_dependencies=" ".join(self.extractor_description["python_dependencies"]),
-            additional_pip_flags="" if self.config.gpu else "--extra-index-url https://download.pytorch.org/whl/cpu",
-            dev=self.config.dev
+            additional_pip_flags="" if self.config["gpu"] else "--extra-index-url https://download.pytorch.org/whl/cpu",
+            dev=self.config.get("dev", False)
         ).render()
     
     def _generate_compressed_tarball(self, dockerfile_content: str) -> bytes:
@@ -314,17 +269,15 @@ class ExtractorPackager:
             dockerfile_info.size = len(dockerfile_bytes)
             tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile_bytes))
 
-            # add all the local files that are in the current directory
-            # add them at /extractor/*
-            local_files = [f for f in os.listdir(".") if os.path.isfile(f)]
-            for f in local_files:
-                file_info = tarfile.TarInfo(name=f"extractor/{f}")
-                file_content = open(f, "rb").read()
-                file_info.size = len(file_content)
-                file_info.mode = 0o644
-                tar.addfile(file_info, io.BytesIO(file_content))
+            # add the module that is at self.extractor_module to the tar using the module name
+            # the path should be the project root in <module_name>.py
+            module_info = tarfile.TarInfo(self.extractor_path.file_name())
+            module_bytes = pkg_resources.read_text(self.extractor_path.module_name, self.extractor_path.file_name()).encode("utf-8")
+            module_info.size = len(module_bytes)
+            module_info.mode = 0o644
+            tar.addfile(module_info, io.BytesIO(module_bytes))
 
-            if self.config.dev:
+            if self.config.get("dev", False):
                 self._add_dev_dependencies(tar)
         
         dockerfile_tar_buffer.seek(0)
@@ -393,8 +346,6 @@ class DynamicModuleLoader:
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return module
-    
-import concurrent.futures
 
 async def async_docker_build(client, **kwargs):
     """

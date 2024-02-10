@@ -12,7 +12,7 @@ class InputParams(BaseModel):
 
 
 class MockExtractor(Extractor):
-    name = "mock-extractor"
+    name = "mock_extractor"
     input_mime_types = ["text/plain", "application/pdf", "image/jpeg"]
 
     system_dependencies = ["sl", "cowsay"] # some really smalll packages for testing
