@@ -13,12 +13,14 @@ from .content_downloader import download_content
 from pydantic import BaseModel
 from concurrent.futures import ProcessPoolExecutor
 from .extractor_worker import extract_content, ExtractorModule
+from .indexify_api_objects import ApiContent, ApiFeature, ExtractedContent
+import httpx
 
 
 class CompletedTask(BaseModel):
     task_id: str
     task_outcome: str
-    content: List[Content]
+    content: List[ApiContent]
 
 
 class ExtractorAgent:
@@ -28,6 +30,7 @@ class ExtractorAgent:
         extractor: coordinator_service_pb2.Extractor,
         channel: grpc.aio.Channel,
         extractor_module: ExtractorModule,
+        ingestion_addr: str = "localhost:8900",
     ):
         self._executor_id = executor_id
         self._extractor = extractor
@@ -36,6 +39,7 @@ class ExtractorAgent:
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(channel)
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
         self._task_outcomes: Dict[str, CompletedTask] = {}
+        self._ingestion_addr = ingestion_addr
 
     async def ticker(self):
         while True:
@@ -49,6 +53,39 @@ class ExtractorAgent:
             executor_id=self._executor_id, extractor=self._extractor
         )
         return await self._stub.RegisterExecutor(req)
+
+    async def task_completion_reporter(self):
+        print("starting task completion reporter")
+        while True:
+            await asyncio.sleep(5)
+            # We should copy only the keys and not the values
+            for task_id, task_outcome in self._task_outcomes.copy().items():
+                print(f"reporting outcome of task {task_id}")
+                task: coordinator_service_pb2.Task = self._tasks[task_id]
+                extracted_content = ExtractedContent(
+                    content_list=task_outcome.content,
+                    task_id=task_outcome.task_id,
+                    namespace=task.namespace,
+                    output_to_index_table_mapping=task.output_index_mapping,
+                    parent_content_id=task.content_metadata.id,
+                    executor_id=self._executor_id,
+                    task_outcome=task_outcome.task_outcome,
+                    extractor_binding=task.extractor_binding,
+                )
+                try:
+                    extracted_content_json = extracted_content.model_dump_json()
+                    headers = {"content-type": "application/json"}
+                    resp = httpx.post(
+                        f"http://{self._ingestion_addr}/write_content",
+                        headers=headers,
+                        data=extracted_content_json,
+                    )
+                    print(f"reported task {task_id} with outcome {resp}")
+                    self._task_outcomes.pop(task_id)
+                except httpx.HTTPError as exc:
+                    print(
+                        f"failed to report task {task_id} with outcome {task_outcome} {exc} {resp.text}"
+                    )
 
     async def launch_task(self, task: coordinator_service_pb2.Task):
         try:
@@ -66,15 +103,36 @@ class ExtractorAgent:
         except Exception as e:
             print(f"failed to execute task {task.id} {e}")
             self._task_outcomes[task.id] = CompletedTask(
-                task_id=task.id, task_outcome="error", content=[]
+                task_id=task.id, task_outcome="Failed", content=[]
             )
             return
-        print(f"completed task {task.id} {out}")
+        print(f"completed task {task.id}")
+        api_content_list: List[ApiContent] = []
+        c: Content
+        for c in out:
+            api_features: List[ApiFeature] = []
+            for feature in c.features:
+                api_features.append(
+                    ApiFeature(
+                        feature_type=feature.feature_type,
+                        name=feature.name,
+                        data=feature.value,
+                    )
+                )
+            api_content_list.append(
+                ApiContent(
+                    mime=c.content_type,
+                    bytes=c.data,
+                    features=api_features,
+                    labels=c.labels,
+                )
+            )
         self._task_outcomes[task.id] = CompletedTask(
-            task_id=task.id, task_outcome="ok", content=out
+            task_id=task.id, task_outcome="Success", content=api_content_list
         )
 
     async def run(self):
+        asyncio.create_task(self.task_completion_reporter())
         while True:
             print("attempting to register")
             try:
@@ -166,5 +224,7 @@ def join(
     channel = grpc.aio.insecure_channel(coordinator)
     id = nanoid.generate()
     print(f"extractor id is {id}")
-    server = ExtractorAgent(id, api_extractor_description, channel, extractor_module)
+    server = ExtractorAgent(
+        id, api_extractor_description, channel, extractor_module, ingestion_addr
+    )
     asyncio.get_event_loop().run_until_complete(server.run())
