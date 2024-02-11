@@ -41,7 +41,6 @@ class ExtractorPackager:
         dev: bool = False,
         gpu: bool = False,
     ):
-        self.docker_client = DockerClient.from_env()
         self.logger = logging.getLogger(__name__)
         self.config = {
             "module_name": module_name,
@@ -53,53 +52,41 @@ class ExtractorPackager:
         }
         self.logger.debug(f"Config: {self.config}")
 
+        self.docker_client = DockerClient.from_env()
+
         self.extractor_path = ExtractorPathWrapper(
             self.config["module_name"], self.config["class_name"]
         ).validate()
 
-        # try to load dynamically
-        try:
-            # change "." into "/"
-            file_name = self.config["module_name"].replace(".", "/") + ".py"
-            # join to the current working directory using path
-            cwd = pathlib.Path.cwd()
-            module_path = cwd.joinpath(file_name)
-            self.logger.info(f"Loading module from {module_path}")
+        self.extractor_module = self._load_extractor_module()
+        self.extractor_description = self._extract_validate_extractor_description()
 
+        if self.config.get("dev", False):
+            self.dev_files = self._collect_dev_files()
+
+    def _load_extractor_module(self):
+        """
+        Dynamically loads the extractor module based on configuration.
+        """
+        file_name = self.config["module_name"].replace(".", "/") + ".py"
+        cwd = pathlib.Path.cwd()
+        module_path = cwd.joinpath(file_name)
+        self.logger.info(f"Loading module from {module_path}")
+
+        try:
             module = DynamicModuleLoader.load_module_from_path(
                 self.config["module_name"], module_path
             )
-            self.extractor_module = module
+            return module
         except Exception as e:
             self.logger.error(
                 f"Failed to load extractor description for {self.extractor_path.format()} from {module_path}: {e}"
             )
             raise
-        # get the class from the module
-        extractor_cls = getattr(module, self.config["class_name"])
 
-        # we don't need to initialize the class, just get the description
-        self.extractor_description = {
-            "name": extractor_cls.name,
-            "version": extractor_cls.version,
-            "system_dependencies": extractor_cls.system_dependencies,
-            "python_dependencies": extractor_cls.python_dependencies,
-        }
-        assert (
-            self.extractor_description["name"] is not None
-        ), "Extractor.name must be defined"
-        assert (
-            self.extractor_description["version"] is not None
-        ), "Extractor.version must be defined"
-
-        # if dev, add the content of pyproject.toml - it's packaged in with resources
-        if self.config.get("dev", False):
-            self.dev_files = {}
-            self._collect_dev_files()
-
-    def _collect_dev_files(self):
+    def _collect_dev_files(self) -> dict:
         # Initialize the structure for package files
-        self.dev_files = {
+        dev_files = {
             "README.md": self._read_file_text(
                 Path(__file__).parent.parent / "README.md"
             ),
@@ -109,7 +96,8 @@ class ExtractorPackager:
             "indexify_extractor_sdk": {"__files__": []},
         }
         # Recursively add files from the package directory
-        self._add_package_files(Path(__file__).parent, "indexify_extractor_sdk")
+        self._add_package_files(Path(__file__).parent, "indexify_extractor_sdk", dev_files)
+        return dev_files
 
     def _read_file_text(self, path):
         # Utility function to read file text
@@ -119,23 +107,22 @@ class ExtractorPackager:
             print(f"Error reading file {path}: {e}")
             return None
 
-    def _add_package_files(self, package_path, package_name):
+    def _add_package_files(self, package_path, package_name, acc: dict):
         # Recursively add files from a directory, maintaining structure
         # if the package name doesn't exist, create it
-        if package_name not in self.dev_files:
-            self.dev_files[package_name] = {"__files__": []}
+        if package_name not in acc:
+            acc[package_name] = {"__files__": []}
         for item in package_path.iterdir():
             if item.is_dir():
                 if item.name == "__pycache__":
                     continue  # Skip __pycache__
                 # Initialize directory structure
-                self.dev_files[package_name][item.name] = {"__files__": []}
+                acc[package_name][item.name] = {"__files__": []}
                 # Recurse into directory
-                self._add_package_files(item, f"{package_name}.{item.name}")
+                self._add_package_files(item, f"{package_name}.{item.name}", acc)
             elif item.suffix in {".py", ".pyi"}:
                 # Add Python files to the list
-                rel_path = item.relative_to(package_path.parent)
-                self.dev_files[package_name]["__files__"].append(str(item.name))
+                acc[package_name]["__files__"].append(str(item.name))
 
     def package(self):
         try:
@@ -156,12 +143,31 @@ class ExtractorPackager:
         self.logger.info(f"Building image {self.extractor_description['name']}...")
         self._build_image(self.extractor_description["name"], compressed_tar_stream)
 
+    def _extract_validate_extractor_description(self) -> dict:
+        extractor_cls = getattr(self.extractor_module, self.config["class_name"])
+
+        # we don't need to initialize the class, just get the description
+        extractor_description = {
+            "name": extractor_cls.name,
+            "version": extractor_cls.version,
+            "system_dependencies": extractor_cls.system_dependencies,
+            "python_dependencies": extractor_cls.python_dependencies,
+        }
+
+        assert (
+            extractor_description["name"] is not None
+        ), "Extractor.name must be defined"
+        assert (
+            extractor_description["version"] is not None
+        ), "Extractor.version must be defined"
+
+        return extractor_description
+
     def _build_image(self, tag: str, fileobj: io.BytesIO):
-        docker_client = docker.from_env()
         try:
-            image, build_log = asyncio.run(
+            image, _ = asyncio.run(
                 async_docker_build(
-                    docker_client,
+                    self.docker_client,
                     tag=tag,
                     fileobj=fileobj,
                     custom_context=True,

@@ -10,7 +10,7 @@ def packager():
         module_name="indexify_extractor_sdk.mock_extractor",
         class_name="MockExtractor",
         dockerfile_template_path="dockerfiles/Dockerfile.extractor",
-        verbose=True,
+        verbose=False,
         dev=False,
         gpu=False
     )
@@ -21,7 +21,7 @@ def packager_dev():
         module_name="indexify_extractor_sdk.mock_extractor",
         class_name="MockExtractor",
         dockerfile_template_path="dockerfiles/Dockerfile.extractor",
-        verbose=True,
+        verbose=False,
         dev=True,
         gpu=False
     )
