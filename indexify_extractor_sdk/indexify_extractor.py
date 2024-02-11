@@ -13,7 +13,7 @@ from concurrent.futures import ProcessPoolExecutor
 from .extractor_worker import extract_content, ExtractorModule
 from .indexify_api_objects import ApiContent, ApiFeature, ExtractedContent
 import httpx
-from .server import http_server, ServerRouter
+from .server import http_server, ServerRouter, get_server_advertise_addr
 
 
 class CompletedTask(BaseModel):
@@ -50,7 +50,9 @@ class ExtractorAgent:
 
     async def register(self):
         req = coordinator_service_pb2.RegisterExecutorRequest(
-            executor_id=self._executor_id, extractor=self._extractor
+            executor_id=self._executor_id,
+            addr=self._advertise_addr,
+            extractor=self._extractor,
         )
         return await self._stub.RegisterExecutor(req)
 
@@ -141,6 +143,8 @@ class ExtractorAgent:
         server_router = ServerRouter(self._extractor_module)
         self._http_server = http_server(server_router)
         asyncio.create_task(self._http_server.serve())
+        self._advertise_addr = await get_server_advertise_addr(self._http_server)
+        print(f"advertise addr is {self._advertise_addr}")
         asyncio.create_task(self.task_completion_reporter())
         self._should_run = True
         while self._should_run:

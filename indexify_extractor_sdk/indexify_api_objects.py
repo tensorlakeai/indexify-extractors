@@ -45,6 +45,7 @@ class ApiContent(BaseModel):
     features: List[ApiFeature] = []
     labels: Dict[str, str] = {}
 
+
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
     task_id: str
