@@ -16,7 +16,7 @@
       apt-get -y clean
   
   # SET ENV VAR EXTRACTOR_PATH. This is used by the indexify-extractor join command to find the extractor
-  ENV EXTRACTOR_PATH indexify_extractor_sdk.mock_extractor:MockExtractor
+  ENV EXTRACTOR_PATH mock_extractor:MockExtractor
   
   WORKDIR /indexify
   
@@ -58,7 +58,7 @@
       apt-get -y clean
   
   # SET ENV VAR EXTRACTOR_PATH. This is used by the indexify-extractor join command to find the extractor
-  ENV EXTRACTOR_PATH indexify_extractor_sdk.mock_extractor:MockExtractor
+  ENV EXTRACTOR_PATH mock_extractor:MockExtractor
   
   WORKDIR /indexify
   
