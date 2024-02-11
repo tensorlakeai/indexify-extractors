@@ -39,20 +39,20 @@ class CoordinatorServiceStub(object):
             request_serializer=coordinator__service__pb2.ListBindingsRequest.SerializeToString,
             response_deserializer=coordinator__service__pb2.ListBindingsResponse.FromString,
         )
-        self.CreateRepository = channel.unary_unary(
-            "/indexify_coordinator.CoordinatorService/CreateRepository",
-            request_serializer=coordinator__service__pb2.CreateRepositoryRequest.SerializeToString,
-            response_deserializer=coordinator__service__pb2.CreateRepositoryResponse.FromString,
+        self.CreateNS = channel.unary_unary(
+            "/indexify_coordinator.CoordinatorService/CreateNS",
+            request_serializer=coordinator__service__pb2.CreateNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.CreateNamespaceResponse.FromString,
         )
-        self.ListRepositories = channel.unary_unary(
-            "/indexify_coordinator.CoordinatorService/ListRepositories",
-            request_serializer=coordinator__service__pb2.ListRepositoriesRequest.SerializeToString,
-            response_deserializer=coordinator__service__pb2.ListRepositoriesResponse.FromString,
+        self.ListNS = channel.unary_unary(
+            "/indexify_coordinator.CoordinatorService/ListNS",
+            request_serializer=coordinator__service__pb2.ListNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListNamespaceResponse.FromString,
         )
-        self.GetRepository = channel.unary_unary(
-            "/indexify_coordinator.CoordinatorService/GetRepository",
-            request_serializer=coordinator__service__pb2.GetRepositoryRequest.SerializeToString,
-            response_deserializer=coordinator__service__pb2.GetRepositoryResponse.FromString,
+        self.GetNS = channel.unary_unary(
+            "/indexify_coordinator.CoordinatorService/GetNS",
+            request_serializer=coordinator__service__pb2.GetNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetNamespaceResponse.FromString,
         )
         self.ListExtractors = channel.unary_unary(
             "/indexify_coordinator.CoordinatorService/ListExtractors",
@@ -139,19 +139,19 @@ class CoordinatorServiceServicer(object):
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
-    def CreateRepository(self, request, context):
+    def CreateNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
-    def ListRepositories(self, request, context):
+    def ListNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
-    def GetRepository(self, request, context):
+    def GetNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
@@ -245,20 +245,20 @@ def add_CoordinatorServiceServicer_to_server(servicer, server):
             request_deserializer=coordinator__service__pb2.ListBindingsRequest.FromString,
             response_serializer=coordinator__service__pb2.ListBindingsResponse.SerializeToString,
         ),
-        "CreateRepository": grpc.unary_unary_rpc_method_handler(
-            servicer.CreateRepository,
-            request_deserializer=coordinator__service__pb2.CreateRepositoryRequest.FromString,
-            response_serializer=coordinator__service__pb2.CreateRepositoryResponse.SerializeToString,
+        "CreateNS": grpc.unary_unary_rpc_method_handler(
+            servicer.CreateNS,
+            request_deserializer=coordinator__service__pb2.CreateNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.CreateNamespaceResponse.SerializeToString,
         ),
-        "ListRepositories": grpc.unary_unary_rpc_method_handler(
-            servicer.ListRepositories,
-            request_deserializer=coordinator__service__pb2.ListRepositoriesRequest.FromString,
-            response_serializer=coordinator__service__pb2.ListRepositoriesResponse.SerializeToString,
+        "ListNS": grpc.unary_unary_rpc_method_handler(
+            servicer.ListNS,
+            request_deserializer=coordinator__service__pb2.ListNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListNamespaceResponse.SerializeToString,
         ),
-        "GetRepository": grpc.unary_unary_rpc_method_handler(
-            servicer.GetRepository,
-            request_deserializer=coordinator__service__pb2.GetRepositoryRequest.FromString,
-            response_serializer=coordinator__service__pb2.GetRepositoryResponse.SerializeToString,
+        "GetNS": grpc.unary_unary_rpc_method_handler(
+            servicer.GetNS,
+            request_deserializer=coordinator__service__pb2.GetNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetNamespaceResponse.SerializeToString,
         ),
         "ListExtractors": grpc.unary_unary_rpc_method_handler(
             servicer.ListExtractors,
@@ -467,7 +467,7 @@ class CoordinatorService(object):
         )
 
     @staticmethod
-    def CreateRepository(
+    def CreateNS(
         request,
         target,
         options=(),
@@ -482,9 +482,9 @@ class CoordinatorService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/indexify_coordinator.CoordinatorService/CreateRepository",
-            coordinator__service__pb2.CreateRepositoryRequest.SerializeToString,
-            coordinator__service__pb2.CreateRepositoryResponse.FromString,
+            "/indexify_coordinator.CoordinatorService/CreateNS",
+            coordinator__service__pb2.CreateNamespaceRequest.SerializeToString,
+            coordinator__service__pb2.CreateNamespaceResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -496,7 +496,7 @@ class CoordinatorService(object):
         )
 
     @staticmethod
-    def ListRepositories(
+    def ListNS(
         request,
         target,
         options=(),
@@ -511,9 +511,9 @@ class CoordinatorService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/indexify_coordinator.CoordinatorService/ListRepositories",
-            coordinator__service__pb2.ListRepositoriesRequest.SerializeToString,
-            coordinator__service__pb2.ListRepositoriesResponse.FromString,
+            "/indexify_coordinator.CoordinatorService/ListNS",
+            coordinator__service__pb2.ListNamespaceRequest.SerializeToString,
+            coordinator__service__pb2.ListNamespaceResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -525,7 +525,7 @@ class CoordinatorService(object):
         )
 
     @staticmethod
-    def GetRepository(
+    def GetNS(
         request,
         target,
         options=(),
@@ -540,9 +540,9 @@ class CoordinatorService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/indexify_coordinator.CoordinatorService/GetRepository",
-            coordinator__service__pb2.GetRepositoryRequest.SerializeToString,
-            coordinator__service__pb2.GetRepositoryResponse.FromString,
+            "/indexify_coordinator.CoordinatorService/GetNS",
+            coordinator__service__pb2.GetNamespaceRequest.SerializeToString,
+            coordinator__service__pb2.GetNamespaceResponse.FromString,
             options,
             channel_credentials,
             insecure,

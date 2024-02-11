@@ -89,13 +89,13 @@ class ListStateChangesResponse(_message.Message):
     ) -> None: ...
 
 class ListTasksRequest(_message.Message):
-    __slots__ = ("repository", "extractor_binding")
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("namespace", "extractor_binding")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_BINDING_FIELD_NUMBER: _ClassVar[int]
-    repository: str
+    namespace: str
     extractor_binding: str
     def __init__(
-        self, repository: _Optional[str] = ..., extractor_binding: _Optional[str] = ...
+        self, namespace: _Optional[str] = ..., extractor_binding: _Optional[str] = ...
     ) -> None: ...
 
 class ListTasksResponse(_message.Message):
@@ -123,10 +123,10 @@ class GetExtractorCoordinatesResponse(_message.Message):
     def __init__(self, addrs: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ListIndexesRequest(_message.Message):
-    __slots__ = ("repository",)
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
-    repository: str
-    def __init__(self, repository: _Optional[str] = ...) -> None: ...
+    __slots__ = ("namespace",)
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    def __init__(self, namespace: _Optional[str] = ...) -> None: ...
 
 class ListIndexesResponse(_message.Message):
     __slots__ = ("indexes",)
@@ -137,13 +137,13 @@ class ListIndexesResponse(_message.Message):
     ) -> None: ...
 
 class GetIndexRequest(_message.Message):
-    __slots__ = ("repository", "name")
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("namespace", "name")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    repository: str
+    namespace: str
     name: str
     def __init__(
-        self, repository: _Optional[str] = ..., name: _Optional[str] = ...
+        self, namespace: _Optional[str] = ..., name: _Optional[str] = ...
     ) -> None: ...
 
 class GetIndexResponse(_message.Message):
@@ -165,20 +165,20 @@ class CreateIndexResponse(_message.Message):
 class Index(_message.Message):
     __slots__ = (
         "name",
-        "repository",
+        "namespace",
         "table_name",
         "schema",
         "extractor_binding",
         "extractor",
     )
     NAME_FIELD_NUMBER: _ClassVar[int]
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     TABLE_NAME_FIELD_NUMBER: _ClassVar[int]
     SCHEMA_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_BINDING_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     name: str
-    repository: str
+    namespace: str
     table_name: str
     schema: str
     extractor_binding: str
@@ -186,7 +186,7 @@ class Index(_message.Message):
     def __init__(
         self,
         name: _Optional[str] = ...,
-        repository: _Optional[str] = ...,
+        namespace: _Optional[str] = ...,
         table_name: _Optional[str] = ...,
         schema: _Optional[str] = ...,
         extractor_binding: _Optional[str] = ...,
@@ -278,7 +278,7 @@ class Task(_message.Message):
     __slots__ = (
         "id",
         "extractor",
-        "repository",
+        "namespace",
         "content_metadata",
         "input_params",
         "extractor_binding",
@@ -298,7 +298,7 @@ class Task(_message.Message):
 
     ID_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     CONTENT_METADATA_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_BINDING_FIELD_NUMBER: _ClassVar[int]
@@ -306,7 +306,7 @@ class Task(_message.Message):
     OUTCOME_FIELD_NUMBER: _ClassVar[int]
     id: str
     extractor: str
-    repository: str
+    namespace: str
     content_metadata: ContentMetadata
     input_params: str
     extractor_binding: str
@@ -316,7 +316,7 @@ class Task(_message.Message):
         self,
         id: _Optional[str] = ...,
         extractor: _Optional[str] = ...,
-        repository: _Optional[str] = ...,
+        namespace: _Optional[str] = ...,
         content_metadata: _Optional[_Union[ContentMetadata, _Mapping]] = ...,
         input_params: _Optional[str] = ...,
         extractor_binding: _Optional[str] = ...,
@@ -368,22 +368,22 @@ class Extractor(_message.Message):
         input_mime_types: _Optional[_Iterable[str]] = ...,
     ) -> None: ...
 
-class GetRepositoryRequest(_message.Message):
+class GetNamespaceRequest(_message.Message):
     __slots__ = ("name",)
     NAME_FIELD_NUMBER: _ClassVar[int]
     name: str
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
-class GetRepositoryResponse(_message.Message):
-    __slots__ = ("repository",)
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
-    repository: Repository
+class GetNamespaceResponse(_message.Message):
+    __slots__ = ("namespace",)
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    namespace: Namespace
     def __init__(
-        self, repository: _Optional[_Union[Repository, _Mapping]] = ...
+        self, namespace: _Optional[_Union[Namespace, _Mapping]] = ...
     ) -> None: ...
 
 class ListContentRequest(_message.Message):
-    __slots__ = ("repository", "source", "parent_id", "labels_eq")
+    __slots__ = ("namespace", "source", "parent_id", "labels_eq")
 
     class LabelsEqEntry(_message.Message):
         __slots__ = ("key", "value")
@@ -395,17 +395,17 @@ class ListContentRequest(_message.Message):
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
 
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]
     LABELS_EQ_FIELD_NUMBER: _ClassVar[int]
-    repository: str
+    namespace: str
     source: str
     parent_id: str
     labels_eq: _containers.ScalarMap[str, str]
     def __init__(
         self,
-        repository: _Optional[str] = ...,
+        namespace: _Optional[str] = ...,
         source: _Optional[str] = ...,
         parent_id: _Optional[str] = ...,
         labels_eq: _Optional[_Mapping[str, str]] = ...,
@@ -421,10 +421,10 @@ class ListContentResponse(_message.Message):
     ) -> None: ...
 
 class ListBindingsRequest(_message.Message):
-    __slots__ = ("repository",)
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
-    repository: str
-    def __init__(self, repository: _Optional[str] = ...) -> None: ...
+    __slots__ = ("namespace",)
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    def __init__(self, namespace: _Optional[str] = ...) -> None: ...
 
 class ListBindingsResponse(_message.Message):
     __slots__ = ("bindings",)
@@ -434,7 +434,7 @@ class ListBindingsResponse(_message.Message):
         self, bindings: _Optional[_Iterable[_Union[ExtractorBinding, _Mapping]]] = ...
     ) -> None: ...
 
-class CreateRepositoryRequest(_message.Message):
+class CreateNamespaceRequest(_message.Message):
     __slots__ = ("name", "bindings")
     NAME_FIELD_NUMBER: _ClassVar[int]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]
@@ -446,7 +446,7 @@ class CreateRepositoryRequest(_message.Message):
         bindings: _Optional[_Iterable[_Union[ExtractorBinding, _Mapping]]] = ...,
     ) -> None: ...
 
-class CreateRepositoryResponse(_message.Message):
+class CreateNamespaceResponse(_message.Message):
     __slots__ = ("name", "created_at")
     NAME_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -456,28 +456,16 @@ class CreateRepositoryResponse(_message.Message):
         self, name: _Optional[str] = ..., created_at: _Optional[int] = ...
     ) -> None: ...
 
-class ListRepositoriesRequest(_message.Message):
+class ListNamespaceRequest(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
 
-class ListRepositoriesResponse(_message.Message):
-    __slots__ = ("repositories",)
-    REPOSITORIES_FIELD_NUMBER: _ClassVar[int]
-    repositories: _containers.RepeatedCompositeFieldContainer[Repository]
+class ListNamespaceResponse(_message.Message):
+    __slots__ = ("namespaces",)
+    NAMESPACES_FIELD_NUMBER: _ClassVar[int]
+    namespaces: _containers.RepeatedCompositeFieldContainer[Namespace]
     def __init__(
-        self, repositories: _Optional[_Iterable[_Union[Repository, _Mapping]]] = ...
-    ) -> None: ...
-
-class DatRepository(_message.Message):
-    __slots__ = ("name", "bindings")
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    BINDINGS_FIELD_NUMBER: _ClassVar[int]
-    name: str
-    bindings: _containers.RepeatedCompositeFieldContainer[ExtractorBinding]
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        bindings: _Optional[_Iterable[_Union[ExtractorBinding, _Mapping]]] = ...,
+        self, namespaces: _Optional[_Iterable[_Union[Namespace, _Mapping]]] = ...
     ) -> None: ...
 
 class ExtractorBinding(_message.Message):
@@ -513,16 +501,16 @@ class ExtractorBinding(_message.Message):
     ) -> None: ...
 
 class ExtractorBindRequest(_message.Message):
-    __slots__ = ("repository", "binding", "created_at")
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("namespace", "binding", "created_at")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     BINDING_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    repository: str
+    namespace: str
     binding: ExtractorBinding
     created_at: int
     def __init__(
         self,
-        repository: _Optional[str] = ...,
+        namespace: _Optional[str] = ...,
         binding: _Optional[_Union[ExtractorBinding, _Mapping]] = ...,
         created_at: _Optional[int] = ...,
     ) -> None: ...
@@ -580,7 +568,7 @@ class ContentMetadata(_message.Message):
         "labels",
         "storage_url",
         "created_at",
-        "repository",
+        "namespace",
         "source",
     )
 
@@ -601,7 +589,7 @@ class ContentMetadata(_message.Message):
     LABELS_FIELD_NUMBER: _ClassVar[int]
     STORAGE_URL_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     id: str
     file_name: str
@@ -610,7 +598,7 @@ class ContentMetadata(_message.Message):
     labels: _containers.ScalarMap[str, str]
     storage_url: str
     created_at: int
-    repository: str
+    namespace: str
     source: str
     def __init__(
         self,
@@ -621,7 +609,7 @@ class ContentMetadata(_message.Message):
         labels: _Optional[_Mapping[str, str]] = ...,
         storage_url: _Optional[str] = ...,
         created_at: _Optional[int] = ...,
-        repository: _Optional[str] = ...,
+        namespace: _Optional[str] = ...,
         source: _Optional[str] = ...,
     ) -> None: ...
 
@@ -639,7 +627,7 @@ class CreateContentResponse(_message.Message):
     id: str
     def __init__(self, id: _Optional[str] = ...) -> None: ...
 
-class Repository(_message.Message):
+class Namespace(_message.Message):
     __slots__ = ("name", "bindings")
     NAME_FIELD_NUMBER: _ClassVar[int]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]

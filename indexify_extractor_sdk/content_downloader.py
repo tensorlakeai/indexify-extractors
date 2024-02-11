@@ -10,7 +10,7 @@ from google.cloud import storage
 
 def disk_loader(file_path: str):
     print(file_path)
-    file_path = file_path.removeprefix("file://")
+    file_path = file_path.removeprefix("file:/")
     with open(file_path, "rb") as f:
         return f.read()
 
@@ -18,23 +18,27 @@ def disk_loader(file_path: str):
 def s3_loader(s3_url: str) -> bytes:
     parsed_url = urlparse(s3_url)
     bucket_name = parsed_url.netloc
-    key = parsed_url.path.lstrip('/')
+    key = parsed_url.path.lstrip("/")
 
-    s3 = boto3.client('s3')
+    s3 = boto3.client("s3")
 
     response = s3.get_object(Bucket=bucket_name, Key=key)
-    return response['Body'].read()
+    return response["Body"].read()
 
 
 def azure_blob_loader(blob_url: str) -> bytes:
     token_credential = DefaultAzureCredential()
     parsed_url = urlparse(blob_url)
     account_url = f"https://{parsed_url.netloc}"
-    container_name = parsed_url.path.split('/')[1]
-    blob_name = '/'.join(parsed_url.path.split('/')[2:])
+    container_name = parsed_url.path.split("/")[1]
+    blob_name = "/".join(parsed_url.path.split("/")[2:])
 
-    blob_service_client = BlobServiceClient(account_url=account_url, credential=token_credential)
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+    blob_service_client = BlobServiceClient(
+        account_url=account_url, credential=token_credential
+    )
+    blob_client = blob_service_client.get_blob_client(
+        container=container_name, blob=blob_name
+    )
 
     return blob_client.download_blob().readall()
 
@@ -42,7 +46,7 @@ def azure_blob_loader(blob_url: str) -> bytes:
 def gcp_storage_loader(storage_url: str) -> bytes:
     parsed_url = urlparse(storage_url)
     bucket_name = parsed_url.netloc
-    blob_name = parsed_url.path.lstrip('/')
+    blob_name = parsed_url.path.lstrip("/")
 
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
