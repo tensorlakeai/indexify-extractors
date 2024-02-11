@@ -12,9 +12,7 @@ from .extractor_packager_utils import (
 )
 import docker
 import logging
-from jinja2 import Template
 import importlib.resources as pkg_resources
-import sys
 import pathlib
 
 
@@ -231,6 +229,12 @@ class ExtractorPackager:
             if self.config.get("dev", False):
                 self._add_dev_dependencies(tar)
 
+            # if self.config.verbose, print the directory structure of the tar
+            # using tar.list(verbose=True)
+            if self.config["verbose"]:
+                self.logger.debug("Tarball contents:")
+                tar.list(verbose=True)
+
         dockerfile_tar_buffer.seek(0)
         compressed_data_buffer = io.BytesIO()
         with gzip.GzipFile(fileobj=compressed_data_buffer, mode="wb") as gz:
@@ -279,6 +283,3 @@ class ExtractorPackager:
         self._add_files_from_dir(
             "indexify_extractor_sdk", "indexify_extractor_sdk", tar
         )
-
-        # print the directory structure of the tar
-        tar.list(verbose=True)
