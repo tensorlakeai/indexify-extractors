@@ -1,5 +1,3 @@
-from fastapi import FastAPI
-import uvicorn
 import asyncio
 from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
@@ -15,6 +13,7 @@ from concurrent.futures import ProcessPoolExecutor
 from .extractor_worker import extract_content, ExtractorModule
 from .indexify_api_objects import ApiContent, ApiFeature, ExtractedContent
 import httpx
+from .server import http_server, ServerRouter
 
 
 class CompletedTask(BaseModel):
@@ -139,6 +138,9 @@ class ExtractorAgent:
         asyncio.get_event_loop().add_signal_handler(
             signal.SIGINT, self.shutdown, asyncio.get_event_loop()
         )
+        server_router = ServerRouter(self._extractor_module)
+        self._http_server = http_server(server_router)
+        asyncio.create_task(self._http_server.serve())
         asyncio.create_task(self.task_completion_reporter())
         self._should_run = True
         while self._should_run:
@@ -172,28 +174,13 @@ class ExtractorAgent:
     async def _shutdown(self, loop):
         print("shutting down agent ...")
         self._should_run = False
+        self._http_server.should_exit = True
         await self._channel.close()
         for task in asyncio.all_tasks(loop):
             task.cancel()
 
     def shutdown(self, loop):
         loop.create_task(self._shutdown(loop))
-
-
-app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-async def http_server_main(loop) -> uvicorn.Server:
-    config = uvicorn.Config(
-        "indexify_extractor:app", port=0, log_level="info", loop=loop
-    )
-    server = uvicorn.Server(config)
-    return server
 
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
