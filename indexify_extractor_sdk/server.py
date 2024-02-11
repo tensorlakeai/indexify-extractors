@@ -5,6 +5,7 @@ from .base_extractor import Content
 from .extractor_worker import extract_content, ExtractorModule
 import uvicorn
 import asyncio
+import json
 
 from fastapi import FastAPI, APIRouter
 
@@ -21,7 +22,7 @@ class ServerRouter:
         self.router = APIRouter()
         self.router.add_api_route("/extract", self.extract, methods=["POST"])
 
-    def extract(self, request: ExtractionRequest):
+    async def extract(self, request: ExtractionRequest):
         loop = asyncio.get_event_loop()
         content = Content(
             content_type=request.content.mime,
@@ -29,8 +30,9 @@ class ServerRouter:
             features=[],
             labels=request.content.labels,
         )
-        content_out: List[Content] = extract_content(
-            loop, self._extractor_module, content, params=request.input_params
+        input_params = json.dumps(request.input_params)
+        content_out: List[Content] = await extract_content(
+            loop, self._extractor_module, content, params=input_params
         )
         api_content: List[ApiContent] = []
         for content in content_out:

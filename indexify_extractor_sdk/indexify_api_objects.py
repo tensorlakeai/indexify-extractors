@@ -42,18 +42,8 @@ class ApiFeature(BaseModel):
 class ApiContent(BaseModel):
     mime: str
     bytes: bytes
-    features: List[ApiFeature]
-    labels: Dict[str, str]
-
-    @classmethod
-    def from_text(cls, text: str, features: list = [], labels: dict = {}):
-        return cls(
-            content_type="text/plain",
-            data=bytes(text, "utf-8"),
-            features=features,
-            labels=labels,
-        )
-
+    features: List[ApiFeature] = []
+    labels: Dict[str, str] = {}
 
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
