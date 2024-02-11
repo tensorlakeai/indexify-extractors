@@ -15,7 +15,6 @@ import logging
 import importlib.resources as pkg_resources
 import pathlib
 
-
 class ExtractorPackager:
     """
     Manages the packaging of an extractor into a Docker image, including Dockerfile generation and tarball creation.
@@ -36,7 +35,6 @@ class ExtractorPackager:
         self,
         module_name: str,
         class_name: str,
-        dockerfile_template_path: str = "../dockerfiles/Dockerfile.extractor",
         verbose: bool = False,
         dev: bool = False,
         gpu: bool = False,
@@ -45,7 +43,6 @@ class ExtractorPackager:
         self.config = {
             "module_name": module_name,
             "class_name": class_name,
-            "dockerfile_template_path": dockerfile_template_path,
             "verbose": verbose,
             "dev": dev,
             "gpu": gpu,
@@ -192,7 +189,7 @@ class ExtractorPackager:
 
     def _generate_dockerfile(self) -> str:
         return (
-            DockerfileTemplate(self.config["dockerfile_template_path"])
+            DockerfileTemplate()
             .configure(
                 extractor_path=self.extractor_path,
                 system_dependencies=" ".join(
