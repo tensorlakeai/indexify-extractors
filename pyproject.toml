@@ -5,6 +5,13 @@ description = ""
 authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
 readme = "README.md"
 
+packages = [
+    {include = "dockerfiles/Dockerfile.extractor"},
+    {include = "pyproject.toml" },
+    {include = "indexify_extractor_sdk" },
+    {include = "indexify_extractor_sdk/embedding" },
+]
+
 
 [tool.poetry.scripts]
 indexify-extractor = "indexify_extractor_sdk.main:typer_app"
@@ -31,11 +38,8 @@ httpx = "^0.26.0"
 
 [tool.poetry.dev-dependencies]
 syrupy = "^4.0.0"
-pytest = "^6.0.0"
+pytest = ">7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.package]
-include = ["dockerfiles/Dockerfile.extractor", "pyproject.toml", "indexify_extractor_sdk", "indexify_extractor_sdk/embedding", "README.md"]
