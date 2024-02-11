@@ -4,7 +4,12 @@ import io
 from pathlib import Path
 import tarfile
 from docker import DockerClient, errors as docker_err
-from .extractor_packager_utils import DockerfileTemplate, ExtractorPathWrapper, DynamicModuleLoader, async_docker_build
+from .extractor_packager_utils import (
+    DockerfileTemplate,
+    ExtractorPathWrapper,
+    DynamicModuleLoader,
+    async_docker_build,
+)
 import docker
 import logging
 from jinja2 import Template
@@ -277,4 +282,3 @@ class ExtractorPackager:
 
         # print the directory structure of the tar
         tar.list(verbose=True)
-
