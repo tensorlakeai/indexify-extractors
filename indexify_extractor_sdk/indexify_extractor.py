@@ -36,6 +36,7 @@ class ExtractorAgent:
         self._extractor = extractor
         self._extractor_module = extractor_module
         self._has_registered = False
+        self._channel = channel
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(channel)
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
         self._task_outcomes: Dict[str, CompletedTask] = {}
@@ -133,8 +134,14 @@ class ExtractorAgent:
         )
 
     async def run(self):
+        import signal
+
+        asyncio.get_event_loop().add_signal_handler(
+            signal.SIGINT, self.shutdown, asyncio.get_event_loop()
+        )
         asyncio.create_task(self.task_completion_reporter())
-        while True:
+        self._should_run = True
+        while self._should_run:
             print("attempting to register")
             try:
                 await self.register()
@@ -161,6 +168,16 @@ class ExtractorAgent:
 
     async def exeucte_task(self):
         return {"status": "ok"}
+
+    async def _shutdown(self, loop):
+        print("shutting down agent ...")
+        self._should_run = False
+        await self._channel.close()
+        for task in asyncio.all_tasks(loop):
+            task.cancel()
+
+    def shutdown(self, loop):
+        loop.create_task(self._shutdown(loop))
 
 
 app = FastAPI()
@@ -196,6 +213,7 @@ def describe(extractor: str):
     module, cls = extractor.split(":")
     wrapper = ExtractorWrapper(module, cls)
     print(wrapper.describe())
+
 
 def split_validate_extractor(name: str) -> Tuple[str, str]:
     try:
@@ -237,4 +255,7 @@ def join(
     server = ExtractorAgent(
         id, api_extractor_description, channel, extractor_module, ingestion_addr
     )
-    asyncio.get_event_loop().run_until_complete(server.run())
+    try:
+        asyncio.get_event_loop().run_until_complete(server.run())
+    except asyncio.CancelledError:
+        print("exiting gracefully")

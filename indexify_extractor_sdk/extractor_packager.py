@@ -15,6 +15,7 @@ import logging
 import importlib.resources as pkg_resources
 import pathlib
 
+
 class ExtractorPackager:
     """
     Manages the packaging of an extractor into a Docker image, including Dockerfile generation and tarball creation.
@@ -93,7 +94,9 @@ class ExtractorPackager:
             "indexify_extractor_sdk": {"__files__": []},
         }
         # Recursively add files from the package directory
-        self._add_package_files(Path(__file__).parent, "indexify_extractor_sdk", dev_files)
+        self._add_package_files(
+            Path(__file__).parent, "indexify_extractor_sdk", dev_files
+        )
         return dev_files
 
     def _read_file_text(self, path):

@@ -15,7 +15,7 @@ class MockExtractor(Extractor):
     name = "mock_extractor"
     input_mime_types = ["text/plain", "application/pdf", "image/jpeg"]
 
-    system_dependencies = ["sl", "cowsay"] # some really smalll packages for testing
+    system_dependencies = ["sl", "cowsay"]  # some really smalll packages for testing
     python_dependencies = ["tinytext", "pyfiglet"]
 
     def __init__(self):

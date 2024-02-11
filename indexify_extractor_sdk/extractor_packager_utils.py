@@ -46,8 +46,9 @@ class DockerfileTemplate:
 
     def _load_template(self) -> Template:
         from importlib import resources as impresources
-        from . import dockerfiles 
-        inp_file = (impresources.files(dockerfiles) / 'Dockerfile.extractor')
+        from . import dockerfiles
+
+        inp_file = impresources.files(dockerfiles) / "Dockerfile.extractor"
         try:
             with open(inp_file) as f:
                 template_content = f.read()
