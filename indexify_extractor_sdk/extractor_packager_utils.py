@@ -90,12 +90,15 @@ class ExtractorPathWrapper:
         return self
 
     def format(self) -> str:
-        return f"{self.module_name}:{self.class_name}"
+        return f"{self.module_name_local()}:{self.class_name}"
+    
+    def module_name_local(self) -> str:
+        # only the file name portion of the module name, without path.to.module
+        file_name = self.module_name.replace("-", "_")
+        return file_name.split(".")[-1]
 
     def file_name(self) -> str:
-        # convert dashes to underscores
-        file_name = self.module_name.replace("-", "_") + ".py"
-        return file_name
+        return self.module_name_local() + ".py"
 
 
 class DynamicModuleLoader:

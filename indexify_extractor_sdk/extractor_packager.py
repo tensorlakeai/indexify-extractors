@@ -18,7 +18,7 @@ class ExtractorPackager:
     Manages the packaging of an extractor into a Docker image, including Dockerfile generation and tarball creation.
 
     Attributes:
-        config (ExtractorPackagerConfig): Configuration for the packager.
+        config: Configuration for the packager.
         docker_client (DockerClient): Client for interacting with Docker.
         logger (Logger): Logger for the packager.
 

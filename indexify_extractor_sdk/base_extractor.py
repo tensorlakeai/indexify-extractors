@@ -24,7 +24,7 @@ class ExtractorDescription(BaseModel):
     python_dependencies: List[str]
     system_dependencies: List[str]
     embedding_schemas: dict[str, EmbeddingSchema]
-    metadata_schemas: dict[str, Any]
+    metadata_schemas: dict[str, Json]
     input_params: Optional[str]
     input_mime_types: List[str]
 
