@@ -5,14 +5,6 @@ description = ""
 authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
 readme = "README.md"
 
-packages = [
-    {include = "dockerfiles/Dockerfile.extractor"},
-    {include = "pyproject.toml" },
-    {include = "indexify_extractor_sdk" },
-    {include = "indexify_extractor_sdk/embedding" },
-]
-
-
 [tool.poetry.scripts]
 indexify-extractor = "indexify_extractor_sdk.main:typer_app"
 

@@ -15,16 +15,12 @@ class DockerfileTemplate:
     """
     Manages the rendering of Dockerfile templates using Jinja2.
 
-    Attributes:
-        template_path (str): The file path to the Jinja2 template for the Dockerfile.
-
     Methods:
         configure: Prepares the template with specific configuration parameters.
         render: Renders the Dockerfile template with the provided configuration.
     """
 
-    def __init__(self, template_path: str):
-        self.template_path = template_path
+    def __init__(self):
         self.template = self._load_template()
         self.configuration_params = {}
 
@@ -49,16 +45,14 @@ class DockerfileTemplate:
         return self
 
     def _load_template(self) -> Template:
+        from importlib import resources as impresources
+        from . import dockerfiles 
+        inp_file = (impresources.files(dockerfiles) / 'Dockerfile.extractor')
         try:
-            template_content = importlib.resources.read_text(
-                "dockerfiles", "Dockerfile.extractor"
-            )
+            with open(inp_file) as f:
+                template_content = f.read()
         except FileNotFoundError as e:
-            try:
-                with open(self.template_path, "r") as f:
-                    template_content = f.read()
-            except FileNotFoundError as e:
-                raise FileNotFoundError(f"Failed to load template: {e}")
+            raise FileNotFoundError(f"Failed to load template: {e}")
 
         return Template(template_content)
 

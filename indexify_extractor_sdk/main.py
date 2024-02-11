@@ -38,7 +38,6 @@ def join(
 @typer_app.command()
 def package(
     extractor: str = typer.Argument(..., help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'."),
-    dockerfile_template_path: str = typer.Option("../dockerfiles/Dockerfile.extractor", "--dockerfile-template-path", help="Path to the Dockerfile template."),
     verbose: bool = typer.Option(False, "--verbose", help="Run in verbose mode."),
     dev: bool = typer.Option(False, "--dev", help="Run in development mode."),
     gpu: bool = typer.Option(False, "--gpu", help="Use GPU acceleration.")
@@ -51,7 +50,6 @@ def package(
     packager = ExtractorPackager(
         module_name=module_name,
         class_name=class_name,
-        dockerfile_template_path=dockerfile_template_path,
         verbose=verbose,
         dev=dev,
         gpu=gpu
