@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Type, Optional, Union
+from typing import Any, Dict, List, Type, Optional
 import json
 from importlib import import_module
 from typing import get_type_hints
@@ -24,7 +24,7 @@ class ExtractorDescription(BaseModel):
     python_dependencies: List[str]
     system_dependencies: List[str]
     embedding_schemas: dict[str, EmbeddingSchema]
-    metadata_schemas: dict[str, str]
+    metadata_schemas: dict[str, Json]
     input_params: Optional[str]
     input_mime_types: List[str]
 
@@ -137,7 +137,7 @@ class ExtractorWrapper:
                     )
                     embedding_schemas[feature.name] = embedding_schema
                 elif feature.feature_type == "metadata":
-                    metadata_schemas[feature.name] = {}
+                    metadata_schemas[feature.name] = json.dumps({})
         return ExtractorDescription(
             name=self._instance.name,
             version=self._instance.version,

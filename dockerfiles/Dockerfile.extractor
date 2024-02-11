@@ -1,0 +1,45 @@
+FROM --platform=linux/amd64 ubuntu:22.04
+
+RUN apt-get update -y && \
+    apt-get -y install lsb-release ca-certificates
+
+RUN update-ca-certificates
+
+RUN echo "deb [trusted=yes] https://cf-repo.diptanu-6d5.workers.dev/repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/indexify-repo.list && \
+    apt-get update -y && \
+    apt-get install -y lsb-release libssl-dev apt-transport-https && \
+    apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
+    apt-get install -y  {{ system_dependencies }} && \
+    apt-get -y clean
+
+# SET ENV VAR EXTRACTOR_PATH. This is used by the indexify-extractor join command to find the extractor
+ENV EXTRACTOR_PATH {{ extractor_path }}
+
+WORKDIR /indexify
+
+RUN python3.11 -m venv ve
+# Use the virtualenv, to make sure we're using the right Python version
+ENV PATH="/indexify/ve/bin:$PATH"
+
+RUN pip3 install --no-input --upgrade pip && \
+    pip3 install --no-input wheel && \
+    pip3 install --no-input {{ additional_pip_flags }} {{ python_dependencies }}
+
+{% if dev %}
+COPY indexify_extractor_sdk /indexify/indexify_extractor_sdk
+
+COPY README.md /indexify/README.md
+COPY pyproject.toml /indexify/pyproject.toml
+
+RUN pip3 install .
+{% else %}
+RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
+{% endif %}
+
+# Copy over the extractor as {{module_name}}.py into /indexify/{{module_name}}.py
+COPY {{module_file_name}} /indexify/{{module_file_name}}
+
+# verify installation
+RUN indexify-extractor --help
+
+ENTRYPOINT [ "indexify-extractor" ]
