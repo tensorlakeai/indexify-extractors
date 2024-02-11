@@ -141,7 +141,10 @@ class ExtractorPackager:
             raise
 
         self.logger.info(f"Building image {self.extractor_description['name']}...")
-        self._build_image(self.extractor_description["name"], compressed_tar_stream)
+        try:
+            self._build_image(self.extractor_description["name"], compressed_tar_stream)
+        except Exception as e:
+            self.logger.error(f"Failed to build image: {e}")
 
     def _extract_validate_extractor_description(self) -> dict:
         extractor_cls = getattr(self.extractor_module, self.config["class_name"])
