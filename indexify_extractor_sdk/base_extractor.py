@@ -102,24 +102,14 @@ class Extractor(ABC):
         return self.extract(self.sample_input())
 
 
-def __init__(self, module_name: str, class_name: str):
-    module = import_module(module_name)
-    cls = getattr(module, class_name)
-    self._instance: Extractor = cls()
-    self._param_cls = get_type_hints(cls.extract).get("params", None)
-
-
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
-        self._module_name = module_name
-        self._class_name = class_name
-
-    def extract(self, content: Content, params: Json) -> List[Content]:
-        module = import_module(self._module_name)
-        cls = getattr(module, self._class_name)
+        module = import_module(module_name)
+        cls = getattr(module, class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
 
+    def extract(self, content: Content, params: Json) -> List[Content]:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
         param_instance = (
@@ -128,11 +118,6 @@ class ExtractorWrapper:
         return self._instance.extract(content, param_instance)
 
     def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
-        module = import_module(self._module_name)
-        cls = getattr(module, self._class_name)
-        self._instance: Extractor = cls()
-        self._param_cls = get_type_hints(cls.extract).get("params", None)
-
         s_input = self._instance.sample_input()
         # Come back to this when we can support schemas based on user defined input params
         if input_params is None:

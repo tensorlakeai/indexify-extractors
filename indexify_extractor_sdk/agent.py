@@ -184,4 +184,5 @@ class ExtractorAgent:
             task.cancel()
 
     def shutdown(self, loop):
+        self._executor.shutdown(wait=True, cancel_futures=True)
         loop.create_task(self._shutdown(loop))
