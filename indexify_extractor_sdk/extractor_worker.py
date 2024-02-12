@@ -9,13 +9,25 @@ class ExtractorModule(BaseModel):
     class_name: str
 
 
+def create_extractor_wrapper(extractor_module: ExtractorModule) -> ExtractorWrapper:
+    print("creating extractor wrapper")
+    global extractor_wrapper
+    extractor_wrapper = ExtractorWrapper(
+        extractor_module.module_name, extractor_module.class_name
+    )
+
+
+def create_executor(extractor_module: ExtractorModule):
+    return concurrent.futures.ProcessPoolExecutor(
+        initializer=create_extractor_wrapper, initargs=(extractor_module,)
+    )
+
+
+def _extract_content(content: Content, params: Json) -> List[Content]:
+    return extractor_wrapper.extract(content, params)
+
+
 async def extract_content(
-    loop, extractor_module: ExtractorModule, content: Content, params: Json
+    loop, executor, content: Content, params: Json
 ) -> List[Content]:
-    with concurrent.futures.ProcessPoolExecutor() as pool:
-        wrapper = ExtractorWrapper(
-            extractor_module.module_name, extractor_module.class_name
-        )
-        result = await loop.run_in_executor(pool, wrapper.extract, content, params)
-        return result
-    raise Exception("unable to fork process for extraction")
+    return await loop.run_in_executor(executor, _extract_content, content, params)

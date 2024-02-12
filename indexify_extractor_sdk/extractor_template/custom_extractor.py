@@ -17,6 +17,7 @@ class InputParams(BaseModel):
     a: int = 0
     b: str = ""
 
+
 class MyExtractor(Extractor):
     name = "your-docker-hub-username/MyExtractor"
     description = "Description of the extractor goes here."
@@ -42,20 +43,20 @@ class MyExtractor(Extractor):
     # no features.
     def extract(self, content: Content, params: InputParams) -> List[Content]:
         return [
-                ## If the name of the embedding field in the schema is anything besides "embedding",
-                # you must specify the name of the field in the Feature.embedding call.
-                # Feature.embedding(value=[1, 2, 3], name="my_embedding")
-                Content.from_text(
-                    text="Hello World", feature=Feature.embedding(values=[1, 2, 3])
-                ),
-                Content.from_text(
-                    text="Pipe Baz", feature=Feature.embedding(values=[1, 2, 3])
-                ),
-                Content.from_text(
-                    text="Hello World",
-                    feature=Feature.metadata(value=json.dumps({"key": "value"})),
-                ),
-            ]
+            ## If the name of the embedding field in the schema is anything besides "embedding",
+            # you must specify the name of the field in the Feature.embedding call.
+            # Feature.embedding(value=[1, 2, 3], name="my_embedding")
+            Content.from_text(
+                text="Hello World", feature=Feature.embedding(values=[1, 2, 3])
+            ),
+            Content.from_text(
+                text="Pipe Baz", feature=Feature.embedding(values=[1, 2, 3])
+            ),
+            Content.from_text(
+                text="Hello World",
+                feature=Feature.metadata(value=json.dumps({"key": "value"})),
+            ),
+        ]
 
     # Provide some representative sample input that the extractor can process.
     def sample_input(self) -> Content:

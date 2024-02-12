@@ -101,11 +101,12 @@ class Extractor(ABC):
     def extract_sample_input(self) -> List[Content]:
         return self.extract(self.sample_input())
 
+
 def __init__(self, module_name: str, class_name: str):
-        module = import_module(module_name)
-        cls = getattr(module, class_name)
-        self._instance: Extractor = cls()
-        self._param_cls = get_type_hints(cls.extract).get("params", None)
+    module = import_module(module_name)
+    cls = getattr(module, class_name)
+    self._instance: Extractor = cls()
+    self._param_cls = get_type_hints(cls.extract).get("params", None)
 
 
 class ExtractorWrapper:
@@ -131,7 +132,6 @@ class ExtractorWrapper:
         cls = getattr(module, self._class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
-
 
         s_input = self._instance.sample_input()
         # Come back to this when we can support schemas based on user defined input params

@@ -1,4 +1,8 @@
-from indexify_extractor_sdk.extractor_worker import extract_content, ExtractorModule
+from indexify_extractor_sdk.extractor_worker import (
+    extract_content,
+    ExtractorModule,
+    create_executor,
+)
 from indexify_extractor_sdk.base_extractor import Content
 import unittest
 import asyncio
@@ -15,15 +19,24 @@ class TestExtractorWorker(IsolatedAsyncioTestCase):
             module_name="indexify_extractor_sdk.mock_extractor",
             class_name="MockExtractor",
         )
+        executor = create_executor(extactor_module)
         content = Content.from_text("hello world")
+        content1 = Content.from_text("pipe baz")
         loop = asyncio.get_event_loop()
         extracted_content = await extract_content(
             loop=loop,
-            extractor_module=extactor_module,
+            executor=executor,
             content=content,
             params='{"a": 1, "b": "foo"}',
         )
         self.assertEqual(len(extracted_content), 2)
+
+        extracted_content1 = await extract_content(
+            loop=loop,
+            executor=executor,
+            content=content1,
+            params='{"a": 1, "b": "foo"}',
+        )
 
 
 if __name__ == "__main__":

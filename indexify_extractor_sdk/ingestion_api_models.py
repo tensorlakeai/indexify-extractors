@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Json
 from typing import List, Dict
 
+
 class ApiFeature(BaseModel):
     feature_type: str
     name: str

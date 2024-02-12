@@ -7,6 +7,7 @@ import uvicorn
 import asyncio
 import json
 import netifaces
+import concurrent
 
 from fastapi import FastAPI, APIRouter
 
@@ -15,13 +16,15 @@ class ExtractionRequest(BaseModel):
     content: ApiContent
     input_params: Optional[Json]
 
+
 class ExtractionResponse(BaseModel):
     content: List[ApiContent]
 
+
 class ServerRouter:
 
-    def __init__(self, extractor_module: ExtractorModule):
-        self._extractor_module = extractor_module
+    def __init__(self, executor: concurrent.futures.ProcessPoolExecutor):
+        self._executor = executor
         self.router = APIRouter()
         self.router.add_api_route("/", self.root, methods=["GET"])
         self.router.add_api_route("/extract", self.extract, methods=["POST"])
@@ -37,9 +40,11 @@ class ServerRouter:
             features=[],
             labels=request.content.labels,
         )
-        input_params = json.dumps(request.input_params) if request.input_params else None
+        input_params = (
+            json.dumps(request.input_params) if request.input_params else None
+        )
         content_out: List[Content] = await extract_content(
-            loop, self._extractor_module, content, params=input_params
+            loop, self._executor, content, params=input_params
         )
         api_content: List[ApiContent] = []
         for content in content_out:

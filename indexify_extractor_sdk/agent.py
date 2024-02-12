@@ -6,7 +6,7 @@ from typing import List, Dict
 from .base_extractor import Content
 from .content_downloader import download_content
 from pydantic import BaseModel
-from .extractor_worker import extract_content, ExtractorModule
+from .extractor_worker import extract_content, ExtractorModule, create_executor
 from .ingestion_api_models import ApiContent, ApiFeature, ExtractedContent
 import httpx
 from .server import http_server, ServerRouter, get_server_advertise_addr
@@ -35,6 +35,7 @@ class ExtractorAgent:
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
         self._task_outcomes: Dict[str, CompletedTask] = {}
         self._ingestion_addr = ingestion_addr
+        self._executor = create_executor(extractor_module)
 
     async def ticker(self):
         while True:
@@ -98,7 +99,7 @@ class ExtractorAgent:
         try:
             out: List[Content] = await extract_content(
                 loop=asyncio.get_running_loop(),
-                extractor_module=self._extractor_module,
+                executor=self._executor,
                 content=content,
                 params=task.input_params,
             )
@@ -139,7 +140,7 @@ class ExtractorAgent:
         asyncio.get_event_loop().add_signal_handler(
             signal.SIGINT, self.shutdown, asyncio.get_event_loop()
         )
-        server_router = ServerRouter(self._extractor_module)
+        server_router = ServerRouter(self._executor)
         self._http_server = http_server(server_router)
         asyncio.create_task(self._http_server.serve())
         self._advertise_addr = await get_server_advertise_addr(self._http_server)
