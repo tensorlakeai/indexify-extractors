@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 from .base_extractor import Content
 import nanoid
 import json
-from .extractor_worker import ExtractorModule
+from .extractor_worker import ExtractorModule, create_executor
 from .agent import ExtractorAgent
 
 
@@ -64,8 +64,9 @@ def join(
     )
     id = nanoid.generate()
     print(f"extractor id is {id}")
+    executor = create_executor(extractor_module)
     server = ExtractorAgent(
-        id, api_extractor_description, coordinator, extractor_module, ingestion_addr
+        id, api_extractor_description, coordinator, executor, ingestion_addr
     )
     try:
         asyncio.get_event_loop().run_until_complete(server.run())

@@ -10,6 +10,7 @@ from .extractor_worker import extract_content, ExtractorModule, create_executor
 from .ingestion_api_models import ApiContent, ApiFeature, ExtractedContent
 import httpx
 from .server import http_server, ServerRouter, get_server_advertise_addr
+import concurrent
 
 
 class CompletedTask(BaseModel):
@@ -24,18 +25,17 @@ class ExtractorAgent:
         executor_id: str,
         extractor: coordinator_service_pb2.Extractor,
         coordinator_addr: str,
-        extractor_module: ExtractorModule,
+        executor: concurrent.futures.ProcessPoolExecutor,
         ingestion_addr: str = "localhost:8900",
     ):
         self._executor_id = executor_id
         self._extractor = extractor
-        self._extractor_module = extractor_module
         self._has_registered = False
         self._coordinator_addr = coordinator_addr
         self._tasks: map[str, coordinator_service_pb2.Task] = {}
         self._task_outcomes: Dict[str, CompletedTask] = {}
         self._ingestion_addr = ingestion_addr
-        self._executor = create_executor(extractor_module)
+        self._executor = executor
 
     async def ticker(self):
         while True:
