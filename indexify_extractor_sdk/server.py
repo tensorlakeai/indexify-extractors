@@ -21,7 +21,11 @@ class ServerRouter:
     def __init__(self, extractor_module: ExtractorModule):
         self._extractor_module = extractor_module
         self.router = APIRouter()
+        self.router.add_api_route("/", self.root, methods=["GET"])
         self.router.add_api_route("/extract", self.extract, methods=["POST"])
+
+    async def root(self):
+        return {"Indexify Extractor"}
 
     async def extract(self, request: ExtractionRequest):
         loop = asyncio.get_event_loop()
@@ -57,27 +61,15 @@ class ServerRouter:
         return api_content
 
 
-app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
 class ServerWithNoSigHandler(uvicorn.Server):
-
-    # Override
     def install_signal_handlers(self) -> None:
-
-        # Do nothing
         pass
 
 
 def http_server(server_router: ServerRouter) -> uvicorn.Server:
     print("starting extraction server endpoint")
+    app = FastAPI()
     app.include_router(server_router.router)
-    addr = get_most_publicly_addressable_ip()
     config = uvicorn.Config(
         app, loop="asyncio", host="0.0.0.0", port=0, log_level="info", lifespan="off"
     )

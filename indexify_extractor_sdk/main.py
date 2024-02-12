@@ -62,3 +62,8 @@ def package(
         gpu=gpu,
     )
     packager.package()
+
+
+@typer_app.command()
+def new():
+    print("Creating a new extractor")
