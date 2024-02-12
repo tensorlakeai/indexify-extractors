@@ -9,7 +9,7 @@ class ApiFeature(BaseModel):
 
 class ApiContent(BaseModel):
     mime: str
-    bytes: bytes
+    bytes: List[int]
     features: List[ApiFeature] = []
     labels: Dict[str, str] = {}
 
