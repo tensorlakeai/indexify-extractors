@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Json
 from typing import Optional, List
-from .ingestion_api_moodels import ApiContent, ApiFeature
+from .ingestion_api_models import ApiContent, ApiFeature
 from .base_extractor import Content
 from .extractor_worker import extract_content, ExtractorModule
 import uvicorn
@@ -15,6 +15,8 @@ class ExtractionRequest(BaseModel):
     content: ApiContent
     input_params: Optional[Json]
 
+class ExtractionResponse(BaseModel):
+    content: List[ApiContent]
 
 class ServerRouter:
 
@@ -31,11 +33,11 @@ class ServerRouter:
         loop = asyncio.get_event_loop()
         content = Content(
             content_type=request.content.mime,
-            data=request.content.bytes,
+            data=bytes(request.content.bytes),
             features=[],
             labels=request.content.labels,
         )
-        input_params = json.dumps(request.input_params)
+        input_params = json.dumps(request.input_params) if request.input_params else None
         content_out: List[Content] = await extract_content(
             loop, self._extractor_module, content, params=input_params
         )
@@ -53,12 +55,12 @@ class ServerRouter:
             api_content.append(
                 ApiContent(
                     mime=content.content_type,
-                    bytes=content.data,
+                    bytes=list(content.data),
                     features=api_features,
                     labels=content.labels,
                 )
             )
-        return api_content
+        return ExtractionResponse(content=api_content)
 
 
 class ServerWithNoSigHandler(uvicorn.Server):
