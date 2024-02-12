@@ -1,4 +1,4 @@
-from indexify_extractor_sdk.extractor_packager import ExtractorPackager
+from indexify_extractor_sdk.packager import ExtractorPackager
 import pytest
 import gzip
 import tarfile

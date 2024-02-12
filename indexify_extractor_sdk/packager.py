@@ -4,7 +4,7 @@ import io
 from pathlib import Path
 import tarfile
 from docker import DockerClient, errors as docker_err
-from .extractor_packager_utils import (
+from .packager_utils import (
     DockerfileTemplate,
     ExtractorPathWrapper,
     DynamicModuleLoader,

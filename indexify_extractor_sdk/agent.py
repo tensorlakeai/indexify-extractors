@@ -7,7 +7,7 @@ from .base_extractor import Content
 from .content_downloader import download_content
 from pydantic import BaseModel
 from .extractor_worker import extract_content, ExtractorModule
-from .indexify_api_objects import ApiContent, ApiFeature, ExtractedContent
+from .ingestion_api_moodels import ApiContent, ApiFeature, ExtractedContent
 import httpx
 from .server import http_server, ServerRouter, get_server_advertise_addr
 

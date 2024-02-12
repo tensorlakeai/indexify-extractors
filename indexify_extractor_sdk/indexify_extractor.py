@@ -1,13 +1,12 @@
 import asyncio
 from . import coordinator_service_pb2
-import grpc
 from .base_extractor import ExtractorWrapper, ExtractorDescription
 from typing import Optional, Tuple
 from .base_extractor import Content
 import nanoid
 import json
 from .extractor_worker import ExtractorModule
-from .extractor_agent import ExtractorAgent
+from .agent import ExtractorAgent
 
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):

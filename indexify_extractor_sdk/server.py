@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Json
 from typing import Optional, List
-from .indexify_api_objects import ApiContent, ApiFeature
+from .ingestion_api_moodels import ApiContent, ApiFeature
 from .base_extractor import Content
 from .extractor_worker import extract_content, ExtractorModule
 import uvicorn

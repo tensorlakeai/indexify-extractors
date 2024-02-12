@@ -1,6 +1,6 @@
 import typer
 from . import indexify_extractor
-from .extractor_packager import ExtractorPackager
+from .packager import ExtractorPackager
 from typing import Optional
 import logging
 import os
