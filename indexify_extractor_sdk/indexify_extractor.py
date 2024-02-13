@@ -69,6 +69,7 @@ def join(
         id, api_extractor_description, coordinator, executor, ingestion_addr
     )
     try:
+        asyncio.set_event_loop(asyncio.new_event_loop())
         asyncio.get_event_loop().run_until_complete(server.run())
     except asyncio.CancelledError:
         print("exiting gracefully")

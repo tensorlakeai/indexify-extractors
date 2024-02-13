@@ -113,7 +113,7 @@ class ExtractorWrapper:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
         param_instance = (
-            self._param_cls.model_validate(params_dict) if self._param_cls else None
+            self._param_cls.model_validate(params_dict) if self._param_cls != type(None) else None
         )
         return self._instance.extract(content, param_instance)
 
@@ -125,8 +125,9 @@ class ExtractorWrapper:
         out_c: List[Content] = self._instance.extract(s_input, input_params)
         embedding_schemas = {}
         metadata_schemas = {}
-        json_schema = self._param_cls.model_json_schema() if self._param_cls else {}
-        json_schema["additionalProperties"] = False
+        json_schema = None if self._param_cls == type(None) else self._param_cls.model_json_schema()
+        if json_schema:
+            json_schema["additionalProperties"] = False
         for content in out_c:
             for feature in content.features:
                 if feature.feature_type == "embedding":
