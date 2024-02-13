@@ -1,6 +1,7 @@
 from pypdf import PdfReader
 from pydantic import BaseModel
 import torch
+from typing import List
 from transformers import AutoProcessor, Blip2ForConditionalGeneration
 from sentence_transformers import SentenceTransformer
 
