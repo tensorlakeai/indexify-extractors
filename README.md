@@ -1,10 +1,12 @@
 # Indexify Extractor SDK 
 
+[![PyPI version](https://badge.fury.io/py/indexify-extractor-sdk.svg)](https://badge.fury.io/py/indexify-extractor-sdk)
+
 Indexify Extractor SDK is for developing new extractors to extract information from any unstructured data sources.
 
 We already have a few extractors here - https://github.com/tensorlakeai/indexify If you don't find one that works for your use-case use this SDK to build one. 
 
-[![PyPI version](https://badge.fury.io/py/indexify-extractor-sdk.svg)](https://badge.fury.io/py/indexify-extractor-sdk)
+
 
 ## Install the SDK
 Install the SDK from PyPi
