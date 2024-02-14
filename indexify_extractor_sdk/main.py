@@ -1,5 +1,5 @@
 import typer
-from . import indexify_extractor
+from . import indexify_extractor, version
 from .packager import ExtractorPackager
 from typing import Optional
 import logging
@@ -11,6 +11,8 @@ sys.path.append(".")
 
 typer_app = typer.Typer()
 
+def print_version():
+    print(f"indexify-extractor-sdk version {version.__version__}")
 
 @typer_app.command()
 def describe(extractor: str):
@@ -32,8 +34,10 @@ def join(
     coordinator: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
 ):
+    print_version()
     if not extractor:
         extractor = os.environ.get("EXTRACTOR_PATH")
+        print(f"Using extractor path from $EXTRACTOR_PATH: {extractor}")
         assert extractor, "Extractor path not provided and $EXTRACTOR_PATH not set."
 
     indexify_extractor.join(extractor, coordinator, ingestion_addr)
@@ -52,6 +56,7 @@ def package(
     """
     Packages an extractor into a Docker image, including Dockerfile generation and tarball creation.
     """
+    print_version()
     module_name, class_name = indexify_extractor.split_validate_extractor(extractor)
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     packager = ExtractorPackager(
@@ -62,8 +67,3 @@ def package(
         gpu=gpu,
     )
     packager.package()
-
-
-@typer_app.command()
-def new():
-    print("Creating a new extractor")
