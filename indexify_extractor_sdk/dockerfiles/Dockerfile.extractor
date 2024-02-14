@@ -1,21 +1,24 @@
 FROM --platform=linux/amd64 ubuntu:22.04
 
+WORKDIR /indexify
+
 RUN apt-get update -y && \
-    apt-get -y install lsb-release ca-certificates
+    apt-get -y install lsb-release ca-certificates apt-transport-https
 
 RUN update-ca-certificates
 
-RUN echo "deb [trusted=yes] https://cf-repo.diptanu-6d5.workers.dev/repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/indexify-repo.list && \
-    apt-get update -y && \
-    apt-get install -y lsb-release libssl-dev apt-transport-https && \
-    apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
+# Add Tini
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /indexify/tini
+RUN chmod +x /indexify/tini
+
+RUN apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
     apt-get install -y  {{ system_dependencies }} && \
     apt-get -y clean
 
 # SET ENV VAR EXTRACTOR_PATH. This is used by the indexify-extractor join command to find the extractor
 ENV EXTRACTOR_PATH {{ extractor_path }}
 
-WORKDIR /indexify
 
 RUN python3.11 -m venv ve
 # Use the virtualenv, to make sure we're using the right Python version
@@ -44,4 +47,4 @@ ENV TOKENIZERS_PARALLELISM=true
 # verify installation
 RUN indexify-extractor --help
 
-ENTRYPOINT [ "indexify-extractor" ]
+ENTRYPOINT ["/indexify/tini", "--", "indexify-extractor"]
