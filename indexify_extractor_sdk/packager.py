@@ -225,15 +225,9 @@ class ExtractorPackager:
             dockerfile_info.size = len(dockerfile_bytes)
             tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile_bytes))
 
-            # add the module that is at self.extractor_module to the tar using the module name
-            # the path should be the project root in <module_name>.py
-            module_info = tarfile.TarInfo(self.extractor_path.file_name())
-            module_bytes = pkg_resources.read_text(
-                self.extractor_path.module_name, self.extractor_path.file_name()
-            ).encode("utf-8")
-            module_info.size = len(module_bytes)
-            module_info.mode = 0o644
-            tar.addfile(module_info, io.BytesIO(module_bytes))
+            parent_dir = pathlib.Path(self.extractor_path.file_name()).parent
+
+            add_directory_to_tar(tar, parent_dir)
 
             if self.config.get("dev", False):
                 self._add_dev_dependencies(tar)
@@ -292,3 +286,26 @@ class ExtractorPackager:
         self._add_files_from_dir(
             "indexify_extractor_sdk", "indexify_extractor_sdk", tar
         )
+
+
+def add_directory_to_tar(tar_file: tarfile.TarFile, directory_path):
+    import os
+
+    """
+    Add a directory to a tar file with path names relative to the parent directory.
+
+    Parameters:
+        directory_path (str): Path to the directory to be added to the tar file.
+        tar_file_path (str): Path to the tar file.
+
+    Returns:
+        None
+    """
+    # Iterate over all files and subdirectories in the given directory
+    print(f"Adding {directory_path} to tar file")
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            relative_path = os.path.relpath(file_path, os.path.dirname(directory_path))
+            print(f"Adding {file_path} to tar file with relative path {relative_path}")
+            tar_file.add(file_path, arcname=relative_path)

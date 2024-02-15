@@ -136,16 +136,16 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals["_EXTRACTORBINDREQUEST"]._serialized_end = 3648
     _globals["_EXTRACTORBINDRESPONSE"]._serialized_start = 3651
     _globals["_EXTRACTORBINDRESPONSE"]._serialized_end = 4085
-    _globals["_EXTRACTORBINDRESPONSE_INDEXNAMETABLEMAPPINGENTRY"]._serialized_start = (
-        3962
-    )
+    _globals[
+        "_EXTRACTORBINDRESPONSE_INDEXNAMETABLEMAPPINGENTRY"
+    ]._serialized_start = 3962
     _globals["_EXTRACTORBINDRESPONSE_INDEXNAMETABLEMAPPINGENTRY"]._serialized_end = 4022
-    _globals["_EXTRACTORBINDRESPONSE_OUTPUTINDEXNAMEMAPPINGENTRY"]._serialized_start = (
-        4024
-    )
-    _globals["_EXTRACTORBINDRESPONSE_OUTPUTINDEXNAMEMAPPINGENTRY"]._serialized_end = (
-        4085
-    )
+    _globals[
+        "_EXTRACTORBINDRESPONSE_OUTPUTINDEXNAMEMAPPINGENTRY"
+    ]._serialized_start = 4024
+    _globals[
+        "_EXTRACTORBINDRESPONSE_OUTPUTINDEXNAMEMAPPINGENTRY"
+    ]._serialized_end = 4085
     _globals["_CONTENTMETADATA"]._serialized_start = 4088
     _globals["_CONTENTMETADATA"]._serialized_end = 4359
     _globals["_CONTENTMETADATA_LABELSENTRY"]._serialized_start = 4314

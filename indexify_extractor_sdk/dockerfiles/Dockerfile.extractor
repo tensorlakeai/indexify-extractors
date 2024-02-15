@@ -40,7 +40,7 @@ RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
 # Copy over the extractor as {{module_name}}.py into /indexify/{{module_name}}.py
-COPY {{module_file_name}} /indexify/{{module_file_name}}
+COPY . /indexify/
 
 ENV TOKENIZERS_PARALLELISM=true
 

@@ -22,7 +22,6 @@ class ExtractionResponse(BaseModel):
 
 
 class ServerRouter:
-
     def __init__(self, executor: concurrent.futures.ProcessPoolExecutor):
         self._executor = executor
         self.router = APIRouter()
