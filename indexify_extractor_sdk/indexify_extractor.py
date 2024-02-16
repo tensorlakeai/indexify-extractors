@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 from .base_extractor import Content
 import nanoid
 import json
-from .extractor_worker import ExtractorModule, create_executor
+from .extractor_worker import ExtractorModule, create_executor, describe
 from .agent import ExtractorAgent
 
 
@@ -20,13 +20,6 @@ def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None
     wrapper = ExtractorWrapper(module, cls)
     result = wrapper.extract([content], params="{}")
     print(result)
-
-
-def describe(extractor: str):
-    module, cls = extractor.split(":")
-    wrapper = ExtractorWrapper(module, cls)
-    print(wrapper.describe())
-
 
 def split_validate_extractor(name: str) -> Tuple[str, str]:
     try:
@@ -46,8 +39,9 @@ def join(
     print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
     extractor_module = ExtractorModule(module_name=module, class_name=cls)
-    wrapper = ExtractorWrapper(module, cls)
-    description: ExtractorDescription = wrapper.describe()
+    executor = create_executor(extractor_module)
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    description: ExtractorDescription = asyncio.get_event_loop().run_until_complete(describe(asyncio.get_event_loop(), executor))
     outputs = {}
     for name, embedding_schema in description.embedding_schemas.items():
         outputs[name] = json.dumps({"embedding": embedding_schema.model_dump()})
@@ -64,12 +58,10 @@ def join(
     )
     id = nanoid.generate()
     print(f"extractor id is {id}")
-    executor = create_executor(extractor_module)
     server = ExtractorAgent(
         id, api_extractor_description, coordinator, executor, ingestion_addr
     )
     try:
-        asyncio.set_event_loop(asyncio.new_event_loop())
         asyncio.get_event_loop().run_until_complete(server.run())
     except asyncio.CancelledError:
         print("exiting gracefully")
