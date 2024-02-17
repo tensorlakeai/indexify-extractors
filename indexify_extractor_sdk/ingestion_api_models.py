@@ -23,4 +23,4 @@ class ExtractedContent(BaseModel):
     parent_content_id: str
     executor_id: str
     task_outcome: str
-    extractor_binding: str
+    extraction_policy: str

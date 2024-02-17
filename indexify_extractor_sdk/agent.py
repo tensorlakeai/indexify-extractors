@@ -72,7 +72,7 @@ class ExtractorAgent:
                     parent_content_id=task.content_metadata.id,
                     executor_id=self._executor_id,
                     task_outcome=task_outcome.task_outcome,
-                    extractor_binding=task.extractor_binding,
+                    extraction_policy=task.extraction_policy,
                 )
                 extracted_content_json = extracted_content.model_dump_json()
                 headers = {"content-type": "application/json"}
