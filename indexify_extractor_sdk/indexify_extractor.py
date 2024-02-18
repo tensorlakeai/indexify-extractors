@@ -16,9 +16,11 @@ def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None
         raise ValueError("You need to pass either text or file")
     if text:
         content = Content.from_text(text)
+    if file:
+        content = Content.from_file(file)
     module, cls = extractor.split(":")
     wrapper = ExtractorWrapper(module, cls)
-    result = wrapper.extract([content], params="{}")
+    result = wrapper.extract(content, params="{}")
     print(result)
 
 def split_validate_extractor(name: str) -> Tuple[str, str]:
