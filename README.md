@@ -7,6 +7,13 @@ These extractors complement the core functionalities of Indexify, enabling seaml
 
 For the main Indexify project, visit: [Indexify Main Repository](https://github.com/diptanu/indexify).
 
+## Available Extractors
+We have built some extractors based on demand from our users. You can write a new or a custom extractor for your use-case too, instructions for writing new extractors are below.
+
+* [Embedding Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/embedding)
+* [Invoice Extractor]((https://github.com/tensorlakeai/indexify-extractors/tree/main/invoices)
+* [Audio Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/whisper-asr)
+
 ## Usage
 
 Pick any extractor you are interested in running. You can also clone the entire repository to access all extractors.
