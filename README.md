@@ -10,7 +10,7 @@ We already have a few extractors here - https://github.com/tensorlakeai/indexify
 
 ## Install the SDK
 Install the SDK from PyPi
-```
+```bash
 virtualenv ve
 source ve/bin/activate
 pip install indexify-extractor-sdk
@@ -18,7 +18,7 @@ pip install indexify-extractor-sdk
 
 ## Implement the extractor SDK
 Implement the extractor interface 
-```
+```python
 class MyExtractor(Extractor):
     input_mime_types = ["text/plain", "application/pdf", "image/jpeg"]
 
@@ -49,7 +49,7 @@ class MyExtractor(Extractor):
 
 ## Test the extractor
 You can run the extractor locally using the command line tool attached to the SDK like this, by passing some arbitrary text or a file. 
-```
+```bash
 indexify-extractor local my_extractor.py:MyExtractor --text "hello"
 ```
 
