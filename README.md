@@ -11,7 +11,7 @@ For the main Indexify project, visit: [Indexify Main Repository](https://github.
 We have built some extractors based on demand from our users. You can write a new or a custom extractor for your use-case too, instructions for writing new extractors are below.
 
 * [Embedding Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/embedding)
-* [Invoice Extractor]((https://github.com/tensorlakeai/indexify-extractors/tree/main/invoices)
+* [Invoice Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/invoices)
 * [Audio Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/whisper-asr)
 
 ## Usage
