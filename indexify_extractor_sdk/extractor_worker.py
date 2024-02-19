@@ -27,6 +27,7 @@ def create_executor(extractor_module: ExtractorModule):
 def _extract_content(content: Content, params: Json) -> List[Content]:
     return extractor_wrapper.extract(content, params)
 
+
 def _describe():
     return extractor_wrapper.describe()
 

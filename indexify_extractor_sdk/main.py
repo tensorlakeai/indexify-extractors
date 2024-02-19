@@ -9,7 +9,9 @@ import sys
 
 sys.path.append(".")
 
-typer_app = typer.Typer()
+typer_app = typer.Typer(
+    help="indexify-extractor - CLI for running and packaging indexify extractors"
+)
 
 
 # Hack to get around buffered output when not run using interactive terminal in docker
@@ -43,7 +45,14 @@ def describe(extractor: str):
 
 
 @typer_app.command()
-def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
+def local(
+    extractor: str = typer.Argument(
+        None,
+        help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
+    ),
+    text: Optional[str] = None,
+    file: Optional[str] = None,
+):
     indexify_extractor.local(extractor, text, file)
 
 
@@ -54,7 +63,7 @@ def join(
         None,
         help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
     ),
-    coordinator: str = "localhost:8950",
+    coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
 ):
     print_version()
@@ -63,7 +72,7 @@ def join(
         print(f"Using extractor path from $EXTRACTOR_PATH: {extractor}")
         assert extractor, "Extractor path not provided and $EXTRACTOR_PATH not set."
 
-    indexify_extractor.join(extractor, coordinator, ingestion_addr)
+    indexify_extractor.join(extractor, coordinator_addr, ingestion_addr)
 
 
 @typer_app.command()

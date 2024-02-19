@@ -23,6 +23,7 @@ def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None
     result = wrapper.extract(content, params="{}")
     print(result)
 
+
 def split_validate_extractor(name: str) -> Tuple[str, str]:
     try:
         module, cls = name.split(":")
@@ -43,7 +44,9 @@ def join(
     extractor_module = ExtractorModule(module_name=module, class_name=cls)
     executor = create_executor(extractor_module)
     asyncio.set_event_loop(asyncio.new_event_loop())
-    description: ExtractorDescription = asyncio.get_event_loop().run_until_complete(describe(asyncio.get_event_loop(), executor))
+    description: ExtractorDescription = asyncio.get_event_loop().run_until_complete(
+        describe(asyncio.get_event_loop(), executor)
+    )
     outputs = {}
     for name, embedding_schema in description.embedding_schemas.items():
         outputs[name] = json.dumps({"embedding": embedding_schema.model_dump()})
