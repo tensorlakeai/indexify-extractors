@@ -34,6 +34,11 @@ The `coordinator-addr` and `ingestion-addr` above are the default addresses expo
 ## Build a new Extractor
 If want to build a new extractor to give Indexify new data processing capabilities you can write a new extractor by cloning this repository - https://tensorlakeai/indexify-extractor-template
 
+### Clone the template
+```shell
+git clone https://github.com/tensorlakeai/indexify-extractor-template.git
+``` 
+
 ### Implement the extractor interface 
 ```python
 class MyExtractor(Extractor):
