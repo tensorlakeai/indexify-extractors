@@ -16,25 +16,24 @@ We have built some extractors based on demand from our users. You can write a ne
 
 ## Usage
 
-Pick any extractor you are interested in running. You can also clone the entire repository to access all extractors.
+Pick any extractor you are interested in running. For example, if you want to run the MinLML6 Embedding Extractors -
 
 ```bash
-git clone https://github.com/your-repository/indexify-extractors.git
+pip install indexify-extractors[minilml6]
 ```
-
-Install the Extractors SDK 
-```
+Installing an extractor also installs the extractor SDK, if you want to install it separately -
+```bash
 pip install indexify-extractor-sdk
 ```
 
-To run an extractor locally, such at the minilm-l6 embedding extractor -
+To run an extractor locally -
 ```
-indexify-extractor local minilm_l6_embedding:MiniLML6Extractor --text "hello world"
+indexify-extractor local minilm_l6:MiniLML6Extractor --text "hello world"
 ```
 
 To run the extractor with Indexify's control plane such that it can continuously extract from content -
 ```
-indexify-extractor join minilm_l6_embedding:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
+indexify-extractor join minilm_l6:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 The `coordinator-addr` and `ingestion-addr` above are the default addresses exposed by the Indexify server to get extraction instructions and to upload extracted data, they can be configured in the server configuration.
 
