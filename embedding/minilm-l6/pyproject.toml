@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "minilm_l6"
+version = "0.0.1"
+description = "The minilm-l6 extractor extracts an embedding from text using huggingface MiniLM-6 model."
+authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>", "Lucas Jackson <lucas@tensorlake.ai>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.2.0"
+transformers = "^4.37.2"
+indexify-extractor-sdk = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

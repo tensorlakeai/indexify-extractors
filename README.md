@@ -83,3 +83,8 @@ When you are ready to deploy the extractor in production, package the extractor 
 indexify-extractor join my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr:8900
 ```
 
+## Running Your Packaged Extractor Image
+To run your packaged extractor image you can run the following command
+```
+docker run ExtractorImageName indexify-extractor join --coordinator-addr=host.docker.internal:8950 --ingestion-addr=host.docker.internal:8900
+```

@@ -29,12 +29,12 @@ RUN pip3 install --no-input --upgrade pip && \
     pip3 install --no-input {{ additional_pip_flags }} {{ python_dependencies }}
 
 {% if dev %}
-COPY indexify_extractor_sdk /indexify/indexify_extractor_sdk
+COPY indexify_extractor_sdk /indexify/indexify_extractor_sdk/indexify_extractor_sdk
 
-COPY README.md /indexify/README.md
-COPY pyproject.toml /indexify/pyproject.toml
+COPY README.md /indexify/indexify_extractor_sdk/README.md
+COPY pyproject.toml /indexify/indexify_extractor_sdk/pyproject.toml
 
-RUN pip3 install .
+RUN cd /indexify/indexify_extractor_sdk && pip3 install .
 {% else %}
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
