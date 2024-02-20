@@ -2,7 +2,7 @@
 name = "indexify-extractors"
 version = "0.0.1"
 description = "Indexify extractors."
-authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
+authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>", "Lucas Jackson <lucas@tensorlake.ai>"]
 readme = "README.md"
 packages = [{ include = "src" }]
 
@@ -14,6 +14,6 @@ path = "embedding/minilm-l6"
 optional = true
 
 [tool.poetry.extras]
-minilm_l6 = ["minilm_l6_embedding"]
+minilm_l6 = ["minilm_l6"]
 
 

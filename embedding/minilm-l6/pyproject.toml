@@ -2,7 +2,7 @@
 name = "minilm_l6"
 version = "0.0.1"
 description = "The minilm-l6 extractor extracts an embedding from text using huggingface MiniLM-6 model."
-authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
+authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>", "Lucas Jackson <lucas@tensorlake.ai>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
