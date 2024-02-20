@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "indexify-extractors"
+version = "0.0.1"
+description = "Indexify extractors."
+authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dependencies.minilm_l6]
+path = "embedding/minilm-l6"
+optional = true
+
+[tool.poetry.extras]
+minilm_l6 = ["minilm_l6_embedding"]
+
+

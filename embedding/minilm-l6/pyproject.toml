@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "indexify-extractors.embedding.minilml6"
+name = "minilm_l6"
 version = "0.0.1"
 description = "The minilm-l6 extractor extracts an embedding from text using huggingface MiniLM-6 model."
 authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
-readme = "indexify_extractors/embedding/README.md"
-packages = [{ include = "indexify_extractors" }]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
