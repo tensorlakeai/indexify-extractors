@@ -39,8 +39,6 @@ RUN cd /indexify/indexify_extractor_sdk && pip3 install .
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
-RUN pip3 install .
-
 # Copy over the extractor as {{module_name}}.py into /indexify/{{module_name}}.py
 COPY . /indexify/
 
