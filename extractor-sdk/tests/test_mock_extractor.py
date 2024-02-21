@@ -24,9 +24,18 @@ class TestMockExtractor(unittest.TestCase):
             [Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))],
             '{"a": 1, "b": "foo"}',
         )
-        self.assertEqual(len(extracted_content), 1)
+        self.assertEqual(len(extracted_content), 2)
 
     def test_extractor_schema(self):
         e = ExtractorWrapper("indexify_extractor_sdk.mock_extractor", "MockExtractor")
         schemas = e.describe()
         self.assertEqual(schemas.embedding_schemas["embedding"].distance, "cosine")
+
+    def test_run_sample_input(self):
+        e = MockExtractor()
+        result = e.extract_sample_input()
+        self.assertEqual(len(result), 2)
+
+
+if __name__ == "__main__":
+    unittest.main()

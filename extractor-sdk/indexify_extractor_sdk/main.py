@@ -41,7 +41,7 @@ def print_version():
 
 @typer_app.command()
 def describe(extractor: str):
-    indexify_extractor.describe(extractor)
+    indexify_extractor.describe_sync(extractor)
 
 
 @typer_app.command()

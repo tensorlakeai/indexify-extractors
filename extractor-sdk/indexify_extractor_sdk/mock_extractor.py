@@ -1,6 +1,6 @@
 from indexify_extractor_sdk.base_extractor import Extractor, Content, Feature
 
-from typing import List
+from typing import List, Tuple
 
 import json
 from pydantic import BaseModel
@@ -38,8 +38,8 @@ class MockExtractor(Extractor):
             ),
         ]
 
-    def sample_input(self) -> Content:
-        return Content.from_text("hello world")
+    def sample_input(self) -> Tuple[Content, InputParams]:
+        return (Content.from_text("hello world"), InputParams(a=5, b="h"))
 
 
 class MockExtractorNoInputParams(Extractor):

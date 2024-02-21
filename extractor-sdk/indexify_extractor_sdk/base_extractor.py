@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Type, Optional
+from typing import Tuple, Dict, List, Type, Optional
 import json
 from importlib import import_module
 from typing import get_type_hints
@@ -95,11 +95,12 @@ class Extractor(ABC):
         pass
 
     @abstractmethod
-    def sample_input(self) -> Content:
+    def sample_input(self) -> Tuple[Content, Type[BaseModel]]:
         pass
 
     def extract_sample_input(self) -> List[Content]:
-        return self.extract(self.sample_input())
+        input = self.sample_input()
+        return self.extract(*input)
 
 
 class ExtractorWrapper:
@@ -137,7 +138,9 @@ class ExtractorWrapper:
         for content in out_c:
             for feature in content.features:
                 if feature.feature_type == "embedding":
-                    embedding_value: Embedding = Embedding.parse_raw(feature.value)
+                    embedding_value: Embedding = Embedding.model_validate_json(
+                        feature.value
+                    )
                     embedding_schema = EmbeddingSchema(
                         dim=len(embedding_value.values),
                         distance=embedding_value.distance,

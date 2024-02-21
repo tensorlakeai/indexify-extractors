@@ -70,3 +70,9 @@ def join(
         asyncio.get_event_loop().run_until_complete(server.run())
     except asyncio.CancelledError:
         print("exiting gracefully")
+
+
+def describe_sync(extractor):
+    module, cls = extractor.split(":")
+    wrapper = ExtractorWrapper(module, cls)
+    print(wrapper.describe())
