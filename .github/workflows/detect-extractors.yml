@@ -1,6 +1,6 @@
 name: Detect Extractors in the Repo
 
-on: push
+on: workflow_dispatch
 
 jobs:
   # Don't recursively run the workflow. If the last file that was changed was just publish-extractor.yml, then don't do anything
