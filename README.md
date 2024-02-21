@@ -77,14 +77,20 @@ class MyExtractor(Extractor):
 
 Once you have developed the extractor you can test the extractor locally by running the `indexify-extractor local` command as described above.
 
-## Deploy the extractor
+### Deploy the extractor
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
 ```
 indexify-extractor join my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr:8900
 ```
 
-## Running Your Packaged Extractor Image
-To run your packaged extractor image you can run the following command
+### Package the Extractor 
+Once you build a new extractor, and have tested it and it's time to deploy this in production, you can build a container with the extractor -
+```bash
+indexify-extractor package my_extractor:MyExtractor
 ```
+
+### Running Your packaged extractor
+To run your packaged extractor image you can run the following command
+```bash
 docker run ExtractorImageName indexify-extractor join --coordinator-addr=host.docker.internal:8950 --ingestion-addr=host.docker.internal:8900
 ```
