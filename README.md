@@ -15,15 +15,15 @@ We have built some extractors based on demand from our users. You can write a ne
 * [Audio Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/whisper-asr)
 
 ## Usage
+Install the Indexify Extractor SDK 
+```bash
+pip install indexify-extractor-sdk
+```
 
 Pick any extractor you are interested in running. For example, if you want to run the MinLML6 Embedding Extractors -
 
 ```bash
-pip install indexify-extractors[minilml6]
-```
-Installing an extractor also installs the extractor SDK, if you want to install it separately -
-```bash
-pip install indexify-extractor-sdk
+indexify-extractor download hub://embedding/colbert
 ```
 
 To run an extractor locally -

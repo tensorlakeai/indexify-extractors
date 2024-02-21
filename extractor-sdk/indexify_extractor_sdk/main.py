@@ -100,7 +100,9 @@ def package(
     )
     packager.package()
 
+
 @typer_app.command()
 def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
     from .downloader import download_extractor
+
     download_extractor(extractor_path)
