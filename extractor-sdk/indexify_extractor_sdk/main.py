@@ -9,6 +9,9 @@ import sys
 
 sys.path.append(".")
 
+if os.path.exists("indexify-extractor"):
+    sys.path.append("indexify-extractor")
+
 typer_app = typer.Typer(
     help="indexify-extractor - CLI for running and packaging indexify extractors"
 )
