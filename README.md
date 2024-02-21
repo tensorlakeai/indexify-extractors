@@ -23,7 +23,7 @@ pip install indexify-extractor-sdk
 Pick any extractor you are interested in running. For example, if you want to run the MinLML6 Embedding Extractors -
 
 ```bash
-indexify-extractor download hub://embedding/colbert
+indexify-extractor download hub://embedding/minilm-l6
 ```
 
 To run an extractor locally -
