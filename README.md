@@ -80,7 +80,7 @@ Once you have developed the extractor you can test the extractor locally by runn
 ### Deploy the extractor
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
 ```
-indexify-extractor join my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr:8900
+indexify-extractor join my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 
 ### Package the Extractor 
