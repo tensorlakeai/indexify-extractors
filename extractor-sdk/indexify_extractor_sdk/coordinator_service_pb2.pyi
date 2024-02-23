@@ -2,13 +2,7 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import (
-    ClassVar as _ClassVar,
-    Iterable as _Iterable,
-    Mapping as _Mapping,
-    Optional as _Optional,
-    Union as _Union,
-)
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -17,7 +11,6 @@ class TaskOutcome(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     UNKNOWN: _ClassVar[TaskOutcome]
     FAILED: _ClassVar[TaskOutcome]
     SUCCESS: _ClassVar[TaskOutcome]
-
 UNKNOWN: TaskOutcome
 FAILED: TaskOutcome
 SUCCESS: TaskOutcome
@@ -32,10 +25,7 @@ class GetContentMetadataResponse(_message.Message):
     __slots__ = ("content_list",)
     CONTENT_LIST_FIELD_NUMBER: _ClassVar[int]
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
-    def __init__(
-        self,
-        content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
 class UpdateTaskRequest(_message.Message):
     __slots__ = ("executor_id", "task_id", "outcome", "content_list")
@@ -47,13 +37,7 @@ class UpdateTaskRequest(_message.Message):
     task_id: str
     outcome: TaskOutcome
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
-    def __init__(
-        self,
-        executor_id: _Optional[str] = ...,
-        task_id: _Optional[str] = ...,
-        outcome: _Optional[_Union[TaskOutcome, str]] = ...,
-        content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, executor_id: _Optional[str] = ..., task_id: _Optional[str] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ..., content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
 class ListStateChangesRequest(_message.Message):
     __slots__ = ()
@@ -71,22 +55,13 @@ class StateChange(_message.Message):
     change_type: str
     created_at: int
     processed_at: int
-    def __init__(
-        self,
-        id: _Optional[str] = ...,
-        object_id: _Optional[str] = ...,
-        change_type: _Optional[str] = ...,
-        created_at: _Optional[int] = ...,
-        processed_at: _Optional[int] = ...,
-    ) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., object_id: _Optional[str] = ..., change_type: _Optional[str] = ..., created_at: _Optional[int] = ..., processed_at: _Optional[int] = ...) -> None: ...
 
 class ListStateChangesResponse(_message.Message):
     __slots__ = ("changes",)
     CHANGES_FIELD_NUMBER: _ClassVar[int]
     changes: _containers.RepeatedCompositeFieldContainer[StateChange]
-    def __init__(
-        self, changes: _Optional[_Iterable[_Union[StateChange, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, changes: _Optional[_Iterable[_Union[StateChange, _Mapping]]] = ...) -> None: ...
 
 class ListTasksRequest(_message.Message):
     __slots__ = ("namespace", "extraction_policy")
@@ -94,17 +69,13 @@ class ListTasksRequest(_message.Message):
     EXTRACTION_POLICY_FIELD_NUMBER: _ClassVar[int]
     namespace: str
     extraction_policy: str
-    def __init__(
-        self, namespace: _Optional[str] = ..., extraction_policy: _Optional[str] = ...
-    ) -> None: ...
+    def __init__(self, namespace: _Optional[str] = ..., extraction_policy: _Optional[str] = ...) -> None: ...
 
 class ListTasksResponse(_message.Message):
     __slots__ = ("tasks",)
     TASKS_FIELD_NUMBER: _ClassVar[int]
     tasks: _containers.RepeatedCompositeFieldContainer[Task]
-    def __init__(
-        self, tasks: _Optional[_Iterable[_Union[Task, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, tasks: _Optional[_Iterable[_Union[Task, _Mapping]]] = ...) -> None: ...
 
 class UpdateTaskResponse(_message.Message):
     __slots__ = ()
@@ -132,9 +103,7 @@ class ListIndexesResponse(_message.Message):
     __slots__ = ("indexes",)
     INDEXES_FIELD_NUMBER: _ClassVar[int]
     indexes: _containers.RepeatedCompositeFieldContainer[Index]
-    def __init__(
-        self, indexes: _Optional[_Iterable[_Union[Index, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, indexes: _Optional[_Iterable[_Union[Index, _Mapping]]] = ...) -> None: ...
 
 class GetIndexRequest(_message.Message):
     __slots__ = ("namespace", "name")
@@ -142,9 +111,7 @@ class GetIndexRequest(_message.Message):
     NAME_FIELD_NUMBER: _ClassVar[int]
     namespace: str
     name: str
-    def __init__(
-        self, namespace: _Optional[str] = ..., name: _Optional[str] = ...
-    ) -> None: ...
+    def __init__(self, namespace: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class GetIndexResponse(_message.Message):
     __slots__ = ("index",)
@@ -163,14 +130,7 @@ class CreateIndexResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Index(_message.Message):
-    __slots__ = (
-        "name",
-        "namespace",
-        "table_name",
-        "schema",
-        "extraction_policy",
-        "extractor",
-    )
+    __slots__ = ("name", "namespace", "table_name", "schema", "extraction_policy", "extractor")
     NAME_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     TABLE_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -183,15 +143,7 @@ class Index(_message.Message):
     schema: str
     extraction_policy: str
     extractor: str
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        namespace: _Optional[str] = ...,
-        table_name: _Optional[str] = ...,
-        schema: _Optional[str] = ...,
-        extraction_policy: _Optional[str] = ...,
-        extractor: _Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., namespace: _Optional[str] = ..., table_name: _Optional[str] = ..., schema: _Optional[str] = ..., extraction_policy: _Optional[str] = ..., extractor: _Optional[str] = ...) -> None: ...
 
 class Embedding(_message.Message):
     __slots__ = ("embedding",)
@@ -213,12 +165,7 @@ class Feature(_message.Message):
     name: str
     embedding: Embedding
     attributes: Attributes
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        embedding: _Optional[_Union[Embedding, _Mapping]] = ...,
-        attributes: _Optional[_Union[Attributes, _Mapping]] = ...,
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., embedding: _Optional[_Union[Embedding, _Mapping]] = ..., attributes: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
 
 class Content(_message.Message):
     __slots__ = ("mime", "data", "features")
@@ -228,12 +175,7 @@ class Content(_message.Message):
     mime: str
     data: bytes
     features: _containers.RepeatedCompositeFieldContainer[Feature]
-    def __init__(
-        self,
-        mime: _Optional[str] = ...,
-        data: _Optional[bytes] = ...,
-        features: _Optional[_Iterable[_Union[Feature, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, mime: _Optional[str] = ..., data: _Optional[bytes] = ..., features: _Optional[_Iterable[_Union[Feature, _Mapping]]] = ...) -> None: ...
 
 class RegisterExecutorRequest(_message.Message):
     __slots__ = ("executor_id", "addr", "extractor")
@@ -243,12 +185,7 @@ class RegisterExecutorRequest(_message.Message):
     executor_id: str
     addr: str
     extractor: Extractor
-    def __init__(
-        self,
-        executor_id: _Optional[str] = ...,
-        addr: _Optional[str] = ...,
-        extractor: _Optional[_Union[Extractor, _Mapping]] = ...,
-    ) -> None: ...
+    def __init__(self, executor_id: _Optional[str] = ..., addr: _Optional[str] = ..., extractor: _Optional[_Union[Extractor, _Mapping]] = ...) -> None: ...
 
 class RegisterExecutorResponse(_message.Message):
     __slots__ = ("executor_id",)
@@ -257,10 +194,12 @@ class RegisterExecutorResponse(_message.Message):
     def __init__(self, executor_id: _Optional[str] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
-    __slots__ = ("executor_id",)
+    __slots__ = ("executor_id", "pending_tasks")
     EXECUTOR_ID_FIELD_NUMBER: _ClassVar[int]
+    PENDING_TASKS_FIELD_NUMBER: _ClassVar[int]
     executor_id: str
-    def __init__(self, executor_id: _Optional[str] = ...) -> None: ...
+    pending_tasks: int
+    def __init__(self, executor_id: _Optional[str] = ..., pending_tasks: _Optional[int] = ...) -> None: ...
 
 class HeartbeatResponse(_message.Message):
     __slots__ = ("executor_id", "tasks")
@@ -268,33 +207,17 @@ class HeartbeatResponse(_message.Message):
     TASKS_FIELD_NUMBER: _ClassVar[int]
     executor_id: str
     tasks: _containers.RepeatedCompositeFieldContainer[Task]
-    def __init__(
-        self,
-        executor_id: _Optional[str] = ...,
-        tasks: _Optional[_Iterable[_Union[Task, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, executor_id: _Optional[str] = ..., tasks: _Optional[_Iterable[_Union[Task, _Mapping]]] = ...) -> None: ...
 
 class Task(_message.Message):
-    __slots__ = (
-        "id",
-        "extractor",
-        "namespace",
-        "content_metadata",
-        "input_params",
-        "extraction_policy",
-        "output_index_mapping",
-        "outcome",
-    )
-
+    __slots__ = ("id", "extractor", "namespace", "content_metadata", "input_params", "extraction_policy", "output_index_mapping", "outcome")
     class OutputIndexMappingEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
@@ -311,17 +234,7 @@ class Task(_message.Message):
     extraction_policy: str
     output_index_mapping: _containers.ScalarMap[str, str]
     outcome: TaskOutcome
-    def __init__(
-        self,
-        id: _Optional[str] = ...,
-        extractor: _Optional[str] = ...,
-        namespace: _Optional[str] = ...,
-        content_metadata: _Optional[_Union[ContentMetadata, _Mapping]] = ...,
-        input_params: _Optional[str] = ...,
-        extraction_policy: _Optional[str] = ...,
-        output_index_mapping: _Optional[_Mapping[str, str]] = ...,
-        outcome: _Optional[_Union[TaskOutcome, str]] = ...,
-    ) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., extractor: _Optional[str] = ..., namespace: _Optional[str] = ..., content_metadata: _Optional[_Union[ContentMetadata, _Mapping]] = ..., input_params: _Optional[str] = ..., extraction_policy: _Optional[str] = ..., output_index_mapping: _Optional[_Mapping[str, str]] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ...) -> None: ...
 
 class ListExtractorsRequest(_message.Message):
     __slots__ = ()
@@ -331,22 +244,17 @@ class ListExtractorsResponse(_message.Message):
     __slots__ = ("extractors",)
     EXTRACTORS_FIELD_NUMBER: _ClassVar[int]
     extractors: _containers.RepeatedCompositeFieldContainer[Extractor]
-    def __init__(
-        self, extractors: _Optional[_Iterable[_Union[Extractor, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, extractors: _Optional[_Iterable[_Union[Extractor, _Mapping]]] = ...) -> None: ...
 
 class Extractor(_message.Message):
     __slots__ = ("name", "description", "input_params", "outputs", "input_mime_types")
-
     class OutputsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
@@ -357,14 +265,7 @@ class Extractor(_message.Message):
     input_params: str
     outputs: _containers.ScalarMap[str, str]
     input_mime_types: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        description: _Optional[str] = ...,
-        input_params: _Optional[str] = ...,
-        outputs: _Optional[_Mapping[str, str]] = ...,
-        input_mime_types: _Optional[_Iterable[str]] = ...,
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ..., input_params: _Optional[str] = ..., outputs: _Optional[_Mapping[str, str]] = ..., input_mime_types: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetNamespaceRequest(_message.Message):
     __slots__ = ("name",)
@@ -376,22 +277,17 @@ class GetNamespaceResponse(_message.Message):
     __slots__ = ("namespace",)
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     namespace: Namespace
-    def __init__(
-        self, namespace: _Optional[_Union[Namespace, _Mapping]] = ...
-    ) -> None: ...
+    def __init__(self, namespace: _Optional[_Union[Namespace, _Mapping]] = ...) -> None: ...
 
 class ListContentRequest(_message.Message):
     __slots__ = ("namespace", "source", "parent_id", "labels_eq")
-
     class LabelsEqEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -400,22 +296,13 @@ class ListContentRequest(_message.Message):
     source: str
     parent_id: str
     labels_eq: _containers.ScalarMap[str, str]
-    def __init__(
-        self,
-        namespace: _Optional[str] = ...,
-        source: _Optional[str] = ...,
-        parent_id: _Optional[str] = ...,
-        labels_eq: _Optional[_Mapping[str, str]] = ...,
-    ) -> None: ...
+    def __init__(self, namespace: _Optional[str] = ..., source: _Optional[str] = ..., parent_id: _Optional[str] = ..., labels_eq: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ListContentResponse(_message.Message):
     __slots__ = ("content_list",)
     CONTENT_LIST_FIELD_NUMBER: _ClassVar[int]
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
-    def __init__(
-        self,
-        content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
 class ListExtractionPoliciesRequest(_message.Message):
     __slots__ = ("namespace",)
@@ -427,9 +314,7 @@ class ListExtractionPoliciesResponse(_message.Message):
     __slots__ = ("policies",)
     POLICIES_FIELD_NUMBER: _ClassVar[int]
     policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
-    def __init__(
-        self, policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
 
 class CreateNamespaceRequest(_message.Message):
     __slots__ = ("name", "policies")
@@ -437,11 +322,7 @@ class CreateNamespaceRequest(_message.Message):
     POLICIES_FIELD_NUMBER: _ClassVar[int]
     name: str
     policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
 
 class CreateNamespaceResponse(_message.Message):
     __slots__ = ("name", "created_at")
@@ -449,9 +330,7 @@ class CreateNamespaceResponse(_message.Message):
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     name: str
     created_at: int
-    def __init__(
-        self, name: _Optional[str] = ..., created_at: _Optional[int] = ...
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., created_at: _Optional[int] = ...) -> None: ...
 
 class ListNamespaceRequest(_message.Message):
     __slots__ = ()
@@ -461,22 +340,17 @@ class ListNamespaceResponse(_message.Message):
     __slots__ = ("namespaces",)
     NAMESPACES_FIELD_NUMBER: _ClassVar[int]
     namespaces: _containers.RepeatedCompositeFieldContainer[Namespace]
-    def __init__(
-        self, namespaces: _Optional[_Iterable[_Union[Namespace, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, namespaces: _Optional[_Iterable[_Union[Namespace, _Mapping]]] = ...) -> None: ...
 
 class ExtractionPolicy(_message.Message):
     __slots__ = ("extractor", "name", "input_params", "filters", "content_source")
-
     class FiltersEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
@@ -487,14 +361,7 @@ class ExtractionPolicy(_message.Message):
     input_params: str
     filters: _containers.ScalarMap[str, str]
     content_source: str
-    def __init__(
-        self,
-        extractor: _Optional[str] = ...,
-        name: _Optional[str] = ...,
-        input_params: _Optional[str] = ...,
-        filters: _Optional[_Mapping[str, str]] = ...,
-        content_source: _Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, extractor: _Optional[str] = ..., name: _Optional[str] = ..., input_params: _Optional[str] = ..., filters: _Optional[_Mapping[str, str]] = ..., content_source: _Optional[str] = ...) -> None: ...
 
 class ExtractionPolicyRequest(_message.Message):
     __slots__ = ("namespace", "policy", "created_at")
@@ -504,40 +371,24 @@ class ExtractionPolicyRequest(_message.Message):
     namespace: str
     policy: ExtractionPolicy
     created_at: int
-    def __init__(
-        self,
-        namespace: _Optional[str] = ...,
-        policy: _Optional[_Union[ExtractionPolicy, _Mapping]] = ...,
-        created_at: _Optional[int] = ...,
-    ) -> None: ...
+    def __init__(self, namespace: _Optional[str] = ..., policy: _Optional[_Union[ExtractionPolicy, _Mapping]] = ..., created_at: _Optional[int] = ...) -> None: ...
 
 class ExtractionPolicyResponse(_message.Message):
-    __slots__ = (
-        "created_at",
-        "extractor",
-        "index_name_table_mapping",
-        "output_index_name_mapping",
-    )
-
+    __slots__ = ("created_at", "extractor", "index_name_table_mapping", "output_index_name_mapping")
     class IndexNameTableMappingEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
-
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     class OutputIndexNameMappingEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     INDEX_NAME_TABLE_MAPPING_FIELD_NUMBER: _ClassVar[int]
@@ -546,36 +397,17 @@ class ExtractionPolicyResponse(_message.Message):
     extractor: Extractor
     index_name_table_mapping: _containers.ScalarMap[str, str]
     output_index_name_mapping: _containers.ScalarMap[str, str]
-    def __init__(
-        self,
-        created_at: _Optional[int] = ...,
-        extractor: _Optional[_Union[Extractor, _Mapping]] = ...,
-        index_name_table_mapping: _Optional[_Mapping[str, str]] = ...,
-        output_index_name_mapping: _Optional[_Mapping[str, str]] = ...,
-    ) -> None: ...
+    def __init__(self, created_at: _Optional[int] = ..., extractor: _Optional[_Union[Extractor, _Mapping]] = ..., index_name_table_mapping: _Optional[_Mapping[str, str]] = ..., output_index_name_mapping: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ContentMetadata(_message.Message):
-    __slots__ = (
-        "id",
-        "file_name",
-        "parent_id",
-        "mime",
-        "labels",
-        "storage_url",
-        "created_at",
-        "namespace",
-        "source",
-    )
-
+    __slots__ = ("id", "file_name", "parent_id", "mime", "labels", "storage_url", "created_at", "namespace", "source")
     class LabelsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
-        def __init__(
-            self, key: _Optional[str] = ..., value: _Optional[str] = ...
-        ) -> None: ...
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     FILE_NAME_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -594,26 +426,13 @@ class ContentMetadata(_message.Message):
     created_at: int
     namespace: str
     source: str
-    def __init__(
-        self,
-        id: _Optional[str] = ...,
-        file_name: _Optional[str] = ...,
-        parent_id: _Optional[str] = ...,
-        mime: _Optional[str] = ...,
-        labels: _Optional[_Mapping[str, str]] = ...,
-        storage_url: _Optional[str] = ...,
-        created_at: _Optional[int] = ...,
-        namespace: _Optional[str] = ...,
-        source: _Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., file_name: _Optional[str] = ..., parent_id: _Optional[str] = ..., mime: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., storage_url: _Optional[str] = ..., created_at: _Optional[int] = ..., namespace: _Optional[str] = ..., source: _Optional[str] = ...) -> None: ...
 
 class CreateContentRequest(_message.Message):
     __slots__ = ("content",)
     CONTENT_FIELD_NUMBER: _ClassVar[int]
     content: ContentMetadata
-    def __init__(
-        self, content: _Optional[_Union[ContentMetadata, _Mapping]] = ...
-    ) -> None: ...
+    def __init__(self, content: _Optional[_Union[ContentMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateContentResponse(_message.Message):
     __slots__ = ("id",)
@@ -627,8 +446,4 @@ class Namespace(_message.Message):
     POLICIES_FIELD_NUMBER: _ClassVar[int]
     name: str
     policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
-    def __init__(
-        self,
-        name: _Optional[str] = ...,
-        policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...,
-    ) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...

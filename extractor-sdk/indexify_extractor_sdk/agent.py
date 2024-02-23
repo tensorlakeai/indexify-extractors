@@ -41,7 +41,8 @@ class ExtractorAgent:
         while True:
             await asyncio.sleep(5)
             yield coordinator_service_pb2.HeartbeatRequest(
-                executor_id=self._executor_id
+                executor_id=self._executor_id,
+                pending_tasks=len(self._tasks),
             )
 
     async def register(self):
@@ -76,11 +77,15 @@ class ExtractorAgent:
                 )
                 extracted_content_json = extracted_content.model_dump_json()
                 headers = {"content-type": "application/json"}
-                resp = httpx.post(
-                    f"http://{self._ingestion_addr}/write_content",
-                    headers=headers,
-                    data=extracted_content_json,
-                )
+                try:
+                    resp = httpx.post(
+                        f"http://{self._ingestion_addr}/write_content",
+                        headers=headers,
+                        data=extracted_content_json,
+                    )
+                except Exception as e:
+                    print(f"failed to report task {task_id}, exception: {e}")
+                    continue
                 try:
                     resp.raise_for_status()
                     print(f"reported task {task_id} with outcome {resp}")
