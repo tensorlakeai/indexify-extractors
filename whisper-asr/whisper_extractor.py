@@ -6,13 +6,10 @@ from indexify_extractor_sdk import (
 )
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from pydantic import BaseModel
 
 
-@dataclass_json
-@dataclass
-class InputParams:
+class InputParams(BaseModel):
     chunk_length: int = 30
     max_new_tokens: int = 128
 
@@ -21,7 +18,7 @@ class WhisperExtractor(Extractor):
     description = "Whisper ASR"
     python_dependencies = ["torch", "transformers", "librosa", "soundfile", "torch", "accelerate[cpu]"]
     system_dependencies = ["ffmpeg"]
-    input_mimes = ["audio", "audio/mpeg"]
+    input_mime_types = ["audio", "audio/mpeg"]
     def __init__(self):
         super().__init__()
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -57,7 +54,7 @@ class WhisperExtractor(Extractor):
     def sample_input(self) -> Content:
         import os
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, "SDS_746.mp3")
+        filename = os.path.join(dirname, "sample-000009.mp3")
         with open(filename, "rb") as f:
             data = f.read()
         return Content(content_type="audio/mpeg", data=data)
