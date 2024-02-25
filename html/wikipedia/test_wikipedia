@@ -29,7 +29,7 @@ class TestWikipediaExtractor(unittest.TestCase):
         )
 
     def test_wikipedia_extraction(self):
-        extracted_content = WikipediaExtractor().run_sample_input()
+        extracted_content = WikipediaExtractor().extract_sample_input()
         extracted_features = json.loads(extracted_content[0].feature.value)
 
         self.assertIsNotNone(extracted_content[0], "No content extracted")
