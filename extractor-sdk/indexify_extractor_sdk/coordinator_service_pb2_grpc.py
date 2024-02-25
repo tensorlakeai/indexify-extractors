@@ -15,95 +15,95 @@ class CoordinatorServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateContent = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/CreateContent',
-                request_serializer=coordinator__service__pb2.CreateContentRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.CreateContentResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/CreateContent",
+            request_serializer=coordinator__service__pb2.CreateContentRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.CreateContentResponse.FromString,
+        )
         self.GetContentMetadata = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/GetContentMetadata',
-                request_serializer=coordinator__service__pb2.GetContentMetadataRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.GetContentMetadataResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/GetContentMetadata",
+            request_serializer=coordinator__service__pb2.GetContentMetadataRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetContentMetadataResponse.FromString,
+        )
         self.ListContent = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListContent',
-                request_serializer=coordinator__service__pb2.ListContentRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListContentResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListContent",
+            request_serializer=coordinator__service__pb2.ListContentRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListContentResponse.FromString,
+        )
         self.CreateExtractionPolicy = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/CreateExtractionPolicy',
-                request_serializer=coordinator__service__pb2.ExtractionPolicyRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ExtractionPolicyResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/CreateExtractionPolicy",
+            request_serializer=coordinator__service__pb2.ExtractionPolicyRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ExtractionPolicyResponse.FromString,
+        )
         self.ListExtractionPolicies = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListExtractionPolicies',
-                request_serializer=coordinator__service__pb2.ListExtractionPoliciesRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListExtractionPoliciesResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListExtractionPolicies",
+            request_serializer=coordinator__service__pb2.ListExtractionPoliciesRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListExtractionPoliciesResponse.FromString,
+        )
         self.CreateNS = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/CreateNS',
-                request_serializer=coordinator__service__pb2.CreateNamespaceRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.CreateNamespaceResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/CreateNS",
+            request_serializer=coordinator__service__pb2.CreateNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.CreateNamespaceResponse.FromString,
+        )
         self.ListNS = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListNS',
-                request_serializer=coordinator__service__pb2.ListNamespaceRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListNamespaceResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListNS",
+            request_serializer=coordinator__service__pb2.ListNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListNamespaceResponse.FromString,
+        )
         self.GetNS = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/GetNS',
-                request_serializer=coordinator__service__pb2.GetNamespaceRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.GetNamespaceResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/GetNS",
+            request_serializer=coordinator__service__pb2.GetNamespaceRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetNamespaceResponse.FromString,
+        )
         self.ListExtractors = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListExtractors',
-                request_serializer=coordinator__service__pb2.ListExtractorsRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListExtractorsResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListExtractors",
+            request_serializer=coordinator__service__pb2.ListExtractorsRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListExtractorsResponse.FromString,
+        )
         self.RegisterExecutor = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/RegisterExecutor',
-                request_serializer=coordinator__service__pb2.RegisterExecutorRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.RegisterExecutorResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/RegisterExecutor",
+            request_serializer=coordinator__service__pb2.RegisterExecutorRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.RegisterExecutorResponse.FromString,
+        )
         self.Heartbeat = channel.stream_stream(
-                '/indexify_coordinator.CoordinatorService/Heartbeat',
-                request_serializer=coordinator__service__pb2.HeartbeatRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.HeartbeatResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/Heartbeat",
+            request_serializer=coordinator__service__pb2.HeartbeatRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.HeartbeatResponse.FromString,
+        )
         self.ListIndexes = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListIndexes',
-                request_serializer=coordinator__service__pb2.ListIndexesRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListIndexesResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListIndexes",
+            request_serializer=coordinator__service__pb2.ListIndexesRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListIndexesResponse.FromString,
+        )
         self.GetIndex = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/GetIndex',
-                request_serializer=coordinator__service__pb2.GetIndexRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.GetIndexResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/GetIndex",
+            request_serializer=coordinator__service__pb2.GetIndexRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetIndexResponse.FromString,
+        )
         self.CreateIndex = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/CreateIndex',
-                request_serializer=coordinator__service__pb2.CreateIndexRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.CreateIndexResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/CreateIndex",
+            request_serializer=coordinator__service__pb2.CreateIndexRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.CreateIndexResponse.FromString,
+        )
         self.GetExtractorCoordinates = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/GetExtractorCoordinates',
-                request_serializer=coordinator__service__pb2.GetExtractorCoordinatesRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.GetExtractorCoordinatesResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/GetExtractorCoordinates",
+            request_serializer=coordinator__service__pb2.GetExtractorCoordinatesRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetExtractorCoordinatesResponse.FromString,
+        )
         self.UpdateTask = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/UpdateTask',
-                request_serializer=coordinator__service__pb2.UpdateTaskRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.UpdateTaskResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/UpdateTask",
+            request_serializer=coordinator__service__pb2.UpdateTaskRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.UpdateTaskResponse.FromString,
+        )
         self.ListStateChanges = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListStateChanges',
-                request_serializer=coordinator__service__pb2.ListStateChangesRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListStateChangesResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListStateChanges",
+            request_serializer=coordinator__service__pb2.ListStateChangesRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListStateChangesResponse.FromString,
+        )
         self.ListTasks = channel.unary_unary(
-                '/indexify_coordinator.CoordinatorService/ListTasks',
-                request_serializer=coordinator__service__pb2.ListTasksRequest.SerializeToString,
-                response_deserializer=coordinator__service__pb2.ListTasksResponse.FromString,
-                )
+            "/indexify_coordinator.CoordinatorService/ListTasks",
+            request_serializer=coordinator__service__pb2.ListTasksRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.ListTasksResponse.FromString,
+        )
 
 
 class CoordinatorServiceServicer(object):
@@ -112,516 +112,733 @@ class CoordinatorServiceServicer(object):
     def CreateContent(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def GetContentMetadata(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListContent(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def CreateExtractionPolicy(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListExtractionPolicies(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def CreateNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def GetNS(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListExtractors(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def RegisterExecutor(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def Heartbeat(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListIndexes(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def GetIndex(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def CreateIndex(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def GetExtractorCoordinates(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def UpdateTask(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListStateChanges(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def ListTasks(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_CoordinatorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'CreateContent': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateContent,
-                    request_deserializer=coordinator__service__pb2.CreateContentRequest.FromString,
-                    response_serializer=coordinator__service__pb2.CreateContentResponse.SerializeToString,
-            ),
-            'GetContentMetadata': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetContentMetadata,
-                    request_deserializer=coordinator__service__pb2.GetContentMetadataRequest.FromString,
-                    response_serializer=coordinator__service__pb2.GetContentMetadataResponse.SerializeToString,
-            ),
-            'ListContent': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListContent,
-                    request_deserializer=coordinator__service__pb2.ListContentRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListContentResponse.SerializeToString,
-            ),
-            'CreateExtractionPolicy': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateExtractionPolicy,
-                    request_deserializer=coordinator__service__pb2.ExtractionPolicyRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ExtractionPolicyResponse.SerializeToString,
-            ),
-            'ListExtractionPolicies': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListExtractionPolicies,
-                    request_deserializer=coordinator__service__pb2.ListExtractionPoliciesRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListExtractionPoliciesResponse.SerializeToString,
-            ),
-            'CreateNS': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateNS,
-                    request_deserializer=coordinator__service__pb2.CreateNamespaceRequest.FromString,
-                    response_serializer=coordinator__service__pb2.CreateNamespaceResponse.SerializeToString,
-            ),
-            'ListNS': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListNS,
-                    request_deserializer=coordinator__service__pb2.ListNamespaceRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListNamespaceResponse.SerializeToString,
-            ),
-            'GetNS': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetNS,
-                    request_deserializer=coordinator__service__pb2.GetNamespaceRequest.FromString,
-                    response_serializer=coordinator__service__pb2.GetNamespaceResponse.SerializeToString,
-            ),
-            'ListExtractors': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListExtractors,
-                    request_deserializer=coordinator__service__pb2.ListExtractorsRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListExtractorsResponse.SerializeToString,
-            ),
-            'RegisterExecutor': grpc.unary_unary_rpc_method_handler(
-                    servicer.RegisterExecutor,
-                    request_deserializer=coordinator__service__pb2.RegisterExecutorRequest.FromString,
-                    response_serializer=coordinator__service__pb2.RegisterExecutorResponse.SerializeToString,
-            ),
-            'Heartbeat': grpc.stream_stream_rpc_method_handler(
-                    servicer.Heartbeat,
-                    request_deserializer=coordinator__service__pb2.HeartbeatRequest.FromString,
-                    response_serializer=coordinator__service__pb2.HeartbeatResponse.SerializeToString,
-            ),
-            'ListIndexes': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListIndexes,
-                    request_deserializer=coordinator__service__pb2.ListIndexesRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListIndexesResponse.SerializeToString,
-            ),
-            'GetIndex': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetIndex,
-                    request_deserializer=coordinator__service__pb2.GetIndexRequest.FromString,
-                    response_serializer=coordinator__service__pb2.GetIndexResponse.SerializeToString,
-            ),
-            'CreateIndex': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateIndex,
-                    request_deserializer=coordinator__service__pb2.CreateIndexRequest.FromString,
-                    response_serializer=coordinator__service__pb2.CreateIndexResponse.SerializeToString,
-            ),
-            'GetExtractorCoordinates': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetExtractorCoordinates,
-                    request_deserializer=coordinator__service__pb2.GetExtractorCoordinatesRequest.FromString,
-                    response_serializer=coordinator__service__pb2.GetExtractorCoordinatesResponse.SerializeToString,
-            ),
-            'UpdateTask': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateTask,
-                    request_deserializer=coordinator__service__pb2.UpdateTaskRequest.FromString,
-                    response_serializer=coordinator__service__pb2.UpdateTaskResponse.SerializeToString,
-            ),
-            'ListStateChanges': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListStateChanges,
-                    request_deserializer=coordinator__service__pb2.ListStateChangesRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListStateChangesResponse.SerializeToString,
-            ),
-            'ListTasks': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListTasks,
-                    request_deserializer=coordinator__service__pb2.ListTasksRequest.FromString,
-                    response_serializer=coordinator__service__pb2.ListTasksResponse.SerializeToString,
-            ),
+        "CreateContent": grpc.unary_unary_rpc_method_handler(
+            servicer.CreateContent,
+            request_deserializer=coordinator__service__pb2.CreateContentRequest.FromString,
+            response_serializer=coordinator__service__pb2.CreateContentResponse.SerializeToString,
+        ),
+        "GetContentMetadata": grpc.unary_unary_rpc_method_handler(
+            servicer.GetContentMetadata,
+            request_deserializer=coordinator__service__pb2.GetContentMetadataRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetContentMetadataResponse.SerializeToString,
+        ),
+        "ListContent": grpc.unary_unary_rpc_method_handler(
+            servicer.ListContent,
+            request_deserializer=coordinator__service__pb2.ListContentRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListContentResponse.SerializeToString,
+        ),
+        "CreateExtractionPolicy": grpc.unary_unary_rpc_method_handler(
+            servicer.CreateExtractionPolicy,
+            request_deserializer=coordinator__service__pb2.ExtractionPolicyRequest.FromString,
+            response_serializer=coordinator__service__pb2.ExtractionPolicyResponse.SerializeToString,
+        ),
+        "ListExtractionPolicies": grpc.unary_unary_rpc_method_handler(
+            servicer.ListExtractionPolicies,
+            request_deserializer=coordinator__service__pb2.ListExtractionPoliciesRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListExtractionPoliciesResponse.SerializeToString,
+        ),
+        "CreateNS": grpc.unary_unary_rpc_method_handler(
+            servicer.CreateNS,
+            request_deserializer=coordinator__service__pb2.CreateNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.CreateNamespaceResponse.SerializeToString,
+        ),
+        "ListNS": grpc.unary_unary_rpc_method_handler(
+            servicer.ListNS,
+            request_deserializer=coordinator__service__pb2.ListNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListNamespaceResponse.SerializeToString,
+        ),
+        "GetNS": grpc.unary_unary_rpc_method_handler(
+            servicer.GetNS,
+            request_deserializer=coordinator__service__pb2.GetNamespaceRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetNamespaceResponse.SerializeToString,
+        ),
+        "ListExtractors": grpc.unary_unary_rpc_method_handler(
+            servicer.ListExtractors,
+            request_deserializer=coordinator__service__pb2.ListExtractorsRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListExtractorsResponse.SerializeToString,
+        ),
+        "RegisterExecutor": grpc.unary_unary_rpc_method_handler(
+            servicer.RegisterExecutor,
+            request_deserializer=coordinator__service__pb2.RegisterExecutorRequest.FromString,
+            response_serializer=coordinator__service__pb2.RegisterExecutorResponse.SerializeToString,
+        ),
+        "Heartbeat": grpc.stream_stream_rpc_method_handler(
+            servicer.Heartbeat,
+            request_deserializer=coordinator__service__pb2.HeartbeatRequest.FromString,
+            response_serializer=coordinator__service__pb2.HeartbeatResponse.SerializeToString,
+        ),
+        "ListIndexes": grpc.unary_unary_rpc_method_handler(
+            servicer.ListIndexes,
+            request_deserializer=coordinator__service__pb2.ListIndexesRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListIndexesResponse.SerializeToString,
+        ),
+        "GetIndex": grpc.unary_unary_rpc_method_handler(
+            servicer.GetIndex,
+            request_deserializer=coordinator__service__pb2.GetIndexRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetIndexResponse.SerializeToString,
+        ),
+        "CreateIndex": grpc.unary_unary_rpc_method_handler(
+            servicer.CreateIndex,
+            request_deserializer=coordinator__service__pb2.CreateIndexRequest.FromString,
+            response_serializer=coordinator__service__pb2.CreateIndexResponse.SerializeToString,
+        ),
+        "GetExtractorCoordinates": grpc.unary_unary_rpc_method_handler(
+            servicer.GetExtractorCoordinates,
+            request_deserializer=coordinator__service__pb2.GetExtractorCoordinatesRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetExtractorCoordinatesResponse.SerializeToString,
+        ),
+        "UpdateTask": grpc.unary_unary_rpc_method_handler(
+            servicer.UpdateTask,
+            request_deserializer=coordinator__service__pb2.UpdateTaskRequest.FromString,
+            response_serializer=coordinator__service__pb2.UpdateTaskResponse.SerializeToString,
+        ),
+        "ListStateChanges": grpc.unary_unary_rpc_method_handler(
+            servicer.ListStateChanges,
+            request_deserializer=coordinator__service__pb2.ListStateChangesRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListStateChangesResponse.SerializeToString,
+        ),
+        "ListTasks": grpc.unary_unary_rpc_method_handler(
+            servicer.ListTasks,
+            request_deserializer=coordinator__service__pb2.ListTasksRequest.FromString,
+            response_serializer=coordinator__service__pb2.ListTasksResponse.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'indexify_coordinator.CoordinatorService', rpc_method_handlers)
+        "indexify_coordinator.CoordinatorService", rpc_method_handlers
+    )
     server.add_generic_rpc_handlers((generic_handler,))
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class CoordinatorService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def CreateContent(request,
+    def CreateContent(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/CreateContent',
+            "/indexify_coordinator.CoordinatorService/CreateContent",
             coordinator__service__pb2.CreateContentRequest.SerializeToString,
             coordinator__service__pb2.CreateContentResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def GetContentMetadata(request,
+    def GetContentMetadata(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/GetContentMetadata',
+            "/indexify_coordinator.CoordinatorService/GetContentMetadata",
             coordinator__service__pb2.GetContentMetadataRequest.SerializeToString,
             coordinator__service__pb2.GetContentMetadataResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListContent(request,
+    def ListContent(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListContent',
+            "/indexify_coordinator.CoordinatorService/ListContent",
             coordinator__service__pb2.ListContentRequest.SerializeToString,
             coordinator__service__pb2.ListContentResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def CreateExtractionPolicy(request,
+    def CreateExtractionPolicy(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/CreateExtractionPolicy',
+            "/indexify_coordinator.CoordinatorService/CreateExtractionPolicy",
             coordinator__service__pb2.ExtractionPolicyRequest.SerializeToString,
             coordinator__service__pb2.ExtractionPolicyResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListExtractionPolicies(request,
+    def ListExtractionPolicies(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListExtractionPolicies',
+            "/indexify_coordinator.CoordinatorService/ListExtractionPolicies",
             coordinator__service__pb2.ListExtractionPoliciesRequest.SerializeToString,
             coordinator__service__pb2.ListExtractionPoliciesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def CreateNS(request,
+    def CreateNS(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/CreateNS',
+            "/indexify_coordinator.CoordinatorService/CreateNS",
             coordinator__service__pb2.CreateNamespaceRequest.SerializeToString,
             coordinator__service__pb2.CreateNamespaceResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListNS(request,
+    def ListNS(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListNS',
+            "/indexify_coordinator.CoordinatorService/ListNS",
             coordinator__service__pb2.ListNamespaceRequest.SerializeToString,
             coordinator__service__pb2.ListNamespaceResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def GetNS(request,
+    def GetNS(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/GetNS',
+            "/indexify_coordinator.CoordinatorService/GetNS",
             coordinator__service__pb2.GetNamespaceRequest.SerializeToString,
             coordinator__service__pb2.GetNamespaceResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListExtractors(request,
+    def ListExtractors(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListExtractors',
+            "/indexify_coordinator.CoordinatorService/ListExtractors",
             coordinator__service__pb2.ListExtractorsRequest.SerializeToString,
             coordinator__service__pb2.ListExtractorsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def RegisterExecutor(request,
+    def RegisterExecutor(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/RegisterExecutor',
+            "/indexify_coordinator.CoordinatorService/RegisterExecutor",
             coordinator__service__pb2.RegisterExecutorRequest.SerializeToString,
             coordinator__service__pb2.RegisterExecutorResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def Heartbeat(request_iterator,
+    def Heartbeat(
+        request_iterator,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.stream_stream(
+            request_iterator,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/indexify_coordinator.CoordinatorService/Heartbeat',
+            "/indexify_coordinator.CoordinatorService/Heartbeat",
             coordinator__service__pb2.HeartbeatRequest.SerializeToString,
             coordinator__service__pb2.HeartbeatResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListIndexes(request,
+    def ListIndexes(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListIndexes',
+            "/indexify_coordinator.CoordinatorService/ListIndexes",
             coordinator__service__pb2.ListIndexesRequest.SerializeToString,
             coordinator__service__pb2.ListIndexesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def GetIndex(request,
+    def GetIndex(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/GetIndex',
+            "/indexify_coordinator.CoordinatorService/GetIndex",
             coordinator__service__pb2.GetIndexRequest.SerializeToString,
             coordinator__service__pb2.GetIndexResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def CreateIndex(request,
+    def CreateIndex(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/CreateIndex',
+            "/indexify_coordinator.CoordinatorService/CreateIndex",
             coordinator__service__pb2.CreateIndexRequest.SerializeToString,
             coordinator__service__pb2.CreateIndexResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def GetExtractorCoordinates(request,
+    def GetExtractorCoordinates(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/GetExtractorCoordinates',
+            "/indexify_coordinator.CoordinatorService/GetExtractorCoordinates",
             coordinator__service__pb2.GetExtractorCoordinatesRequest.SerializeToString,
             coordinator__service__pb2.GetExtractorCoordinatesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def UpdateTask(request,
+    def UpdateTask(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/UpdateTask',
+            "/indexify_coordinator.CoordinatorService/UpdateTask",
             coordinator__service__pb2.UpdateTaskRequest.SerializeToString,
             coordinator__service__pb2.UpdateTaskResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListStateChanges(request,
+    def ListStateChanges(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListStateChanges',
+            "/indexify_coordinator.CoordinatorService/ListStateChanges",
             coordinator__service__pb2.ListStateChangesRequest.SerializeToString,
             coordinator__service__pb2.ListStateChangesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def ListTasks(request,
+    def ListTasks(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indexify_coordinator.CoordinatorService/ListTasks',
+            "/indexify_coordinator.CoordinatorService/ListTasks",
             coordinator__service__pb2.ListTasksRequest.SerializeToString,
             coordinator__service__pb2.ListTasksResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )

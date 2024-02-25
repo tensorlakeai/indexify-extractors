@@ -21,7 +21,6 @@ class BeginExtractedContentIngest(BaseModel):
     parent_content_id: str
     executor_id: str
     task_outcome: str
-    extraction_policy: str
 
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
@@ -29,11 +28,14 @@ class ExtractedContent(BaseModel):
 class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
 
+
 class ApiBeginExtractedContentIngest(BaseModel):
     BeginExtractedContentIngest: BeginExtractedContentIngest
 
+
 class ApiExtractedContent(BaseModel):
     ExtractedContent: ExtractedContent
+
 
 class ApiFinishExtractedContentIngest(BaseModel):
     FinishExtractedContentIngest: FinishExtractedContentIngest
