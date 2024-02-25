@@ -6,13 +6,15 @@ from typing import List, Dict
 from .base_extractor import Content
 from .content_downloader import download_content
 from pydantic import BaseModel
-from .extractor_worker import extract_content, ExtractorModule, create_executor
-from .ingestion_api_models import ApiContent, ApiFeature, ExtractedContent
+from .extractor_worker import extract_content 
+from .ingestion_api_models import ApiContent, ApiFeature, BeginExtractedContentIngest, ExtractedContent, FinishExtractedContentIngest, ApiBeginExtractedContentIngest, ApiExtractedContent, ApiFinishExtractedContentIngest
 import httpx
 from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
+from httpx_ws import aconnect_ws, connect_ws
+from itertools import batched
 
-
+CONTENT_UPLOAD_BATCH_SIZE = 2
 class CompletedTask(BaseModel):
     task_id: str
     task_outcome: str
@@ -62,11 +64,11 @@ class ExtractorAgent:
         while True:
             await asyncio.sleep(5)
             # We should copy only the keys and not the values
+            url = f"http://{self._ingestion_addr}/write_content"
             for task_id, task_outcome in self._task_outcomes.copy().items():
                 print(f"reporting outcome of task {task_id}")
                 task: coordinator_service_pb2.Task = self._tasks[task_id]
-                extracted_content = ExtractedContent(
-                    content_list=task_outcome.content,
+                begin_msg = ApiBeginExtractedContentIngest(BeginExtractedContentIngest=BeginExtractedContentIngest(
                     task_id=task_outcome.task_id,
                     namespace=task.namespace,
                     output_to_index_table_mapping=task.output_index_mapping,
@@ -74,26 +76,21 @@ class ExtractorAgent:
                     executor_id=self._executor_id,
                     task_outcome=task_outcome.task_outcome,
                     extraction_policy=task.extraction_policy,
-                )
-                extracted_content_json = extracted_content.model_dump_json()
-                headers = {"content-type": "application/json"}
+                ))
                 try:
-                    resp = httpx.post(
-                        f"http://{self._ingestion_addr}/write_content",
-                        headers=headers,
-                        data=extracted_content_json,
-                    )
+                    async with aconnect_ws(url) as ws:
+                        await ws.send_text(begin_msg.model_dump_json())
+                        for batch in batched(task_outcome.content, CONTENT_UPLOAD_BATCH_SIZE):
+                            extracted_content = ApiExtractedContent(ExtractedContent=ExtractedContent(content_list=batch))
+                            await ws.send_text(extracted_content.model_dump_json()) 
+                        print(f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)).model_dump_json()}")
+                        finish_msg = ApiFinishExtractedContentIngest(FinishExtractedContentIngest=FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)))
+                        await ws.send_text(finish_msg.model_dump_json())
                 except Exception as e:
                     print(f"failed to report task {task_id}, exception: {e}")
                     continue
-                try:
-                    resp.raise_for_status()
-                    print(f"reported task {task_id} with outcome {resp}")
-                    self._task_outcomes.pop(task_id)
-                except httpx.HTTPStatusError as exc:
-                    print(
-                        f"failed to report task {task_id} with outcome {task_outcome} {exc} {exc.response.text}"
-                    )
+
+                self._task_outcomes.pop(task_id)
 
     async def launch_task(self, task: coordinator_service_pb2.Task):
         try:
