@@ -29,11 +29,14 @@ class ExtractedContent(BaseModel):
 class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
 
+
 class ApiBeginExtractedContentIngest(BaseModel):
     BeginExtractedContentIngest: BeginExtractedContentIngest
 
+
 class ApiExtractedContent(BaseModel):
     ExtractedContent: ExtractedContent
+
 
 class ApiFinishExtractedContentIngest(BaseModel):
     FinishExtractedContentIngest: FinishExtractedContentIngest

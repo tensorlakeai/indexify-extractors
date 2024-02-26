@@ -6,15 +6,23 @@ from typing import List, Dict
 from .base_extractor import Content
 from .content_downloader import download_content
 from pydantic import BaseModel
-from .extractor_worker import extract_content 
-from .ingestion_api_models import ApiContent, ApiFeature, BeginExtractedContentIngest, ExtractedContent, FinishExtractedContentIngest, ApiBeginExtractedContentIngest, ApiExtractedContent, ApiFinishExtractedContentIngest
-import httpx
+from .extractor_worker import extract_content
+from .ingestion_api_models import (
+    ApiContent,
+    ApiFeature,
+    BeginExtractedContentIngest,
+    ExtractedContent,
+    FinishExtractedContentIngest,
+    ApiBeginExtractedContentIngest,
+    ApiExtractedContent,
+    ApiFinishExtractedContentIngest,
+)
 from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
-from httpx_ws import aconnect_ws, connect_ws
 from itertools import batched
+import websockets
 
-CONTENT_UPLOAD_BATCH_SIZE = 2
+CONTENT_UPLOAD_BATCH_SIZE = 5
 class CompletedTask(BaseModel):
     task_id: str
     task_outcome: str
@@ -64,28 +72,44 @@ class ExtractorAgent:
         while True:
             await asyncio.sleep(5)
             # We should copy only the keys and not the values
-            url = f"http://{self._ingestion_addr}/write_content"
+            url = f"ws://{self._ingestion_addr}/write_content"
             for task_id, task_outcome in self._task_outcomes.copy().items():
-                print(f"reporting outcome of task {task_id}")
+                print(
+                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.content)}"
+                )
                 task: coordinator_service_pb2.Task = self._tasks[task_id]
-                begin_msg = ApiBeginExtractedContentIngest(BeginExtractedContentIngest=BeginExtractedContentIngest(
-                    task_id=task_outcome.task_id,
-                    namespace=task.namespace,
-                    output_to_index_table_mapping=task.output_index_mapping,
-                    parent_content_id=task.content_metadata.id,
-                    executor_id=self._executor_id,
-                    task_outcome=task_outcome.task_outcome,
-                    extraction_policy=task.extraction_policy,
-                ))
+                begin_msg = ApiBeginExtractedContentIngest(
+                    BeginExtractedContentIngest=BeginExtractedContentIngest(
+                        task_id=task_outcome.task_id,
+                        namespace=task.namespace,
+                        output_to_index_table_mapping=task.output_index_mapping,
+                        parent_content_id=task.content_metadata.id,
+                        executor_id=self._executor_id,
+                        task_outcome=task_outcome.task_outcome,
+                        extraction_policy=task.extraction_policy,
+                    )
+                )
                 try:
-                    async with aconnect_ws(url) as ws:
-                        await ws.send_text(begin_msg.model_dump_json())
-                        for batch in batched(task_outcome.content, CONTENT_UPLOAD_BATCH_SIZE):
-                            extracted_content = ApiExtractedContent(ExtractedContent=ExtractedContent(content_list=batch))
-                            await ws.send_text(extracted_content.model_dump_json()) 
-                        print(f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)).model_dump_json()}")
-                        finish_msg = ApiFinishExtractedContentIngest(FinishExtractedContentIngest=FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)))
-                        await ws.send_text(finish_msg.model_dump_json())
+                    async with websockets.connect(
+                        url, ping_interval=5, ping_timeout=30
+                    ) as ws:
+                        await ws.send(begin_msg.model_dump_json())
+                        for batch in batched(
+                            task_outcome.content, CONTENT_UPLOAD_BATCH_SIZE
+                        ):
+                            extracted_content = ApiExtractedContent(
+                                ExtractedContent=ExtractedContent(content_list=batch)
+                            )
+                            await ws.send(extracted_content.model_dump_json())
+                        print(
+                            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)).model_dump_json()}"
+                        )
+                        finish_msg = ApiFinishExtractedContentIngest(
+                            FinishExtractedContentIngest=FinishExtractedContentIngest(
+                                num_extracted_content=len(task_outcome.content)
+                            )
+                        )
+                        await ws.send(finish_msg.model_dump_json())
                 except Exception as e:
                     print(f"failed to report task {task_id}, exception: {e}")
                     continue
