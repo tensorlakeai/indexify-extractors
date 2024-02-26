@@ -21,6 +21,7 @@ class BeginExtractedContentIngest(BaseModel):
     parent_content_id: str
     executor_id: str
     task_outcome: str
+    extraction_policy: str
 
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
