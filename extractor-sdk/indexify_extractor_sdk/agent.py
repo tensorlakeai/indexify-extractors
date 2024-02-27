@@ -19,7 +19,7 @@ from .ingestion_api_models import (
 )
 from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
-from itertools import batched
+from itertools import islice
 import websockets
 
 CONTENT_UPLOAD_BATCH_SIZE = 5
@@ -90,6 +90,15 @@ class ExtractorAgent:
                     )
                 )
                 try:
+                    # https://docs.python.org/3/library/itertools.html#itertools.batched
+                    def batched(iterable, n):
+                        # batched('ABCDEFG', 3) --> ABC DEF G
+                        if n < 1:
+                            raise ValueError('n must be at least one')
+                        it = iter(iterable)
+                        while batch := tuple(islice(it, n)):
+                            yield batch
+                            
                     async with websockets.connect(
                         url, ping_interval=5, ping_timeout=30
                     ) as ws:
