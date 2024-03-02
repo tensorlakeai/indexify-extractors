@@ -2,11 +2,11 @@ import logging
 import os
 import pickle
 import shutil
+import tempfile
 import time
 from collections import defaultdict
-from typing import List
-import tempfile
 from io import BytesIO
+from typing import List
 
 import cv2
 import face_recognition
