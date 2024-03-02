@@ -6,6 +6,7 @@ import time
 from collections import defaultdict
 from typing import List
 import tempfile
+from io import BytesIO
 
 import cv2
 import face_recognition
@@ -58,26 +59,32 @@ class FaceExtractor(Extractor):
         self.encodings_dir = os.path.join(data_dir, "encodings")
         os.makedirs(self.encodings_dir, exist_ok=True)
 
+        # process data
         self.extract_frames()
         self.extract_encodings()
         cluster_images = self.cluster_images()
 
+        # clean up
         os.remove(tmpfile_name)
-
+        shutil.rmtree("data")
         content_list = []
         for k in cluster_images.keys():
-            feature = Feature.metadata({"face": str(k)}, name="image")
-            img = Image.fromarray(cluster_images[k][0])
-            # convert to jpg
+            feature = Feature.metadata(
+                {"face": str(k), "frame": cluster_images[k][0]["frame"]}, name="image"
+            )
+            img = Image.fromarray(cluster_images[k][0]["image"])
+
+            output = BytesIO()
             img = img.convert("RGB")
-            # save
-            img.save("tmp.jpg")
-            with open("tmp.jpg",'rb') as f:
-                content_list.append(
-                    Content(
-                        content_type=f"image/jpeg", data=f.read(), features=[feature]
-                    )
+            img.save(output, format="JPEG")
+
+            content_list.append(
+                Content(
+                    content_type=f"image/jpeg",
+                    data=output.getvalue(),
+                    features=[feature],
                 )
+            )
 
         return content_list
 
@@ -131,7 +138,7 @@ class FaceExtractor(Extractor):
             if frame_count % int(fps * self.save_fps) == 0:
                 logger.info(f"Saving frame number {frame_count}")
                 frame = self._auto_resize(frame)
-                filename = "frame_" + str(frame_count) + ".jpg"
+                filename = str(frame_count) + ".jpg"
                 cv2.imwrite(os.path.join(self.frames_dir, filename), frame)
             frame_count += 1
         logger.info("Frames extracted")
@@ -207,15 +214,15 @@ class FaceExtractor(Extractor):
         image = self._rescale_by_width(image, 100)
         return image
 
-    def cluster_images(self):
+    def cluster_images(self, max_per_label=1):
         # load the serialized face encodings + bounding box locations from
         # disk, then extract the set of encodings to so we can cluster on
         # them
         logger.info("Loading encodings")
-        data = pickle.loads(open(self.encodings_pkl_path, "rb").read())
-        data = np.array(data)
+        encodings_data = pickle.loads(open(self.encodings_pkl_path, "rb").read())
+        encodings_data = np.array(encodings_data)
 
-        encodings = [d["encoding"] for d in data]
+        encodings = [d["encoding"] for d in encodings_data]
 
         # cluster the embeddings
         logger.info("Clustering")
@@ -232,11 +239,13 @@ class FaceExtractor(Extractor):
         result = defaultdict(lambda: [])
         for label in range(unique_faces_count):
             ids = np.where(labels == label)[0]
-            for id in ids[:10]:
-                image = cv2.imread(data[id]["image_path"])
+            for id in ids[:max_per_label]:
+                image_path = encodings_data[id]["image_path"]
+                image = cv2.imread(image_path)
+                frame, _ = os.path.splitext(os.path.basename(image_path))
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                image = self.crop_image(data[id]["loc"], image)
-                result[label].append(image)
+                image = self.crop_image(encodings_data[id]["loc"], image)
+                result[label].append({"image": image, "frame": frame})
         return result
 
     def sample_input(self) -> Content:
