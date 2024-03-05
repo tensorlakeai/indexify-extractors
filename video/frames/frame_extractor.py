@@ -21,6 +21,8 @@ class FrameExtractor(Extractor):
             tmpfile.flush()  # Ensure data is written to disk
             
             cap = cv2.VideoCapture(tmpfile.name)
+            fps = cap.get(cv2.CAP_PROP_FPS)
+
             _, frame = cap.read()
 
 
@@ -39,7 +41,7 @@ class FrameExtractor(Extractor):
                 output.write(buffer)
 
                 feature = Feature.metadata(
-                    {"frame": frame_count}, name="image"
+                    {"frame": frame_count, "timestamp": frame_count / fps}
                 )
                 
                 content_list.append(
