@@ -3,8 +3,6 @@ from typing import List
 from ultralytics import YOLO
 import numpy as np
 import cv2
-import json
-from io import BytesIO
 
 
 class YoloExtractor(Extractor):
