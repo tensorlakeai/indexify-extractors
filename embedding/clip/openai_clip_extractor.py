@@ -16,7 +16,7 @@ class ClipInputParams(BaseModel):
 class ClipImageEmbeddingExtractor(Extractor):
     name = "tensorlake/clip-extractor"
     description = "Clip Embedding Image Extractor"
-    input_mimes = ["image/jpeg", "image/png", "text/plain"]
+    input_mime_types = ["image/jpeg", "image/png", "text/plain"]
 
     def __init__(self):
         super(ClipImageEmbeddingExtractor, self).__init__()
