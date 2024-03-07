@@ -27,7 +27,7 @@ class AudioExtractor(Extractor):
                 video.audio.write_audiofile(tmpfile_audio.name, codec="libmp3lame")
                 f = open(tmpfile_audio.name, "rb")
                 data = f.read()
-                return [Content(data=data, content_type="audio/mp3")]
+                return [Content(data=data, content_type="audio/mpeg")]
 
     def sample_input(self) -> Content:
         file_path = "sample.mp4"
