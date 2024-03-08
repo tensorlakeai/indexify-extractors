@@ -73,8 +73,12 @@ class FrameExtractor(Extractor):
                     hist_current = cv2.calcHist(
                         [frame_gray], [0], None, [256], [0, 256]
                     )
-                    if (hist_prev is None) or self.is_keyframe(hist_current, hist_prev, params.key_frames_threshold):
-                        content_list.append(self.frame_to_content(frame, frame_count, fps))
+                    if (hist_prev is None) or self.is_keyframe(
+                        hist_current, hist_prev, params.key_frames_threshold
+                    ):
+                        content_list.append(
+                            self.frame_to_content(frame, frame_count, fps)
+                        )
                     hist_prev = hist_current
                 elif frame_count % skip_factor == 0:
                     content_list.append(self.frame_to_content(frame, frame_count, fps))
