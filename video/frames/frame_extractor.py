@@ -3,8 +3,10 @@ from typing import List
 import cv2
 import tempfile
 from io import BytesIO
+from pydantic import BaseModel
 
-
+class FrameExtractorConfig(BaseModel):
+    max_fps:int = 60
 class FrameExtractor(Extractor):
     name = "tensorlake/frame-extractor"
     description = "Extract frames from video"
@@ -13,7 +15,14 @@ class FrameExtractor(Extractor):
     def __init__(self):
         super(FrameExtractor, self).__init__()
 
-    def extract(self, content: Content, params: None) -> List[Content]:
+    def get_skip_factor(self,fps:float, max_fps:int):
+        if fps > max_fps:
+            skip_factor = int(fps / max_fps)
+        else:
+            skip_factor = 1
+        return skip_factor
+
+    def extract(self, content: Content, params: FrameExtractorConfig) -> List[Content]:
         content_list = []
         
         with tempfile.NamedTemporaryFile(suffix='.mp4', delete=True) as tmpfile:
@@ -23,8 +32,7 @@ class FrameExtractor(Extractor):
             cap = cv2.VideoCapture(tmpfile.name)
             fps = cap.get(cv2.CAP_PROP_FPS)
 
-            _, frame = cap.read()
-
+            skip_factor = self.get_skip_factor(fps, params.max_fps)
 
             frame_count = 0
             while cap.isOpened():
@@ -33,9 +41,14 @@ class FrameExtractor(Extractor):
 
                 if not ret:
                     break
-
+                
                 frame_count += 1
 
+                # skip frame
+                if (frame_count - 1) % skip_factor != 0:
+                    continue
+
+                # extract frame
                 output = BytesIO()
                 _, buffer = cv2.imencode('.jpg', frame)
                 output.write(buffer)
