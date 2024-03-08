@@ -46,3 +46,5 @@ ENV TOKENIZERS_PARALLELISM=true
 
 # verify installation
 RUN indexify-extractor --help
+
+ENTRYPOINT ["indexify-extractor"]
