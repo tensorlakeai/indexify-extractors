@@ -2,8 +2,8 @@ import asyncio
 from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
-from typing import List, Dict
-from .base_extractor import Content
+from typing import List, Dict, Union
+from .base_extractor import Content, Feature
 from .content_downloader import download_content
 from pydantic import BaseModel
 from .extractor_worker import extract_content
@@ -12,9 +12,11 @@ from .ingestion_api_models import (
     ApiFeature,
     BeginExtractedContentIngest,
     ExtractedContent,
+    ExtractedFeatures,
     FinishExtractedContentIngest,
     ApiBeginExtractedContentIngest,
     ApiExtractedContent,
+    ApiExtractedFeatures,
     ApiFinishExtractedContentIngest,
 )
 from .server import http_server, ServerRouter, get_server_advertise_addr
@@ -23,10 +25,13 @@ from itertools import islice
 import websockets
 
 CONTENT_UPLOAD_BATCH_SIZE = 5
+
+
 class CompletedTask(BaseModel):
     task_id: str
     task_outcome: str
-    content: List[ApiContent]
+    new_content: List[ApiContent]
+    features: List[ApiFeature]
 
 
 class ExtractorAgent:
@@ -75,7 +80,7 @@ class ExtractorAgent:
             url = f"ws://{self._ingestion_addr}/write_content"
             for task_id, task_outcome in self._task_outcomes.copy().items():
                 print(
-                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.content)}"
+                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}"
                 )
                 task: coordinator_service_pb2.Task = self._tasks[task_id]
                 begin_msg = ApiBeginExtractedContentIngest(
@@ -87,6 +92,7 @@ class ExtractorAgent:
                         executor_id=self._executor_id,
                         task_outcome=task_outcome.task_outcome,
                         extraction_policy=task.extraction_policy,
+                        extractor=task.extractor,
                     )
                 )
                 try:
@@ -94,28 +100,35 @@ class ExtractorAgent:
                     def batched(iterable, n):
                         # batched('ABCDEFG', 3) --> ABC DEF G
                         if n < 1:
-                            raise ValueError('n must be at least one')
+                            raise ValueError("n must be at least one")
                         it = iter(iterable)
                         while batch := tuple(islice(it, n)):
                             yield batch
-                            
+
                     async with websockets.connect(
                         url, ping_interval=5, ping_timeout=30
                     ) as ws:
                         await ws.send(begin_msg.model_dump_json())
                         for batch in batched(
-                            task_outcome.content, CONTENT_UPLOAD_BATCH_SIZE
+                            task_outcome.new_content, CONTENT_UPLOAD_BATCH_SIZE
                         ):
                             extracted_content = ApiExtractedContent(
                                 ExtractedContent=ExtractedContent(content_list=batch)
                             )
                             await ws.send(extracted_content.model_dump_json())
                         print(
-                            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.content)).model_dump_json()}"
+                            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
                         )
+                        for batch in batched(task_outcome.features, CONTENT_UPLOAD_BATCH_SIZE):
+                            extracted_features = ApiExtractedFeatures(
+                                ExtractedFeatures=ExtractedFeatures(
+                                    content_id=task.content_metadata.id, features=batch
+                                )
+                            )
+                            await ws.send(extracted_features.model_dump_json())
                         finish_msg = ApiFinishExtractedContentIngest(
                             FinishExtractedContentIngest=FinishExtractedContentIngest(
-                                num_extracted_content=len(task_outcome.content)
+                                num_extracted_content=len(task_outcome.new_content)
                             )
                         )
                         await ws.send(finish_msg.model_dump_json())
@@ -132,7 +145,7 @@ class ExtractorAgent:
             print(f"failed to download content{e} for task {task.id}")
             return
         try:
-            out: List[Content] = await extract_content(
+            outputs: Union[List[Feature], List[Content]] = await extract_content(
                 loop=asyncio.get_running_loop(),
                 executor=self._executor,
                 content=content,
@@ -141,32 +154,43 @@ class ExtractorAgent:
         except Exception as e:
             print(f"failed to execute task {task.id} {e}")
             self._task_outcomes[task.id] = CompletedTask(
-                task_id=task.id, task_outcome="Failed", content=[]
+                task_id=task.id, task_outcome="Failed", new_content=[], features=[]
             )
             return
         print(f"completed task {task.id}")
-        api_content_list: List[ApiContent] = []
-        c: Content
-        for c in out:
-            api_features: List[ApiFeature] = []
-            for feature in c.features:
-                api_features.append(
+        new_content: List[ApiContent] = []
+        new_features: List[ApiFeature] = []
+        out: Union[Feature, Content]
+        for out in outputs:
+            if type(out) == Feature:
+                new_features.append(
+                    ApiFeature(
+                        feature_type=out.feature_type, name=out.name, data=out.value
+                    )
+                )
+                continue
+            content_features = []
+            for feature in out.features:
+                content_features.append(
                     ApiFeature(
                         feature_type=feature.feature_type,
                         name=feature.name,
                         data=feature.value,
                     )
                 )
-            api_content_list.append(
+            new_content.append(
                 ApiContent(
-                    mime=c.content_type,
-                    bytes=list(c.data),
-                    features=api_features,
-                    labels=c.labels,
+                    mime=out.content_type,
+                    bytes=list(out.data),
+                    features=content_features,
+                    labels=out.labels,
                 )
             )
         self._task_outcomes[task.id] = CompletedTask(
-            task_id=task.id, task_outcome="Success", content=api_content_list
+            task_id=task.id,
+            task_outcome="Success",
+            new_content=new_content,
+            features=new_features,
         )
 
     async def run(self):
@@ -200,12 +224,15 @@ class ExtractorAgent:
                     task: coordinator_service_pb2.Task
                     for task in resp.tasks:
                         if task.id not in self._tasks:
-                            self._tasks[task.id] = task
+                            self.add_task(task)
                             print(f"added task {task.id} to queue")
                             asyncio.create_task(self.launch_task(task))
             except Exception as e:
                 print(f"failed to heartbeat{e}")
                 continue
+
+    def add_task(self, task: coordinator_service_pb2.Task):
+        self._tasks[task.id] = task
 
     async def exeucte_task(self):
         return {"status": "ok"}

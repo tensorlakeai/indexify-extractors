@@ -15,6 +15,7 @@ import logging
 import importlib.resources as pkg_resources
 import pathlib
 
+
 class ExtractorPackager:
     """
     Manages the packaging of an extractor into a Docker image, including Dockerfile generation and tarball creation.
@@ -164,10 +165,12 @@ class ExtractorPackager:
         ), "Extractor.version must be defined"
 
         return extractor_description
-    
+
     def _get_python_dependencies(self):
         # get module path
-        module_path = pathlib.Path.cwd() / (self.config["module_name"].replace(".", "/") + ".py")
+        module_path = pathlib.Path.cwd() / (
+            self.config["module_name"].replace(".", "/") + ".py"
+        )
 
         # check for requirements.txt
         requirements_path = module_path.joinpath(module_path.parent, "requirements.txt")
@@ -176,12 +179,12 @@ class ExtractorPackager:
                 requirements = f.read()
 
             return [entry for entry in requirements.split("\n") if entry]
-        
+
         # check for class dependencies
         extractor_cls = getattr(self.extractor_module, self.config["class_name"])
         if extractor_cls.python_dependencies:
             return extractor_cls.python_dependencies
-        
+
         # no dependencies found
         return []
 
