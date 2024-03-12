@@ -9,16 +9,16 @@ class Doc2QueryConfig(BaseModel):
     query: int = "What is the invoice total?"
 
 
-class Doc2Query(Extractor):
+class Doc2QueryExtractor(Extractor):
     name = "tensorlake/doc2query-extractor"
     description = "Doc2query"
     input_mime_types = ["application/pdf", "image/jpeg", "image/png"]
     system_dependencies = ["tesseract-ocr", "poppler-utils"]
 
     def __init__(self):
-        super(Doc2Query, self).__init__()
+        super(Doc2QueryExtractor, self).__init__()
 
-    def extract(self, content: Content, params: Doc2QueryConfig) -> Feature:
+    def extract(self, content: Content, params: Doc2QueryConfig) -> List[Feature]:
         suffix = f'.{content.content_type.split("/")[-1]}'
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=True) as tmpfile:
             # write bytes to temp file
@@ -29,14 +29,14 @@ class Doc2Query(Extractor):
             doc = document.load_document(tmpfile.name)
             result = p(question=params.query, **doc.context)[0]  # get first result
 
-        return Feature.metadata(
+        return [Feature.metadata(
             value={
                 "query": params.query,
                 "answer": result.get("answer"),
                 "score": result.get("score"),
                 "page": result.get("page"),
             }
-        )
+        )]
 
     def sample_input(self) -> Content:
         file_path = "invoice-example.pdf"
@@ -52,7 +52,7 @@ class Doc2Query(Extractor):
 
 
 if __name__ == "__main__":
-    contents = Doc2Query().extract_sample_input()
+    contents = Doc2QueryExtractor().extract_sample_input()
     print(len(contents))
     for content in contents:
         print(len(content.features))
