@@ -67,7 +67,7 @@ class Content(BaseModel):
     def from_file(cls, path: str):
         import mimetypes
 
-        m = mimetypes.guess_extension(path)
+        m, _ = mimetypes.guess_type(path)
         with open(path, "rb") as f:
             return cls(content_type=m, data=f.read())
 
