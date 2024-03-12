@@ -7,7 +7,7 @@ import tempfile
 
 
 class LayoutLMDocumentQAConfig(BaseModel):
-    query: int = "What is the addendum date?"
+    query: int = "What is the invoice total?"
 
 
 class LayoutLMDocumentQA(Extractor):
