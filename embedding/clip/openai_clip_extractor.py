@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel
 from indexify_extractor_sdk import Content, Extractor, Feature
 import torch
@@ -6,20 +6,19 @@ import clip
 from PIL import Image
 from io import BytesIO
 import base64
-import os
 
 
 class ClipInputParams(BaseModel):
     model: str = "ViT-B/32"
 
 
-class ClipImageEmbeddingExtractor(Extractor):
+class ClipEmbeddingExtractor(Extractor):
     name = "tensorlake/clip-extractor"
-    description = "Clip Embedding Image Extractor"
+    description = "OpenAI Clip Embedding Extractor"
     input_mime_types = ["image/jpeg", "image/png", "text/plain"]
 
     def __init__(self):
-        super(ClipImageEmbeddingExtractor, self).__init__()
+        super(ClipEmbeddingExtractor, self).__init__()
 
     def extract(self, content: Content, params: ClipInputParams) -> List[Content]:
         self._device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -59,4 +58,4 @@ class ClipImageEmbeddingExtractor(Extractor):
 
 
 if __name__ == "__main__":
-    ClipImageEmbeddingExtractor().extract_sample_input()
+    ClipEmbeddingExtractor().extract_sample_input()
