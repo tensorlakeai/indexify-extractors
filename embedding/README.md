@@ -14,7 +14,7 @@ indexify-extractor join <extractor-module-name>
 
 | Name     | Download link                    | Extractor Module Name                             |
 |----------|----------------------------------|---------------------------------------------------|
-| clip     | hub://embedding/clip             | openai_clip_extractor:ClipImageEmbeddingExtractor |
+| clip     | hub://embedding/clip             | openai_clip_extractor:ClipEmbeddingExtractor      |
 | Colbert  | hub://embedding/colbert          | colbertv2:ColBERTv2Base                           |
 | e5       | hub://embedding/e5_embedding     | e5_small_v2:E5SmallEmbeddings                     |
 | flag     | hub://embedding/flag_embedding   | bge_base:BGEBase                                  |
