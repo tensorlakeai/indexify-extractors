@@ -69,14 +69,14 @@ class LayoutLMDocumentQA(Extractor):
         ]
 
     def sample_input(self) -> Content:
-        file_path = "invoice-example.jpg"
+        file_path = "invoice-example.pdf"
 
         with open(file_path, "rb") as f:
             data = f.read()
 
         return Content(
             data=data,
-            content_type="image/jpeg",
+            content_type="application/pdf",
             features=[],
         )
 
