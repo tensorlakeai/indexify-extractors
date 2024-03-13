@@ -1,4 +1,4 @@
-# Unstructured PDF Extractor
+# Unstructured.io PDF Extractor
 This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructured) to extract data from both pdf and image files. Unstructured will extract text from key elements along with important metadata like page number and type.
 
 ### Output:
