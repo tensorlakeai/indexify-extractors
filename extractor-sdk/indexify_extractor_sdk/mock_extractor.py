@@ -42,6 +42,20 @@ class MockExtractor(Extractor):
         return (Content.from_text("hello world"), InputParams(a=5, b="h"))
 
 
+class MockExtractorsReturnsFeature(Extractor):
+    def __init__(self):
+        super().__init__()
+
+    def extract(self, content: Content, params: InputParams) -> List[Feature]:
+        return [
+        #    Feature.embedding(values=[1, 2, 3]),
+            Feature.metadata(json.loads('{"a": 1, "b": "foo"}')),
+        ]
+
+    def sample_input(self) -> Tuple[Content, InputParams]:
+        return (Content.from_text("hello world"), InputParams(a=5, b="h"))
+
+
 class MockExtractorNoInputParams(Extractor):
     def __init__(self):
         super().__init__()

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Tuple, Dict, List, Type, Optional
 import json
 from importlib import import_module
-from typing import get_type_hints
+from typing import get_type_hints, Literal, Union
 
 from pydantic import BaseModel, Json
 
@@ -30,7 +30,7 @@ class ExtractorDescription(BaseModel):
 
 
 class Feature(BaseModel):
-    feature_type: str
+    feature_type: Literal["embedding", "metadata"]
     name: str
     value: str
 
@@ -88,9 +88,12 @@ class Extractor(ABC):
     @abstractmethod
     def extract(
         self, content: Content, params: Type[BaseModel] = None
-    ) -> List[Content]:
+    ) -> List[Union[Feature, Content]]:
         """
-        Extracts information from the content.
+        Extracts information from the content. Returns a list of features to add
+        to the content.
+        It can also return a list of Content objects, which will be added to storage
+        and any extraction policies defined will be applied to them.
         """
         pass
 
@@ -98,7 +101,7 @@ class Extractor(ABC):
     def sample_input(self) -> Tuple[Content, Type[BaseModel]]:
         pass
 
-    def extract_sample_input(self) -> List[Content]:
+    def extract_sample_input(self) -> List[Union[Feature, Content]]:
         input = self.sample_input()
         return self.extract(*input)
 
@@ -122,10 +125,14 @@ class ExtractorWrapper:
 
     def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
         s_input = self._instance.sample_input()
+        if type(s_input) == tuple:
+            (s_input, input_params) = s_input
         # Come back to this when we can support schemas based on user defined input params
         if input_params is None:
             input_params = self._param_cls() if self._param_cls else None
-        out_c: List[Content] = self._instance.extract(s_input, input_params)
+        outputs: Union[List[Feature], List[Content]] = self._instance.extract(
+            s_input, input_params
+        )
         embedding_schemas = {}
         metadata_schemas = {}
         json_schema = (
@@ -135,8 +142,9 @@ class ExtractorWrapper:
         )
         if json_schema:
             json_schema["additionalProperties"] = False
-        for content in out_c:
-            for feature in content.features:
+        for out in outputs:
+            features = out.features if type(out) == Content else [out]
+            for feature in features:
                 if feature.feature_type == "embedding":
                     embedding_value: Embedding = Embedding.model_validate_json(
                         feature.value

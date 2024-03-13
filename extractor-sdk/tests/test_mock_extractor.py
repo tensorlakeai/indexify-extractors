@@ -1,8 +1,10 @@
 import unittest
 
-from indexify_extractor_sdk.base_extractor import ExtractorWrapper, Content
+from indexify_extractor_sdk.base_extractor import ExtractorWrapper, Content, Feature
 
 from indexify_extractor_sdk.mock_extractor import MockExtractor, InputParams
+
+from typing import List
 
 
 class TestMockExtractor(unittest.TestCase):
@@ -35,6 +37,18 @@ class TestMockExtractor(unittest.TestCase):
         e = MockExtractor()
         result = e.extract_sample_input()
         self.assertEqual(len(result), 2)
+
+    def test_only_features(self):
+        e = ExtractorWrapper(
+            "indexify_extractor_sdk.mock_extractor", "MockExtractorsReturnsFeature"
+        )
+        extracted_features: List[Feature] = e.extract(
+            [Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))],
+            '{"a": 1, "b": "foo"}',
+        )
+        self.assertEqual(len(extracted_features), 2)
+        self.assertEqual(extracted_features[0].feature_type, "embedding")
+        self.assertEqual(extracted_features[1].feature_type, "metadata")
 
 
 if __name__ == "__main__":

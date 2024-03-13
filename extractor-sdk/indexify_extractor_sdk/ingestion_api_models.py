@@ -14,6 +14,7 @@ class ApiContent(BaseModel):
     features: List[ApiFeature] = []
     labels: Dict[str, str] = {}
 
+
 class BeginExtractedContentIngest(BaseModel):
     task_id: str
     namespace: str
@@ -22,9 +23,16 @@ class BeginExtractedContentIngest(BaseModel):
     executor_id: str
     task_outcome: str
     extraction_policy: str
+    extractor: str
+
+class ExtractedFeatures(BaseModel):
+    content_id: str
+    features: List[ApiFeature]
+
 
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
+
 
 class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
@@ -40,3 +48,6 @@ class ApiExtractedContent(BaseModel):
 
 class ApiFinishExtractedContentIngest(BaseModel):
     FinishExtractedContentIngest: FinishExtractedContentIngest
+
+class ApiExtractedFeatures(BaseModel):
+    ExtractedFeatures: ExtractedFeatures
