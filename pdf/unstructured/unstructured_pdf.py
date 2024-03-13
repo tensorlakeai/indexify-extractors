@@ -32,6 +32,9 @@ class UnstructuredExtractor(Extractor):
             if suffix == ".pdf":
                 elements = partition_pdf(tmpfile.name, **dict(params))
             else:
+                if params.strategy == "fast":
+                    print("fast is not supported on images, defaulting to hi_res")
+                    params.strategy = "hi_res"
                 elements = partition_image(tmpfile.name, **dict(params))
 
             # extract data
