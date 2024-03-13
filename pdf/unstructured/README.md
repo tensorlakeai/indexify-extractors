@@ -1,5 +1,5 @@
 # Unstructured PDF Extractor
-This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructured) to extract data from both pdf and image files.
+This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructured) to extract data from both pdf and image files. Unstructured will extract text from key elements along with important metadata like page number and type.
 
 ### Strategies
 [Four strategies are available](https://github.com/Unstructured-IO/unstructured-api?tab=readme-ov-file#strategies) for processing PDF/Images files: hi_res, fast, ocr_only and auto. fast is the default strategy and works well for documents that do not have text embedded in images.
@@ -9,8 +9,9 @@ hi_res is the better choice for PDFs that may have text within embedded images, 
 ### Input parameters
 strategy: Literal['hi_res', 'fast', 'ocr_only', 'auto'] = "fast"
 languages: Optional[Iterable[str]] = None
+
 ### Output:
-text/plain
+text/plain for each element found
 
 ### Metadata:
 [Metadata extracted](https://unstructured-io.github.io/unstructured/metadata.html) from unstructured also applied to the content.

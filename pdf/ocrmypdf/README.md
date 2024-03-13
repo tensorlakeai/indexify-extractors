@@ -42,3 +42,8 @@ To search for additional language packs:
 ```bash
 apt search tesseract-ocr
 ```
+
+Install language packs on Mac
+```bash
+brew install tesseract-lang
+```
