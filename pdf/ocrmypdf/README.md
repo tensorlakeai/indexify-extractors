@@ -1,5 +1,5 @@
 # OCRMyPDF
-This extractor uses ocrmypdf to generate searchable PDF/A content from a regular PDF.
+This extractor uses ocrmypdf to generate searchable PDF/A content from a regular PDF and then extract the text into plain text content.
 
 Output Content:
 text/plain for each page

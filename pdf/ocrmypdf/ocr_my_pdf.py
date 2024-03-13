@@ -15,7 +15,7 @@ class OCRMyPDFConfig(BaseModel):
 
 class OCRMyPDFExtractor(Extractor):
     name = "tensorlake/ocrmypdf"
-    description = "OCRMyPDF for image based pdfs to editable searchable text based pdfs"
+    description = "This extractor uses ocrmypdf to generate searchable PDF/A content from a regular PDF and then extract the text into plain text content."
     input_mime_types = ["application/pdf"]
     # language packs can be added to system dependencies
     system_dependencies = ["tesseract-ocr"]
@@ -32,13 +32,14 @@ class OCRMyPDFExtractor(Extractor):
                 ocrmypdf.ocr(inputtmpfile.name, outtmpfile.name, **dict(params))
 
                 new_content = []
+                # extract text from each page
                 reader = PdfReader(outtmpfile.name)
                 for i, page in enumerate(reader.pages):
                     new_content.append(
                         Content(
                             content_type="text/plain",
                             data=bytes(page.extract_text(), "utf-8"),
-                            features=[Feature.metadata(value={"page":i})]
+                            features=[Feature.metadata(value={"page": i})],
                         )
                     )
 
