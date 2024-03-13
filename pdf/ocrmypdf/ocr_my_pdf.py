@@ -32,7 +32,7 @@ class OCRMyPDFExtractor(Extractor):
                 ]
             
     def sample_input(self) -> Content:
-        f = open("image-based.pdf")
+        f = open("image-based.pdf", "rb")
         return Content(content_type="application/pdf", data=f.read())
 
 
