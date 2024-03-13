@@ -1,5 +1,5 @@
 # Unstructured PDF Extractor
-This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructured) to extract data from pdf files.
+This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructured) to extract data from both pdf and image files.
 
 ### Strategies
 [Four strategies are available](https://github.com/Unstructured-IO/unstructured-api?tab=readme-ov-file#strategies) for processing PDF/Images files: hi_res, fast, ocr_only and auto. fast is the default strategy and works well for documents that do not have text embedded in images.
