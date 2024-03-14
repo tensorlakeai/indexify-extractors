@@ -50,4 +50,3 @@ class YoloExtractor(Extractor):
 
 if __name__ == "__main__":
     features = YoloExtractor().extract_sample_input()
-    print(features)

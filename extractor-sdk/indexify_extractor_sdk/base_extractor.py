@@ -5,6 +5,7 @@ from importlib import import_module
 from typing import get_type_hints, Literal, Union
 
 from pydantic import BaseModel, Json
+from genson import SchemaBuilder
 
 
 class EmbeddingSchema(BaseModel):
@@ -155,7 +156,9 @@ class ExtractorWrapper:
                     )
                     embedding_schemas[feature.name] = embedding_schema
                 elif feature.feature_type == "metadata":
-                    metadata_schemas[feature.name] = json.dumps({})
+                    builder = SchemaBuilder()
+                    builder.add_object(json.loads(feature.value))
+                    metadata_schemas[feature.name] = json.dumps(builder.to_schema())
         return ExtractorDescription(
             name=self._instance.name,
             version=self._instance.version,

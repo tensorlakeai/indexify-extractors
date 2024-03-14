@@ -48,7 +48,7 @@ class MockExtractorsReturnsFeature(Extractor):
 
     def extract(self, content: Content, params: InputParams) -> List[Feature]:
         return [
-        #    Feature.embedding(values=[1, 2, 3]),
+            #    Feature.embedding(values=[1, 2, 3]),
             Feature.metadata(json.loads('{"a": 1, "b": "foo"}')),
         ]
 
