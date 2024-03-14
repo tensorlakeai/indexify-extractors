@@ -22,7 +22,7 @@ text/plain for each page
 
 ### Example
 ##### content (pdf):
-![PDF](image-based.png)
+<img src="image-based.png" style="max-width:400px;" alt="PDF" title="PDF">
 
 ##### Output
 ```json

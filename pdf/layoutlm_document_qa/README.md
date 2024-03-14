@@ -14,7 +14,7 @@ Input Parameters
 query: what is the invoice total?
 
 ##### content (pdf):
-![Invoice](invoice-example.png)
+<img src="invoice-example.png" style="max-width:400px;" alt="PDF" title="PDF">
 
 ##### output metadata:
 ```json
