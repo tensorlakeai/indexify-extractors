@@ -26,6 +26,77 @@ file_directory: str
 filename: str
 type: str
 
+### Example
+
+##### content (pdf):
+![Invoice](sample.png)
+
+##### output:
+```json
+[
+  {
+    "contentType": "text/plain",
+    "data": "Sample Scientific Paper",
+    "features": [
+      {
+        "featureType": "metadata",
+        "name": "metadata",
+        "value": {
+          "coordinates": {
+            "points": [
+              [185.283, 41.349000000000046],
+              [185.283, 69.34900000000005],
+              [469.93100000000004, 69.34900000000005],
+              [469.93100000000004, 41.349000000000046]
+            ],
+            "system": "PixelSpace",
+            "layoutWidth": 612.0,
+            "layoutHeight": 792.0
+          },
+          "fileDirectory": "/var/folders/04/ysg_dpf16px3f4_bq92dpxww0000gn/T",
+          "filename": "tmp3n50zewo.pdf",
+          "languages": ["eng"],
+          "lastModified": "2024-03-14T11:52:33",
+          "pageNumber": 1,
+          "filetype": "application/pdf",
+          "type": "Header"
+        }
+      }
+    ]
+  },
+  {
+    "contentType": "text/plain",
+    "data": "Investigating how macrophages and adipocytes influence breast cancer metastasis using the chick embryo model",
+    "features": [
+      {
+        "featureType": "metadata",
+        "name": "metadata",
+        "value": {
+          "coordinates": {
+            "points": [
+              [86.04, 74.48399999999992],
+              [86.04, 100.28399999999988],
+              [528.8363999999996, 100.28399999999988],
+              [528.8363999999996, 74.48399999999992]
+            ],
+            "system": "PixelSpace",
+            "layoutWidth": 612.0,
+            "layoutHeight": 792.0
+          },
+          "fileDirectory": "/var/folders/04/ysg_dpf16px3f4_bq92dpxww0000gn/T",
+          "filename": "tmp3n50zewo.pdf",
+          "languages": ["eng"],
+          "lastModified": "2024-03-14T11:52:33",
+          "pageNumber": 1,
+          "parentId": "42a49f252ef50427f37b1b9280f06cc8",
+          "filetype": "application/pdf",
+          "type": "NarrativeText"
+        }
+      }
+    ]
+  }...
+```
+
 ### Additional Language Support
 This extractor depends on having [tesseract](https://github.com/tesseract-ocr/tesseract) installed.
 
