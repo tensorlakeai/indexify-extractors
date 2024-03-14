@@ -17,7 +17,7 @@ class UnstructuredIOExtractor(Extractor):
     description = "This extractor uses unstructured.io to extract pieces of pdf document into separate plain text content data."
     input_mime_types = ["application/pdf", "image/jpeg", "image.png"]
     # language packs can be added to system dependencies
-    system_dependencies = ["tesseract-ocr"]
+    system_dependencies = ["tesseract-ocr", "tesseract-ocr-spa", "tesseract-ocr-chi-sim", "tesseract-ocr-fra", "tesseract-ocr-deu"]
 
     def __init__(self):
         super(UnstructuredIOExtractor, self).__init__()

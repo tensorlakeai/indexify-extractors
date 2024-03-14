@@ -29,7 +29,7 @@ type: str
 ### Example
 
 ##### content (pdf):
-![Invoice](sample.png)
+<img src="sample.png" style="max-width:400px;" alt="Invoice" title="Invoice">
 
 ##### output:
 ```json
