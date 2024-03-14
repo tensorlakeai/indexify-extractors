@@ -12,8 +12,9 @@ We have built some extractors based on demand from our users. You can write a ne
 
 * [Embedding Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/embedding)
 * [Video Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/video)
-* [Invoice Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/invoices)
-* [Audio Extractor](https://github.com/tensorlakeai/indexify-extractors/tree/main/whisper-asr)
+* [Invoice Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/invoices)
+* [Audio Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/whisper-asr)
+* [PDF Extractors](https://github.com/tensorlakeai/indexify-extractors/tree/main/pdf)
 
 ## Usage
 Install the Indexify Extractor SDK 
