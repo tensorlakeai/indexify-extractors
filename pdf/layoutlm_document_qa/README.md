@@ -9,13 +9,25 @@ This extractor uses the pretrained [model from huggingface](https://huggingface.
 Input Parameters
 - query: string - the query you want to perform on content
 
-Example:
+### Example:
+##### input params
 query: what is the invoice total?
 
-the following metadata will be added to the content:
-{
-  "query": "what is the invoice total?",
-  "answer": "$85.73",
-  "page": 0,
-  "score": 99.3692321,
-}
+##### content (pdf):
+![Invoice](invoice-example.png)
+
+##### output metadata:
+```json
+[
+  {
+    "featureType": "metadata",
+    "name": "metadata",
+    "value": {
+      "query": "What is the invoice total?",
+      "answer": "$93.00",
+      "page": 0,
+      "score": 0.9743825197219849
+    }
+  }
+]
+```

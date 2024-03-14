@@ -12,8 +12,8 @@ indexify-extractor download <download-link>
 indexify-extractor join <extractor-module-name>
 ```
 
-| Name           | Download link                 | Extractor Module Name                           |
-|----------------|-------------------------------|-------------------------------------------------|
-| donut_cord     | hub://embedding/donut_cord    | base_cord_v2:DonutBaseV2                        |
-| donut_invoice  | hub://embedding/donut_invoice | donut_base_invoice:SimpleInvoiceParserExtractor |
-|                |                               |                                                 |
+| Name           | Download link                | Extractor Module Name                           |
+|----------------|---------------------------- -|-------------------------------------------------|
+| donut_cord     | hub://invoices/donut_cord    | base_cord_v2:DonutBaseV2                        |
+| donut_invoice  | hub://invoices/donut_invoice | donut_base_invoice:SimpleInvoiceParserExtractor |
+|                |                              |                                                 |
