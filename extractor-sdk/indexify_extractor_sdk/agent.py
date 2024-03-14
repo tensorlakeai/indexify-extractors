@@ -119,7 +119,9 @@ class ExtractorAgent:
                         print(
                             f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
                         )
-                        for batch in batched(task_outcome.features, CONTENT_UPLOAD_BATCH_SIZE):
+                        for batch in batched(
+                            task_outcome.features, CONTENT_UPLOAD_BATCH_SIZE
+                        ):
                             extracted_features = ApiExtractedFeatures(
                                 ExtractedFeatures=ExtractedFeatures(
                                     content_id=task.content_metadata.id, features=batch

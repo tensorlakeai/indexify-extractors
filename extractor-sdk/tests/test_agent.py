@@ -48,6 +48,7 @@ def _create_executor():
     )
     return create_executor(extractor_module)
 
+
 def create_extractor_agent():
     extractor = Extractor(
         name="mock_extractor",
@@ -64,6 +65,7 @@ def create_extractor_agent():
         ingestion_addr="localhost:8900",
     )
 
+
 class TestAgent(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super(TestAgent, self).__init__(*args, **kwargs)
@@ -74,7 +76,7 @@ class TestAgent(unittest.IsolatedAsyncioTestCase):
         agent.add_task(task)
         await agent.launch_task(task)
         self.assertEqual(len(agent._task_outcomes), 1)
-        self.assertEqual(agent._task_outcomes[task.id].task_outcome, 'Success')
+        self.assertEqual(agent._task_outcomes[task.id].task_outcome, "Success")
         self.assertEqual(len(agent._task_outcomes[task.id].new_content), 2)
 
 

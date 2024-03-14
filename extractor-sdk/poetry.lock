@@ -738,6 +738,16 @@ ssh = ["paramiko"]
 tqdm = ["tqdm"]
 
 [[package]]
+name = "genson"
+version = "1.2.2"
+description = "GenSON is a powerful, user-friendly JSON Schema generator."
+optional = false
+python-versions = "*"
+files = [
+    {file = "genson-1.2.2.tar.gz", hash = "sha256:8caf69aa10af7aee0e1a1351d1d06801f4696e005f06cedef438635384346a16"},
+]
+
+[[package]]
 name = "google-api-core"
 version = "2.17.1"
 description = "Google API client core library"
@@ -3381,4 +3391,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d6cdefc7410452b9d8d8f9273e82e68a045dcaa973dd8dfda92badc05a1d37b4"
+content-hash = "4d6189d34a68044412748ceb422e4020a0247a74d4dbbb9bd3f43b2037054412"

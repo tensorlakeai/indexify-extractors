@@ -25,6 +25,7 @@ class BeginExtractedContentIngest(BaseModel):
     extraction_policy: str
     extractor: str
 
+
 class ExtractedFeatures(BaseModel):
     content_id: str
     features: List[ApiFeature]
@@ -48,6 +49,7 @@ class ApiExtractedContent(BaseModel):
 
 class ApiFinishExtractedContentIngest(BaseModel):
     FinishExtractedContentIngest: FinishExtractedContentIngest
+
 
 class ApiExtractedFeatures(BaseModel):
     ExtractedFeatures: ExtractedFeatures
