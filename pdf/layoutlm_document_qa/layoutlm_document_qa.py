@@ -7,7 +7,7 @@ import tempfile
 
 
 class LayoutLMDocumentQAConfig(BaseModel):
-    query: int = "What is the invoice total?"
+    query: str = "What is the invoice total?"
 
 
 class LayoutLMDocumentQA(Extractor):
