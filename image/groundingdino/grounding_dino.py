@@ -8,6 +8,8 @@ from groundingdino.util.inference import load_model, load_image, predict
 
 class GroundingDinoConfig(BaseModel):
     prompt: str = "dog"
+    box_threshold:float = 0.35
+    text_threshold:float = 0.25
 
 
 class GroundingDinoExtractor(Extractor):
@@ -34,8 +36,8 @@ class GroundingDinoExtractor(Extractor):
                 model=self.model,
                 image=image,
                 caption=params.prompt,
-                box_threshold=0.35,
-                text_threshold=0.25,
+                box_threshold=params.box_threshold,
+                text_threshold=params.text_threshold,
                 device="cpu",
             )
 
