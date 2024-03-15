@@ -25,6 +25,7 @@ To be more specific about what you want to detect, you can prompt something like
 <img src="sample.jpg" style="max-width:400px;" alt="Image" title="image">
 
 ##### output metadata
+```json
 [
   {
     "feature_type": "metadata",
@@ -54,3 +55,4 @@ To be more specific about what you want to detect, you can prompt something like
     }
   }
 ]
+```
