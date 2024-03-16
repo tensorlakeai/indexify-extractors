@@ -158,7 +158,9 @@ class ExtractorWrapper:
                 elif feature.feature_type == "metadata":
                     builder = SchemaBuilder()
                     builder.add_object(json.loads(feature.value))
-                    metadata_schemas[feature.name] = json.dumps(builder.to_schema())
+                    schema = builder.to_schema()
+                    schema["$id"] = f"/{feature.name}"
+                    metadata_schemas[feature.name] = json.dumps(schema)
         return ExtractorDescription(
             name=self._instance.name,
             version=self._instance.version,
