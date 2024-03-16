@@ -80,7 +80,7 @@ class ExtractorAgent:
             url = f"ws://{self._ingestion_addr}/write_content"
             for task_id, task_outcome in self._task_outcomes.copy().items():
                 print(
-                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}"
+                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}, num_features: {len(task_outcome.features)}"
                 )
                 task: coordinator_service_pb2.Task = self._tasks[task_id]
                 begin_msg = ApiBeginExtractedContentIngest(
