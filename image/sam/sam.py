@@ -26,7 +26,7 @@ class SamExtractor(Extractor):
         self.model = SamModel.from_pretrained("facebook/sam-vit-huge").to(self.device)
         self.processor = SamProcessor.from_pretrained("facebook/sam-vit-huge")
 
-    def get_features(self, content, params: SamConfig):
+    def get_boxes_and_classes(self, content, params: SamConfig):
         input_boxes = []
         class_names = []
 
@@ -66,7 +66,7 @@ class SamExtractor(Extractor):
         image_embeddings = self.model.get_image_embeddings(inputs["pixel_values"])
 
         # get boxes
-        boxes, class_names = self.get_features(content, params)
+        boxes, class_names = self.get_boxes_and_classes(content, params)
         if not len(boxes):
             print("no bounding boxes found")
             return []
