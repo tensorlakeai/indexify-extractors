@@ -3,8 +3,6 @@ from transformers import SamModel, SamProcessor
 from typing import List
 from pydantic import BaseModel
 from indexify_extractor_sdk import Extractor, Content, Feature
-import tempfile
-import mimetypes
 from PIL import Image
 from io import BytesIO
 import json
@@ -46,25 +44,34 @@ class SamExtractor(Extractor):
 
         return input_boxes, class_names
 
-    # export cropped images with mask
     def mask_pixels_from_original_image(self, orig_img, mask_np) -> Image:
+        """ 
+        export cropped images with mask
+        set everything transparent besides where mask is true
+        """
+
         original_pixels = np.array(orig_img)
         output_pixels = np.zeros_like(original_pixels)
-        output_pixels[mask_np] = original_pixels[mask_np]
+        output_pixels[mask_np] = original_pixels[mask_np] 
         output_pixels[~mask_np, 3] = (
-            0  # Set alpha to 0 (transparent) where mask is False
+            0  # set alpha to 0 (transparent) where mask is False
         )
         output_image = Image.fromarray(output_pixels, "RGBA")
         return output_image
 
-    def extract(self, content: Content, params: SamConfig) -> List[Feature]:
+    def extract(self, content: Content, params: SamConfig) -> List[Content]:
         # extract image embeddings
         raw_image = Image.open(BytesIO(content.data))
         inputs = self.processor(raw_image, return_tensors="pt").to(self.device)
         image_embeddings = self.model.get_image_embeddings(inputs["pixel_values"])
 
-        # process box
+        # get boxes
         boxes, class_names = self.get_features(content, params)
+        if not len(boxes):
+            print("no bounding boxes found")
+            return []
+        
+        # process boxes
         inputs = self.processor(raw_image, input_boxes=[boxes], return_tensors="pt").to(
             self.device
         )
@@ -80,13 +87,11 @@ class SamExtractor(Extractor):
             inputs["reshaped_input_sizes"].cpu(),
         )
         scores = outputs.iou_scores
-        
+
         # iterate masks and extract segments
         results = []
         for i, mask_set in enumerate(masks[0]):
-            mask_index = 2
-            # extract pixels from mask
-            mask = (mask_set[mask_index],)
+            mask = mask_set[2]
             mask_boolean = mask.to(torch.bool)
             mask_np = mask_boolean.cpu().numpy()
             output_image = self.mask_pixels_from_original_image(
@@ -99,15 +104,14 @@ class SamExtractor(Extractor):
             output = BytesIO()
             output_image.save(output, format="PNG")
             output.seek(0)
-
             results.append(
                 Content(
                     content_type="image/png",
                     data=output.read(),
                     features=[
                         Feature.metadata(
-                            {
-                                "score": scores[0][i][mask_index],
+                            value={
+                                "mask_score": scores[0][i][2].item(),
                                 "class_name": class_names[i],
                             }
                         )
