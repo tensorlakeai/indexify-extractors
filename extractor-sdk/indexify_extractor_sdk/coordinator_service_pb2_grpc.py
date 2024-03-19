@@ -104,6 +104,16 @@ class CoordinatorServiceStub(object):
             request_serializer=coordinator__service__pb2.ListTasksRequest.SerializeToString,
             response_deserializer=coordinator__service__pb2.ListTasksResponse.FromString,
         )
+        self.GetSchema = channel.unary_unary(
+            "/indexify_coordinator.CoordinatorService/GetSchema",
+            request_serializer=coordinator__service__pb2.GetSchemaRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetSchemaResponse.FromString,
+        )
+        self.ListSchemas = channel.unary_unary(
+            "/indexify_coordinator.CoordinatorService/ListSchemas",
+            request_serializer=coordinator__service__pb2.GetAllSchemaRequest.SerializeToString,
+            response_deserializer=coordinator__service__pb2.GetAllSchemaResponse.FromString,
+        )
 
 
 class CoordinatorServiceServicer(object):
@@ -217,6 +227,18 @@ class CoordinatorServiceServicer(object):
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
+    def GetSchema(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def ListSchemas(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
 
 def add_CoordinatorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -309,6 +331,16 @@ def add_CoordinatorServiceServicer_to_server(servicer, server):
             servicer.ListTasks,
             request_deserializer=coordinator__service__pb2.ListTasksRequest.FromString,
             response_serializer=coordinator__service__pb2.ListTasksResponse.SerializeToString,
+        ),
+        "GetSchema": grpc.unary_unary_rpc_method_handler(
+            servicer.GetSchema,
+            request_deserializer=coordinator__service__pb2.GetSchemaRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetSchemaResponse.SerializeToString,
+        ),
+        "ListSchemas": grpc.unary_unary_rpc_method_handler(
+            servicer.ListSchemas,
+            request_deserializer=coordinator__service__pb2.GetAllSchemaRequest.FromString,
+            response_serializer=coordinator__service__pb2.GetAllSchemaResponse.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -833,6 +865,64 @@ class CoordinatorService(object):
             "/indexify_coordinator.CoordinatorService/ListTasks",
             coordinator__service__pb2.ListTasksRequest.SerializeToString,
             coordinator__service__pb2.ListTasksResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
+
+    @staticmethod
+    def GetSchema(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/indexify_coordinator.CoordinatorService/GetSchema",
+            coordinator__service__pb2.GetSchemaRequest.SerializeToString,
+            coordinator__service__pb2.GetSchemaResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
+
+    @staticmethod
+    def ListSchemas(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/indexify_coordinator.CoordinatorService/ListSchemas",
+            coordinator__service__pb2.GetAllSchemaRequest.SerializeToString,
+            coordinator__service__pb2.GetAllSchemaResponse.FromString,
             options,
             channel_credentials,
             insecure,

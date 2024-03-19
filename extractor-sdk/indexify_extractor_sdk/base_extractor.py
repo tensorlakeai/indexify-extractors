@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Tuple, Dict, List, Type, Optional
 import json
 from importlib import import_module
-from typing import get_type_hints, Literal, Union
+from typing import get_type_hints, Literal, Union, Dict
 
 from pydantic import BaseModel, Json
 from genson import SchemaBuilder
@@ -25,7 +25,7 @@ class ExtractorDescription(BaseModel):
     python_dependencies: List[str]
     system_dependencies: List[str]
     embedding_schemas: dict[str, EmbeddingSchema]
-    metadata_schemas: dict[str, Json]
+    metadata_schemas: dict[str, Dict]
     input_params: Optional[str]
     input_mime_types: List[str]
 
@@ -33,18 +33,35 @@ class ExtractorDescription(BaseModel):
 class Feature(BaseModel):
     feature_type: Literal["embedding", "metadata"]
     name: str
-    value: str
+    value: Json
 
     @classmethod
     def embedding(cls, values: List[float], name: str = "embedding", distance="cosine"):
         embedding = Embedding(values=values, distance=distance)
         return cls(
-            feature_type="embedding", name=name, value=embedding.model_dump_json()
+            feature_type="embedding",
+            name=name,
+            value=json.dumps(embedding.model_dump_json()),
         )
 
     @classmethod
     def metadata(cls, value: Json, name: str = "metadata"):
         return cls(feature_type="metadata", name=name, value=json.dumps(value))
+
+    def get_schema(self) -> dict:
+        if self.feature_type == "embedding":
+            embedding_value: Embedding = Embedding.model_validate_json(self.value)
+            return EmbeddingSchema(
+                dim=len(embedding_value.values), distance=embedding_value.distance
+            ).model_dump()
+        else:
+            schema_builder = SchemaBuilder()
+            schema_builder.add_object(self.value)
+            metadata_schema = schema_builder.to_schema()
+            schema = {}
+            for (k, v) in metadata_schema["properties"].items():
+                schema[k] = {"type": v["type"]}
+            return schema
 
 
 class Content(BaseModel):
@@ -156,11 +173,7 @@ class ExtractorWrapper:
                     )
                     embedding_schemas[feature.name] = embedding_schema
                 elif feature.feature_type == "metadata":
-                    builder = SchemaBuilder()
-                    builder.add_object(json.loads(feature.value))
-                    schema = builder.to_schema()
-                    schema["$id"] = f"/{feature.name}"
-                    metadata_schemas[feature.name] = json.dumps(schema)
+                    metadata_schemas[feature.name] = feature.get_schema()
         return ExtractorDescription(
             name=self._instance.name,
             version=self._instance.version,
