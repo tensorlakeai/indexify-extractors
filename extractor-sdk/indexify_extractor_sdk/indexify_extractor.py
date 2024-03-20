@@ -47,19 +47,23 @@ def join(
     description: ExtractorDescription = asyncio.get_event_loop().run_until_complete(
         describe(asyncio.get_event_loop(), executor)
     )
-    outputs = {}
+    embedding_schemas = {}
+    metadata_schemas = {}
     for name, embedding_schema in description.embedding_schemas.items():
-        outputs[name] = json.dumps({"embedding": embedding_schema.model_dump()})
+        embedding_schemas[name] = embedding_schema.model_dump_json()
     for name, metadata_schema in description.metadata_schemas.items():
-        outputs[name] = json.dumps({"attributes": metadata_schema})
-    print(outputs)
+        metadata_schemas[name] = json.dumps(metadata_schema)
+
+    print(f"embedding schemas are {embedding_schemas}")
+    print(f"metadata schemas are {metadata_schemas}")
 
     api_extractor_description = coordinator_service_pb2.Extractor(
         name=description.name,
         description=description.description,
         input_params=description.input_params,
         input_mime_types=description.input_mime_types,
-        outputs=outputs,
+        metadata_schemas=metadata_schemas,
+        embedding_schemas=embedding_schemas,
     )
     id = nanoid.generate()
     print(f"extractor id is {id}")

@@ -19,6 +19,7 @@ from .ingestion_api_models import (
     ApiExtractedFeatures,
     ApiFinishExtractedContentIngest,
 )
+import json
 from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
 from itertools import islice
@@ -167,7 +168,7 @@ class ExtractorAgent:
             if type(out) == Feature:
                 new_features.append(
                     ApiFeature(
-                        feature_type=out.feature_type, name=out.name, data=out.value
+                        feature_type=out.feature_type, name=out.name, data=json.dumps(out.value)
                     )
                 )
                 continue

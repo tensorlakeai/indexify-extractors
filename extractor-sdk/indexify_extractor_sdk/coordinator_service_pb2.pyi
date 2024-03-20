@@ -340,9 +340,26 @@ class ListExtractorsResponse(_message.Message):
     ) -> None: ...
 
 class Extractor(_message.Message):
-    __slots__ = ("name", "description", "input_params", "outputs", "input_mime_types")
+    __slots__ = (
+        "name",
+        "description",
+        "input_params",
+        "embedding_schemas",
+        "metadata_schemas",
+        "input_mime_types",
+    )
 
-    class OutputsEntry(_message.Message):
+    class EmbeddingSchemasEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(
+            self, key: _Optional[str] = ..., value: _Optional[str] = ...
+        ) -> None: ...
+
+    class MetadataSchemasEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -354,19 +371,22 @@ class Extractor(_message.Message):
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
-    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    EMBEDDING_SCHEMAS_FIELD_NUMBER: _ClassVar[int]
+    METADATA_SCHEMAS_FIELD_NUMBER: _ClassVar[int]
     INPUT_MIME_TYPES_FIELD_NUMBER: _ClassVar[int]
     name: str
     description: str
     input_params: str
-    outputs: _containers.ScalarMap[str, str]
+    embedding_schemas: _containers.ScalarMap[str, str]
+    metadata_schemas: _containers.ScalarMap[str, str]
     input_mime_types: _containers.RepeatedScalarFieldContainer[str]
     def __init__(
         self,
         name: _Optional[str] = ...,
         description: _Optional[str] = ...,
         input_params: _Optional[str] = ...,
-        outputs: _Optional[_Mapping[str, str]] = ...,
+        embedding_schemas: _Optional[_Mapping[str, str]] = ...,
+        metadata_schemas: _Optional[_Mapping[str, str]] = ...,
         input_mime_types: _Optional[_Iterable[str]] = ...,
     ) -> None: ...
 
@@ -569,6 +589,7 @@ class ContentMetadata(_message.Message):
         "created_at",
         "namespace",
         "source",
+        "size_bytes",
     )
 
     class LabelsEntry(_message.Message):
@@ -589,6 +610,7 @@ class ContentMetadata(_message.Message):
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
+    SIZE_BYTES_FIELD_NUMBER: _ClassVar[int]
     id: str
     file_name: str
     parent_id: str
@@ -598,6 +620,7 @@ class ContentMetadata(_message.Message):
     created_at: int
     namespace: str
     source: str
+    size_bytes: int
     def __init__(
         self,
         id: _Optional[str] = ...,
@@ -609,6 +632,7 @@ class ContentMetadata(_message.Message):
         created_at: _Optional[int] = ...,
         namespace: _Optional[str] = ...,
         source: _Optional[str] = ...,
+        size_bytes: _Optional[int] = ...,
     ) -> None: ...
 
 class CreateContentRequest(_message.Message):
@@ -635,4 +659,47 @@ class Namespace(_message.Message):
         self,
         name: _Optional[str] = ...,
         policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...,
+    ) -> None: ...
+
+class GetSchemaRequest(_message.Message):
+    __slots__ = ("namespace", "content_source")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    content_source: str
+    def __init__(
+        self, namespace: _Optional[str] = ..., content_source: _Optional[str] = ...
+    ) -> None: ...
+
+class GetSchemaResponse(_message.Message):
+    __slots__ = ("schema",)
+    SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    schema: StructuredDataSchema
+    def __init__(
+        self, schema: _Optional[_Union[StructuredDataSchema, _Mapping]] = ...
+    ) -> None: ...
+
+class StructuredDataSchema(_message.Message):
+    __slots__ = ("columns", "content_source")
+    COLUMNS_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    columns: str
+    content_source: str
+    def __init__(
+        self, columns: _Optional[str] = ..., content_source: _Optional[str] = ...
+    ) -> None: ...
+
+class GetAllSchemaRequest(_message.Message):
+    __slots__ = ("namespace",)
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    def __init__(self, namespace: _Optional[str] = ...) -> None: ...
+
+class GetAllSchemaResponse(_message.Message):
+    __slots__ = ("schemas",)
+    SCHEMAS_FIELD_NUMBER: _ClassVar[int]
+    schemas: _containers.RepeatedCompositeFieldContainer[StructuredDataSchema]
+    def __init__(
+        self,
+        schemas: _Optional[_Iterable[_Union[StructuredDataSchema, _Mapping]]] = ...,
     ) -> None: ...
