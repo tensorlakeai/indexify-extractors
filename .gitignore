@@ -4,3 +4,9 @@
 __pycache__
 dist
 *.pt
+
+*sample.png
+*sample.jpg
+*sample.mp4
+*sample.mp3
+*sample.pdf
