@@ -55,8 +55,10 @@ class WhisperExtractor(Extractor):
         return self.sample_mp3()
 
 if __name__ == "__main__":
-    extractor = WhisperExtractor()
-    with open("all-in-e154.mp3", "rb") as f:
-        data = f.read()
-    content = Content(content_type="audio", data=data)
-    print(extractor.extract([content], InputParams()))
+    contents = WhisperExtractor().extract_sample_input()
+    print(len(contents))
+    for content in contents:
+        print(len(content.features))
+        for feature in content.features:
+            print(feature.value)
+
