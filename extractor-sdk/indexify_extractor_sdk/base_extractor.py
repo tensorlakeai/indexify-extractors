@@ -6,6 +6,9 @@ from typing import get_type_hints, Literal, Union
 
 from pydantic import BaseModel, Json
 from genson import SchemaBuilder
+import requests
+import os
+import tempfile
 
 
 class EmbeddingSchema(BaseModel):
@@ -105,6 +108,50 @@ class Extractor(ABC):
     def extract_sample_input(self) -> List[Union[Feature, Content]]:
         input = self.sample_input()
         return self.extract(*input)
+
+    def _download_file(self, url, filename):
+        # Check if the file already exists
+        if os.path.exists(filename):
+            print(f"File '{filename}' already exists. Skipping download.")
+            return
+
+        # Try to download the file
+        try:
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()  # Raises an HTTPError if the response status code is 4XX/5XX
+                with open(filename, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading the file: {e}")
+
+
+    def sample_mp3(self, features: List[Feature] = []) -> Content:
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as tmpfile:
+            self._download_file(
+                "https://extractor-files.diptanu-6d5.workers.dev/podcast.mp3",
+                tmpfile.name,
+            )
+            f = open(tmpfile.name, "rb")
+            return Content(content_type="audio/mpeg", data=f.read(), features=features)
+
+    def sample_mp4(self, features: List[Feature] = []) -> Content:
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmpfile:
+            self._download_file(
+                "https://extractor-files.diptanu-6d5.workers.dev/sample.mp4",
+                tmpfile.name,
+            )
+            f = open(tmpfile.name, "rb")
+            return Content(content_type="video/mp4", data=f.read(), features=features)
+
+    def sample_jpg(self, features: List[Feature] = []) -> Content:
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=True) as tmpfile:
+            self._download_file(
+                "https://extractor-files.diptanu-6d5.workers.dev/people-standing.jpg",
+                tmpfile.name,
+            )
+            f = open(tmpfile.name, "rb")
+            return Content(content_type="image/jpg", data=f.read(), features=features)
 
 
 class ExtractorWrapper:
