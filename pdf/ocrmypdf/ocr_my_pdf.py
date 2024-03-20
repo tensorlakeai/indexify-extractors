@@ -46,8 +46,7 @@ class OCRMyPDFExtractor(Extractor):
                 return new_content
 
     def sample_input(self) -> Content:
-        f = open("image-based.pdf", "rb")
-        return Content(content_type="application/pdf", data=f.read())
+        return self.sample_image_based_pdf()
 
 
 if __name__ == "__main__":

@@ -6,6 +6,9 @@ from typing import get_type_hints, Literal, Union, Dict
 
 from pydantic import BaseModel, Json
 from genson import SchemaBuilder
+import requests
+import os
+import tempfile
 
 
 class EmbeddingSchema(BaseModel):
@@ -122,6 +125,83 @@ class Extractor(ABC):
     def extract_sample_input(self) -> List[Union[Feature, Content]]:
         input = self.sample_input()
         return self.extract(*input)
+
+    def _download_file(self, url, filename):
+        if os.path.exists(filename):
+            # file exists skip
+            return
+        try:
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()  # Raises an HTTPError if the response status code is 4XX/5XX
+                with open(filename, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading the file: {e}")
+
+
+    def sample_mp3(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.mp3"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/sample-000009.mp3",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="audio/mpeg", data=f.read(), features=features)
+
+    def sample_mp4(self, features: List[Feature] = []) -> Content:
+        file_name="sample.mp4"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/sample.mp4",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="video/mp4", data=f.read(), features=features)
+
+    def sample_jpg(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.jpg"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/people-standing.jpg",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="image/jpg", data=f.read(), features=features)
+
+    def sample_invoice_jpg(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.jpg"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/invoice-example.jpg",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="image/jpg", data=f.read(), features=features)
+
+    def sample_invoice_pdf(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.pdf"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/invoice-example.pdf",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="application/pdf", data=f.read(), features=features)
+    
+    def sample_image_based_pdf(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.pdf"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/image-based.pdf",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="application/pdf", data=f.read(), features=features)
+    
+    def sample_scientific_pdf(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.pdf"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/scientific-paper-example.pdf",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="application/pdf", data=f.read(), features=features)
 
 
 class ExtractorWrapper:

@@ -8,7 +8,7 @@ from PIL import Image
 
 
 class GroundingDinoConfig(BaseModel):
-    prompt: str = "dog"
+    prompt: str = "person"
     box_threshold: float = 0.35
     text_threshold: float = 0.25
 
@@ -76,8 +76,7 @@ class GroundingDinoExtractor(Extractor):
             return metadata
 
     def sample_input(self) -> Content:
-        f = open("sample.jpg", "rb")
-        return Content(content_type="image/jpeg", data=f.read())
+        return self.sample_jpg()
 
 
 if __name__ == "__main__":

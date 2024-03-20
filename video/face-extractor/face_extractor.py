@@ -249,16 +249,7 @@ class FaceExtractor(Extractor):
         return result
 
     def sample_input(self) -> Content:
-        file_path = "sample.mp4"
-
-        with open(file_path, "rb") as f:
-            data = f.read()
-
-        return Content(
-            data=data,
-            content_type="video/mp4",
-            features=[Feature.metadata({"filename": file_path})],
-        )
+        return self.sample_mp4()
 
 
 if __name__ == "__main__":

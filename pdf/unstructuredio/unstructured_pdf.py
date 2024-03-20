@@ -52,8 +52,7 @@ class UnstructuredIOExtractor(Extractor):
             return new_content
 
     def sample_input(self) -> Content:
-        f = open("sample.pdf", "rb")
-        return Content(content_type="application/pdf", data=f.read())
+        return self.sample_scientific_pdf()
 
 
 if __name__ == "__main__":
