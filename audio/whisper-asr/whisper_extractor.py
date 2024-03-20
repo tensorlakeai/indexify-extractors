@@ -52,12 +52,7 @@ class WhisperExtractor(Extractor):
         return [Content.from_text(text)]
 
     def sample_input(self) -> Content:
-        import os
-        dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, "sample-000009.mp3")
-        with open(filename, "rb") as f:
-            data = f.read()
-        return Content(content_type="audio/mpeg", data=data)
+        return self.sample_mp3()
 
 if __name__ == "__main__":
     extractor = WhisperExtractor()

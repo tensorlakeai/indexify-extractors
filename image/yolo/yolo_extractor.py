@@ -12,6 +12,7 @@ class YoloExtractor(Extractor):
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
+        self._download_file("https://extractor-files.diptanu-6d5.workers.dev/yolov9c.pt","yolov9c.pt")
         self.model = YOLO("yolov9c.pt")
 
     def extract(self, content: Content, params: None) -> List[Union[Feature, Content]]:
@@ -33,20 +34,7 @@ class YoloExtractor(Extractor):
         return features
 
     def sample_input(self) -> Content:
-        file_path = "ny.jpg"
-
-        with open(file_path, "rb") as f:
-            data = f.read()
-
-        return (
-            Content(
-                data=data,
-                content_type="image/jpeg",
-                features=[],
-            ),
-            None,
-        )
-
+        return self.sample_jpg()
 
 if __name__ == "__main__":
     features = YoloExtractor().extract_sample_input()
