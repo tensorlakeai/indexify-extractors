@@ -110,12 +110,9 @@ class Extractor(ABC):
         return self.extract(*input)
 
     def _download_file(self, url, filename):
-        # Check if the file already exists
         if os.path.exists(filename):
-            print(f"File '{filename}' already exists. Skipping download.")
+            # file exists skip
             return
-
-        # Try to download the file
         try:
             with requests.get(url, stream=True) as r:
                 r.raise_for_status()  # Raises an HTTPError if the response status code is 4XX/5XX
@@ -127,31 +124,40 @@ class Extractor(ABC):
 
 
     def sample_mp3(self, features: List[Feature] = []) -> Content:
-        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as tmpfile:
-            self._download_file(
-                "https://extractor-files.diptanu-6d5.workers.dev/podcast.mp3",
-                tmpfile.name,
-            )
-            f = open(tmpfile.name, "rb")
-            return Content(content_type="audio/mpeg", data=f.read(), features=features)
+        file_name = "sample.mp3"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/podcast.mp3",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="audio/mpeg", data=f.read(), features=features)
 
     def sample_mp4(self, features: List[Feature] = []) -> Content:
-        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmpfile:
-            self._download_file(
-                "https://extractor-files.diptanu-6d5.workers.dev/sample.mp4",
-                tmpfile.name,
-            )
-            f = open(tmpfile.name, "rb")
-            return Content(content_type="video/mp4", data=f.read(), features=features)
+        file_name="sample.mp4"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/sample.mp4",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="video/mp4", data=f.read(), features=features)
 
     def sample_jpg(self, features: List[Feature] = []) -> Content:
-        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=True) as tmpfile:
-            self._download_file(
-                "https://extractor-files.diptanu-6d5.workers.dev/people-standing.jpg",
-                tmpfile.name,
-            )
-            f = open(tmpfile.name, "rb")
-            return Content(content_type="image/jpg", data=f.read(), features=features)
+        file_name = "sample.jpg"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/people-standing.jpg",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="image/jpg", data=f.read(), features=features)
+
+    def sample_invoice_jpg(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.jpg"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/invoice-example.jpg",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="image/jpg", data=f.read(), features=features)
 
 
 class ExtractorWrapper:
