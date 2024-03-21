@@ -44,7 +44,7 @@ class Feature(BaseModel):
         return cls(
             feature_type="embedding",
             name=name,
-            value=json.dumps(embedding.model_dump_json()),
+            value=embedding.model_dump_json(),
         )
 
     @classmethod
@@ -244,7 +244,7 @@ class ExtractorWrapper:
             features = out.features if type(out) == Content else [out]
             for feature in features:
                 if feature.feature_type == "embedding":
-                    embedding_value: Embedding = Embedding.model_validate_json(
+                    embedding_value: Embedding = Embedding.model_validate(
                         feature.value
                     )
                     embedding_schema = EmbeddingSchema(
