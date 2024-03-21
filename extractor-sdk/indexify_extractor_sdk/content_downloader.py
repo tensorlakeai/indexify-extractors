@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
 from google.cloud import storage
+import httpx
 
 
 def disk_loader(file_path: str):
@@ -54,6 +55,10 @@ def gcp_storage_loader(storage_url: str) -> bytes:
     blob = bucket.blob(blob_name)
     return blob.download_as_bytes()
 
+def http_loader(url: str) -> bytes:
+    response = httpx.get(url)
+    return response.content
+
 
 def download_content(
     content_metadata: coordinator_service_pb2.ContentMetadata,
@@ -63,7 +68,7 @@ def download_content(
     elif content_metadata.storage_url.startswith("s3://"):
         data = s3_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("https://"):
-        data = azure_blob_loader(content_metadata.storage_url)
+        data = http_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("gs://"):
         data = gcp_storage_loader(content_metadata.storage_url)
     else:
