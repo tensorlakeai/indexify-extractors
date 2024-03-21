@@ -53,7 +53,7 @@ class ServerRouter:
                     ApiFeature(
                         feature_type=feature.feature_type,
                         name=feature.name,
-                        data=feature.value,
+                        data=json.dumps(feature.value),
                     )
                 )
             api_content.append(
