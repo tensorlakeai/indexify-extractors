@@ -21,6 +21,7 @@ class GroundingDinoExtractor(Extractor):
 
     def __init__(self):
         super(GroundingDinoExtractor, self).__init__()
+        self._download_file("https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth", "groundingdino_swint_ogc.pth")
         self.model = load_model(
             "GroundingDINO_SwinT_OGC.py", "groundingdino_swint_ogc.pth"
         )
