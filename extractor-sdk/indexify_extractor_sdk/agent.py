@@ -184,7 +184,7 @@ class ExtractorAgent:
                 )
             new_content.append(
                 ApiContent(
-                    mime=out.content_type,
+                    content_type=out.content_type,
                     bytes=list(out.data),
                     features=content_features,
                     labels=out.labels,
