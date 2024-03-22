@@ -48,7 +48,7 @@ class ExtractorAgent:
         self._extractor = extractor
         self._has_registered = False
         self._coordinator_addr = coordinator_addr
-        self._tasks: map[str, coordinator_service_pb2.Task] = {}
+        self._tasks: Dict[str, coordinator_service_pb2.Task] = {}
         self._task_outcomes: Dict[str, CompletedTask] = {}
         self._ingestion_addr = ingestion_addr
         self._executor = executor
@@ -140,6 +140,7 @@ class ExtractorAgent:
                     continue
 
                 self._task_outcomes.pop(task_id)
+                self._tasks.pop(task_id)
 
     async def launch_task(self, task: coordinator_service_pb2.Task):
         try:
