@@ -168,7 +168,9 @@ class ExtractorAgent:
             if type(out) == Feature:
                 new_features.append(
                     ApiFeature(
-                        feature_type=out.feature_type, name=out.name, data=json.dumps(out.value)
+                        feature_type=out.feature_type,
+                        name=out.name,
+                        data=json.dumps(out.value),
                     )
                 )
                 continue
@@ -178,7 +180,7 @@ class ExtractorAgent:
                     ApiFeature(
                         feature_type=feature.feature_type,
                         name=feature.name,
-                        data=feature.value,
+                        data=json.dumps(feature.value),
                     )
                 )
             new_content.append(
