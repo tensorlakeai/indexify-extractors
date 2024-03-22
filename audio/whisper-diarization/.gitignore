@@ -1,0 +1,6 @@
+**__pycache__
+*.srt
+*.txt
+*.wav
+*.mp3
+temp_outputs
