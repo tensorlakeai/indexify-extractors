@@ -1,6 +1,6 @@
-# Scene Frame Extractor
+# Key Frame Extractor
 
-Dissect a video into its individual frames and generate JPEG image content for each extracted frame. Comes with frame frequency and scene detection that can be configured with input parameters.
+Dissect a video into its key scene frames and generate JPEG image content for each extracted frame. Comes with frame frequency and scene detection that can be configured with input parameters.
 
 Input content: video/mp4
 Output: jpg image content for each frame
