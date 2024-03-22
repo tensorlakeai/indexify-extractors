@@ -6,20 +6,20 @@ from io import BytesIO
 from pydantic import BaseModel
 
 
-class FrameExtractorConfig(BaseModel):
+class KeyFrameExtractorConfig(BaseModel):
+    # maxfps can be used if key_frames is turned off
     max_fps: int = 60
-    # specifying key frames will override max_fps
-    key_frames: bool = False
+    key_frames: bool = True
     key_frames_threshold: float = 0.8
 
 
-class FrameExtractor(Extractor):
-    name = "tensorlake/frame-extractor"
+class KeyFrameExtractor(Extractor):
+    name = "tensorlake/scene-frame-extractor"
     description = "Extract frames from video"
     input_mime_types = ["video", "video/mp4"]
 
     def __init__(self):
-        super(FrameExtractor, self).__init__()
+        super(KeyFrameExtractor, self).__init__()
 
     def get_skip_factor(self, fps: float, max_fps: int):
         if fps > max_fps:
@@ -47,7 +47,7 @@ class FrameExtractor(Extractor):
             features=[feature],
         )
 
-    def extract(self, content: Content, params: FrameExtractorConfig) -> List[Content]:
+    def extract(self, content: Content, params: KeyFrameExtractorConfig) -> List[Content]:
         content_list = []
 
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmpfile:
@@ -91,7 +91,7 @@ class FrameExtractor(Extractor):
         return self.sample_mp4()
 
 if __name__ == "__main__":
-    contents = FrameExtractor().extract_sample_input()
+    contents = KeyFrameExtractor().extract_sample_input()
     print(len(contents))
     for content in contents:
         print(len(content.features))
