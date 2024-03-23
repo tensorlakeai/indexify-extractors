@@ -15,7 +15,7 @@ class YoloExtractor(Extractor):
         self._download_file("https://extractor-files.diptanu-6d5.workers.dev/yolov9c.pt","yolov9c.pt")
         self.model = YOLO("yolov9c.pt")
 
-    def extract(self, content: Content, params: None) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params=None) -> List[Union[Feature, Content]]:
         image_array = np.frombuffer(content.data, dtype=np.uint8)
         image = cv2.imdecode(image_array, cv2.IMREAD_ANYCOLOR)
 

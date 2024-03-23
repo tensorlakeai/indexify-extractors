@@ -27,7 +27,7 @@ class MockExtractor(Extractor):
                 text="Hello World",
                 features=[
                     Feature.embedding(values=[1, 2, 3]),
-                    Feature.metadata(json.loads('{"a": 1, "b": "foo"}')),
+                    Feature.metadata(json.dumps({"a": 1, "b": "foo"})),
                 ],
                 labels={"url": "test.com"},
             ),
@@ -39,7 +39,7 @@ class MockExtractor(Extractor):
         ]
 
     def sample_input(self) -> Tuple[Content, InputParams]:
-        return (Content.from_text("hello world"), InputParams(a=5, b="h"))
+        return (Content.from_text("hello world"), InputParams(a=5, b="h").model_dump_json())
 
 
 class MockExtractorsReturnsFeature(Extractor):
@@ -48,7 +48,7 @@ class MockExtractorsReturnsFeature(Extractor):
 
     def extract(self, content: Content, params: InputParams) -> List[Feature]:
         return [
-            #    Feature.embedding(values=[1, 2, 3]),
+            Feature.embedding(values=[1, 2, 3]),
             Feature.metadata(json.loads('{"a": 1, "b": "foo"}')),
         ]
 

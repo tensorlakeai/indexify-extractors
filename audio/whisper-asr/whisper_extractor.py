@@ -54,13 +54,13 @@ class WhisperExtractor(Extractor):
         return [Content.from_text(text)]
     
     def extract_batch(self, content_list: List[Content], params: type[BaseModel] = None) -> List[List[Feature | Content]]:
-        results = []
+        out = []
         with self._accelerator.split_between_processes(content_list) as content_list:
             data = [content.data for content in content_list]
             results = self._pipe(data)
             texts = [result['text'] for result in results]
-            results.extend([Content.from_text(text) for text in texts])
-        results_gathered = gather_object(results)
+            out.append([Content.from_text(text) for text in texts])
+        results_gathered = gather_object(out)
         return results_gathered
 
 
