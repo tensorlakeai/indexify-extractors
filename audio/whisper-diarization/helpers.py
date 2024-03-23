@@ -229,12 +229,12 @@ def get_sentences_speaker_mapping(word_speaker_mapping, spk_ts):
             snts.append(snt)
             snt = {
                 "speaker": f"Speaker {spk}",
-                "start_time": s,
-                "end_time": e,
+                "start_time": s / 1000,
+                "end_time": e / 1000,
                 "text": "",
             }
         else:
-            snt["end_time"] = e
+            snt["end_time"] = e / 1000
         snt["text"] += wrd + " "
         prev_spk = spk
 

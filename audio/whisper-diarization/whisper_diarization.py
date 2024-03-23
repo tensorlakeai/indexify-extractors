@@ -41,30 +41,6 @@ class WhisperDiarizationExtractor(Extractor):
     def __init__(self):
         super().__init__()
 
-    def get_vocal_target(self, params: InputParams, file_path: str):
-        if params.stemming:
-            # Isolate vocals from the rest of the audio
-
-            return_code = os.system(
-                f'python3 -m demucs.separate -n htdemucs --two-stems=vocals "{file_path}" -o "temp_outputs"'
-            )
-
-            if return_code != 0:
-                print(
-                    "Source splitting failed, using original audio file. Use --no-stem argument to disable it."
-                )
-                vocal_target = file_path
-            else:
-                vocal_target = os.path.join(
-                    "temp_outputs",
-                    "htdemucs",
-                    os.path.splitext(os.path.basename(file_path))[0],
-                    "vocals.wav",
-                )
-        else:
-            vocal_target = file_path
-        return vocal_target
-
     def extract(self, content: Content, params: InputParams) -> List[Content]:
         suffix = mimetypes.guess_extension(content.content_type)
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as inputtmpfile:
@@ -136,7 +112,7 @@ class WhisperDiarizationExtractor(Extractor):
 
             wsm = get_realigned_ws_mapping_with_punctuation(wsm)
             ssm = get_sentences_speaker_mapping(wsm, speaker_ts)
-            print(ssm)
+
             return [
                 Content(
                     content_type="application/json",
@@ -144,6 +120,30 @@ class WhisperDiarizationExtractor(Extractor):
                 )
             ]
 
+    def get_vocal_target(self, params: InputParams, file_path: str):
+        if params.stemming:
+            # Isolate vocals from the rest of the audio
+
+            return_code = os.system(
+                f'python3 -m demucs.separate -n htdemucs --two-stems=vocals "{file_path}" -o "temp_outputs"'
+            )
+
+            if return_code != 0:
+                print(
+                    "Source splitting failed, using original audio file. Use --no-stem argument to disable it."
+                )
+                vocal_target = file_path
+            else:
+                vocal_target = os.path.join(
+                    "temp_outputs",
+                    "htdemucs",
+                    os.path.splitext(os.path.basename(file_path))[0],
+                    "vocals.wav",
+                )
+        else:
+            vocal_target = file_path
+        return vocal_target
+    
     def get_word_timestamps(self, whisper_results, language, vocal_target, params):
         if language in wav2vec2_langs:
             alignment_model, metadata = whisperx.load_align_model(
