@@ -8,8 +8,6 @@ from pydantic import BaseModel, Json
 from genson import SchemaBuilder
 import requests
 import os
-import tempfile
-
 
 class EmbeddingSchema(BaseModel):
     dim: int
@@ -117,6 +115,9 @@ class Extractor(ABC):
         and any extraction policies defined will be applied to them.
         """
         pass
+
+    def extract_batch(self, content_list: List[Content], params: Type[BaseModel]=None) -> List[List[Union[Feature, Content]]]:
+        raise NotImplemented("extract_batch not implemented")
 
     @abstractmethod
     def sample_input(self) -> Tuple[Content, Type[BaseModel]]:
