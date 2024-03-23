@@ -68,12 +68,12 @@ def download_content(
         data = disk_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("s3://"):
         data = s3_loader(content_metadata.storage_url)
-    elif content_metadata.storage_url.startswith("https://"):
+    elif content_metadata.storage_url.startswith("https://") or content_metadata.storage_url.startswith("http://"):
         data = http_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("gs://"):
         data = gcp_storage_loader(content_metadata.storage_url)
     else:
-        raise Exception(f"Unsupported storage url{content_metadata.storage_url}")
+        raise Exception(f"Unsupported storage url: {content_metadata.storage_url}")
 
     return Content(
         content_type=content_metadata.mime,
