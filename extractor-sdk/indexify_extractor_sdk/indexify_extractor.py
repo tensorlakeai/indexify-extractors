@@ -36,13 +36,14 @@ def split_validate_extractor(name: str) -> Tuple[str, str]:
 
 def join(
     extractor: str,
+    workers: int,
     coordinator: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
 ):
     print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
     extractor_module = ExtractorModule(module_name=module, class_name=cls)
-    executor = create_executor(extractor_module)
+    executor = create_executor(extractor_module, workers=workers)
     asyncio.set_event_loop(asyncio.new_event_loop())
     description: ExtractorDescription = asyncio.get_event_loop().run_until_complete(
         describe(asyncio.get_event_loop(), executor)

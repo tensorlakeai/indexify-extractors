@@ -7,6 +7,11 @@ import os
 
 import sys
 
+import multiprocessing
+from typing_extensions import Annotated
+
+cpu_count = multiprocessing.cpu_count()
+
 sys.path.append(".")
 
 if os.path.exists("indexify-extractor"):
@@ -68,6 +73,7 @@ def join(
     ),
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
+    workers: Annotated[int, typer.Option(help="number of worker processes for extraction")] = cpu_count,
 ):
     print_version()
     if not extractor:
@@ -75,7 +81,9 @@ def join(
         print(f"Using extractor path from $EXTRACTOR_PATH: {extractor}")
         assert extractor, "Extractor path not provided and $EXTRACTOR_PATH not set."
 
-    indexify_extractor.join(extractor, coordinator_addr, ingestion_addr)
+    print("workers ", workers)
+
+    indexify_extractor.join(extractor, workers, coordinator_addr, ingestion_addr)
 
 
 @typer_app.command()

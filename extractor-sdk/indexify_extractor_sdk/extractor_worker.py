@@ -17,10 +17,10 @@ def create_extractor_wrapper(extractor_module: ExtractorModule) -> ExtractorWrap
     )
 
 
-def create_executor(extractor_module: ExtractorModule):
+def create_executor(extractor_module: ExtractorModule, workers:int):
     print("creating executor")
     return concurrent.futures.ProcessPoolExecutor(
-        initializer=create_extractor_wrapper, initargs=(extractor_module,)
+        initializer=create_extractor_wrapper, max_workers=workers, initargs=(extractor_module,)
     )
 
 
