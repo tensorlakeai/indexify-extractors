@@ -77,6 +77,7 @@ class ExtractorAgent:
         print("starting task completion reporter")
         while True:
             await asyncio.sleep(5)
+            await self.launch_tasks()
             # We should copy only the keys and not the values
             url = f"ws://{self._ingestion_addr}/write_content"
             for task_id, task_outcome in self._task_outcomes.copy().items():
@@ -142,60 +143,72 @@ class ExtractorAgent:
                 self._task_outcomes.pop(task_id)
                 self._tasks.pop(task_id)
 
-    async def launch_task(self, task: coordinator_service_pb2.Task):
-        try:
-            content = download_content(task.content_metadata)
-        except Exception as e:
-            print(f"failed to download content{e} for task {task.id}")
+    async def launch_tasks(self):
+        tasks = self._tasks.copy()
+        if len(tasks) == 0:
             return
+        print("launching tasks : ", ",".join(tasks.keys()))
+        content_list = {}
+        for (_, task) in tasks.items():
+            try:
+                content = download_content(task.content_metadata)
+                content_list[task.id] = content
+            except Exception as e:
+                print(f"failed to download content{e} for task {task.id}")
+                self._task_outcomes[task.id] = CompletedTask(
+                    task_id=task.id, task_outcome="Failed", new_content=[], features=[]
+                )
+                continue
         try:
-            outputs: Union[List[Feature], List[Content]] = await extract_content(
+            outputs: Dict[str, Union[List[Feature], List[Content]]] = await extract_content(
                 loop=asyncio.get_running_loop(),
                 executor=self._executor,
-                content=content,
+                content_list=content_list,
                 params=task.input_params,
             )
         except Exception as e:
-            print(f"failed to execute task {task.id} {e}")
-            self._task_outcomes[task.id] = CompletedTask(
-                task_id=task.id, task_outcome="Failed", new_content=[], features=[]
-            )
+            print(f"failed to execute tasks {content_list.values()} {e}")
+            for task_id in content_list.keys():
+                self._task_outcomes[task.id] = CompletedTask(
+                    task_id=task.id, task_outcome="Failed", new_content=[], features=[]
+                )
             return
-        print(f"completed task {task.id}")
-        new_content: List[ApiContent] = []
-        new_features: List[ApiFeature] = []
-        out: Union[Feature, Content]
-        for out in outputs:
-            if type(out) == Feature:
-                new_features.append(
-                    ApiFeature(
-                        feature_type=out.feature_type, name=out.name, data=json.dumps(out.value)
+        for (task_id, e_output) in outputs.items():
+            print(f"completed task {task_id}")
+            new_content: List[ApiContent] = []
+            new_features: List[ApiFeature] = []
+            out: Union[Feature, Content]
+            for out in e_output:
+                if type(out) == Feature:
+                    new_features.append(
+                        ApiFeature(
+                            feature_type=out.feature_type, name=out.name, data=json.dumps(out.value)
+                            )
                     )
-                )
-                continue
-            content_features = []
-            for feature in out.features:
-                content_features.append(
-                    ApiFeature(
-                        feature_type=feature.feature_type,
-                        name=feature.name,
-                        data=json.dumps(feature.value),
+                    continue
+                content_features = []
+                for feature in out.features:
+                    content_features.append(
+                        ApiFeature(
+                            feature_type=feature.feature_type,
+                            name=feature.name,
+                            data=json.dumps(feature.value),
+                            )
                     )
-                )
-            new_content.append(
-                ApiContent(
-                    content_type=out.content_type,
-                    bytes=list(out.data),
-                    features=content_features,
-                    labels=out.labels,
-                )
-            )
-        self._task_outcomes[task.id] = CompletedTask(
-            task_id=task.id,
-            task_outcome="Success",
-            new_content=new_content,
-            features=new_features,
-        )
+                    new_content.append(
+                        ApiContent(
+                        content_type=out.content_type,
+                        bytes=list(out.data),
+                        features=content_features,
+                        labels=out.labels,
+                        )
+                    )
+                    self._task_outcomes[task_id] = CompletedTask(
+                        task_id=task_id,
+                        task_outcome="Success",
+                        new_content=new_content,
+                        features=new_features,
+                    )
 
     async def run(self):
         import signal
@@ -230,7 +243,6 @@ class ExtractorAgent:
                         if task.id not in self._tasks:
                             self.add_task(task)
                             print(f"added task {task.id} to queue")
-                            asyncio.create_task(self.launch_task(task))
             except Exception as e:
                 print(f"failed to heartbeat{e}")
                 continue

@@ -22,11 +22,11 @@ class TestMockExtractor(unittest.TestCase):
 
     def test_extractor_wrapper(self):
         e = ExtractorWrapper("indexify_extractor_sdk.mock_extractor", "MockExtractor")
-        extracted_content = e.extract(
-            [Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))],
+        extracted_content = e.extract_batch(
+            {"task1":Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))},
             '{"a": 1, "b": "foo"}',
         )
-        self.assertEqual(len(extracted_content), 2)
+        self.assertEqual(len(extracted_content), 1)
 
     def test_extractor_schema(self):
         e = ExtractorWrapper("indexify_extractor_sdk.mock_extractor", "MockExtractor")
@@ -42,13 +42,13 @@ class TestMockExtractor(unittest.TestCase):
         e = ExtractorWrapper(
             "indexify_extractor_sdk.mock_extractor", "MockExtractorsReturnsFeature"
         )
-        extracted_features: List[Feature] = e.extract(
-            [Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))],
+        extracted_features: List[Feature] = e.extract_batch(
+            {"task1" :Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))},
             '{"a": 1, "b": "foo"}',
         )
-        self.assertEqual(len(extracted_features), 2)
-        self.assertEqual(extracted_features[0].feature_type, "embedding")
-        self.assertEqual(extracted_features[1].feature_type, "metadata")
+        self.assertEqual(len(extracted_features), 1)
+        self.assertEqual(extracted_features["task1"][0].feature_type, "embedding")
+        self.assertEqual(extracted_features["task1"][1].feature_type, "metadata")
 
 
 if __name__ == "__main__":

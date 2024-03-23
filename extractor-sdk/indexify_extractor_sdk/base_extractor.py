@@ -8,8 +8,6 @@ from pydantic import BaseModel, Json
 from genson import SchemaBuilder
 import requests
 import os
-import tempfile
-
 
 class EmbeddingSchema(BaseModel):
     dim: int
@@ -62,6 +60,7 @@ class Feature(BaseModel):
             schema_builder.add_object(self.value)
             metadata_schema = schema_builder.to_schema()
             schema = {}
+            print(metadata_schema)
             for (k, v) in metadata_schema["properties"].items():
                 schema[k] = {"type": v["type"]}
             return schema
@@ -210,16 +209,33 @@ class ExtractorWrapper:
         cls = getattr(module, class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
+        extract_batch = getattr(self._instance, "extract_batch", None)
+        self._has_batch_extract = True if callable(extract_batch) else False
 
-    def extract(self, content: Content, params: Json) -> List[Content]:
+    def extract_batch(self, content_list: Dict[str, Content], params: Json) -> Dict[str, List[Union[Feature, Content]]]:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
         param_instance = (
             self._param_cls.model_validate(params_dict)
-            if self._param_cls != type(None)
+            if self._param_cls is not None
             else None
         )
-        return self._instance.extract(content, param_instance)
+        if self._has_batch_extract:
+            keys = []
+            values = []
+            for (k, v) in content_list.items():
+                keys.append(k)
+                values.append(v)
+            result = self._instance.extract_batch(values, param_instance)
+            out:Dict[str, List[Union[Feature, Content]]] = {}
+            for i, extractor_out in enumerate(result):
+                out[keys[i]] = extractor_out
+            return out
+        out = {}
+        for (task_id, content) in content_list.items():
+            out[task_id] = self._instance.extract(content, param_instance)
+        return out
+
 
     def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
         s_input = self._instance.sample_input()
@@ -227,19 +243,18 @@ class ExtractorWrapper:
             (s_input, input_params) = s_input
         # Come back to this when we can support schemas based on user defined input params
         if input_params is None:
-            input_params = self._param_cls() if self._param_cls else None
-        outputs: Union[List[Feature], List[Content]] = self._instance.extract(
-            s_input, input_params
+            input_params = self._param_cls().model_dump_json() if self._param_cls is not None else None
+        outputs: Dict[str, List[Union[Feature, Content]]] = self.extract_batch(
+            {"task_id": s_input}, input_params
         )
         embedding_schemas = {}
         metadata_schemas = {}
         json_schema = (
-            None
-            if self._param_cls == type(None)
-            else self._param_cls.model_json_schema()
+            self._param_cls.model_json_schema()
+            if self._param_cls is not None
+            else None
         )
-        if json_schema:
-            json_schema["additionalProperties"] = False
+        outputs = outputs["task_id"]
         for out in outputs:
             features = out.features if type(out) == Content else [out]
             for feature in features:

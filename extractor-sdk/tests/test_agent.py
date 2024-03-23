@@ -54,8 +54,9 @@ def create_extractor_agent():
         name="mock_extractor",
         description="mock extractor",
         input_params="{}",
+        embedding_schemas={"embedding": "embedding_index_name_x"},
+        metadata_schemas={"a", "int"},
         input_mime_types=["text/plain"],
-        outputs={"embedding": "embedding_index_name_x"},
     )
     return ExtractorAgent(
         executor_id="124",
