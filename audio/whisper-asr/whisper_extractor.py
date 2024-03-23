@@ -26,26 +26,49 @@ class WhisperExtractor(Extractor):
         self._accelerator = Accelerator()
         torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
         model_id = "distil-whisper/distil-large-v2"
-        model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id,
-            device_map={"":self._accelerator.process_index},
-            torch_dtype=torch_dtype,
-            low_cpu_mem_usage=True,
-            use_safetensors=True,
-        )
+
+        # FIXME : THERE MUST BE A BETTER WAY TO DO THIS
+        if torch.cuda.is_available():
+            model = AutoModelForSpeechSeq2Seq.from_pretrained(
+                model_id,
+                device_map={"":self._accelerator.process_index},
+                torch_dtype=torch_dtype,
+                low_cpu_mem_usage=True,
+                use_safetensors=True,
+            )
+        else:
+            model = AutoModelForSpeechSeq2Seq.from_pretrained(
+                model_id,
+                torch_dtype=torch_dtype,
+                low_cpu_mem_usage=True,
+                use_safetensors=True,
+            )
         processor = AutoProcessor.from_pretrained(model_id)
-        self._pipe = pipeline(
-            "automatic-speech-recognition",
-            model=model,
-            tokenizer=processor.tokenizer,
-            feature_extractor=processor.feature_extractor,
-            max_new_tokens=128,
-            chunk_length_s=15,
-            batch_size=16,
-            return_timestamps=True,
-            torch_dtype=torch_dtype,
-            device_map={"":self._accelerator.process_index},
-        )
+        if torch.cuda.is_available():
+            self._pipe = pipeline(
+                "automatic-speech-recognition",
+                model=model,
+                tokenizer=processor.tokenizer,
+                feature_extractor=processor.feature_extractor,
+                max_new_tokens=128,
+                chunk_length_s=15,
+                batch_size=16,
+                return_timestamps=True,
+                torch_dtype=torch_dtype,
+                device_map={"":self._accelerator.process_index},
+            )
+        else:
+            self._pipe = pipeline(
+                "automatic-speech-recognition",
+                model=model,
+                tokenizer=processor.tokenizer,
+                feature_extractor=processor.feature_extractor,
+                max_new_tokens=128,
+                chunk_length_s=15,
+                batch_size=16,
+                return_timestamps=True,
+                torch_dtype=torch_dtype,
+            )
 
     def extract(
         self, content: Content, params: InputParams) -> List[Content]:
