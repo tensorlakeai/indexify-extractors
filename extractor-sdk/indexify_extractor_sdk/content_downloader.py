@@ -56,8 +56,9 @@ def gcp_storage_loader(storage_url: str) -> bytes:
     return blob.download_as_bytes()
 
 def http_loader(url: str) -> bytes:
-    response = httpx.get(url)
-    return response.content
+    response = httpx.get(url, follow_redirects=True)
+    response.raise_for_status()
+    return response.read()
 
 
 def download_content(

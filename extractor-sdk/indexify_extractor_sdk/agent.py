@@ -145,11 +145,15 @@ class ExtractorAgent:
 
     async def launch_tasks(self):
         tasks = self._tasks.copy()
-        if len(tasks) == 0:
+        tasks_to_launch = {}
+        for task_id in tasks.keys():
+            if not task_id in self._task_outcomes:
+                tasks_to_launch[task_id] = tasks[task_id]
+        if len(tasks_to_launch) == 0:
             return
         print("launching tasks : ", ",".join(tasks.keys()))
         content_list = {}
-        for (_, task) in tasks.items():
+        for (_, task) in tasks_to_launch.items():
             try:
                 content = download_content(task.content_metadata)
                 content_list[task.id] = content
@@ -195,20 +199,20 @@ class ExtractorAgent:
                             data=json.dumps(feature.value),
                             )
                     )
-                    new_content.append(
-                        ApiContent(
-                        content_type=out.content_type,
-                        bytes=list(out.data),
-                        features=content_features,
-                        labels=out.labels,
-                        )
+                new_content.append(
+                    ApiContent(
+                    content_type=out.content_type,
+                    bytes=list(out.data),
+                    features=content_features,
+                    labels=out.labels,
                     )
-                    self._task_outcomes[task_id] = CompletedTask(
-                        task_id=task_id,
-                        task_outcome="Success",
-                        new_content=new_content,
-                        features=new_features,
-                    )
+                )
+            self._task_outcomes[task_id] = CompletedTask(
+                task_id=task_id,
+                task_outcome="Success",
+                new_content=new_content,
+                features=new_features,
+            )
 
     async def run(self):
         import signal

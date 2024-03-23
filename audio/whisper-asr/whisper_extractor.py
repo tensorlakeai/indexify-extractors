@@ -20,7 +20,7 @@ class WhisperExtractor(Extractor):
     description = "Whisper ASR"
     python_dependencies = ["torch", "transformers", "librosa", "soundfile", "torch", "accelerate"]
     system_dependencies = ["ffmpeg"]
-    input_mimes = ["audio", "audio/mpeg"]
+    input_mime_types = ["audio", "audio/mpeg"]
     def __init__(self):
         super().__init__()
         self._accelerator = Accelerator()
