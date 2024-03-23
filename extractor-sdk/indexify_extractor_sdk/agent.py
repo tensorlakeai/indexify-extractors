@@ -171,7 +171,8 @@ class ExtractorAgent:
                 params=task.input_params,
             )
         except Exception as e:
-            print(f"failed to execute tasks {",".join(content_list.keys())} {e}")
+            task_ids = ",".join(content_list.keys())
+            print(f"failed to execute tasks {task_ids} {e}")
             for task_id in content_list.keys():
                 self._task_outcomes[task.id] = CompletedTask(
                     task_id=task.id, task_outcome="Failed", new_content=[], features=[]
