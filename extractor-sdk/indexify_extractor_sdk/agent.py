@@ -5,7 +5,6 @@ import grpc
 from typing import List, Dict, Union
 from .base_extractor import Content, Feature
 from .content_downloader import download_content
-from pydantic import BaseModel
 from .extractor_worker import extract_content
 from .ingestion_api_models import (
     ApiContent,
@@ -19,20 +18,13 @@ from .ingestion_api_models import (
     ApiExtractedFeatures,
     ApiFinishExtractedContentIngest,
 )
-import json
+from .utils import batched
 from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
-from itertools import islice
 import websockets
+from .task_store import TaskStore, CompletedTask
 
 CONTENT_UPLOAD_BATCH_SIZE = 5
-
-
-class CompletedTask(BaseModel):
-    task_id: str
-    task_outcome: str
-    new_content: List[ApiContent]
-    features: List[ApiFeature]
 
 
 class ExtractorAgent:
@@ -44,12 +36,11 @@ class ExtractorAgent:
         executor: concurrent.futures.ProcessPoolExecutor,
         ingestion_addr: str = "localhost:8900",
     ):
+        self._task_store: TaskStore = TaskStore()
         self._executor_id = executor_id
         self._extractor = extractor
         self._has_registered = False
         self._coordinator_addr = coordinator_addr
-        self._tasks: Dict[str, coordinator_service_pb2.Task] = {}
-        self._task_outcomes: Dict[str, CompletedTask] = {}
         self._ingestion_addr = ingestion_addr
         self._executor = executor
 
@@ -58,7 +49,7 @@ class ExtractorAgent:
             await asyncio.sleep(5)
             yield coordinator_service_pb2.HeartbeatRequest(
                 executor_id=self._executor_id,
-                pending_tasks=len(self._tasks),
+                pending_tasks=self._task_store.num_pending_tasks(),
             )
 
     async def register(self):
@@ -80,11 +71,13 @@ class ExtractorAgent:
             await self.launch_tasks()
             # We should copy only the keys and not the values
             url = f"ws://{self._ingestion_addr}/write_content"
-            for task_id, task_outcome in self._task_outcomes.copy().items():
+            for task_outcome in self._task_store.task_outcomes():
                 print(
-                    f"reporting outcome of task {task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}, num_features: {len(task_outcome.features)}"
+                    f"reporting outcome of task {task_outcome.task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}, num_features: {len(task_outcome.features)}"
                 )
-                task: coordinator_service_pb2.Task = self._tasks[task_id]
+                task: coordinator_service_pb2.Task = self._task_store.get_task(
+                    task_outcome.task_id
+                )
                 begin_msg = ApiBeginExtractedContentIngest(
                     BeginExtractedContentIngest=BeginExtractedContentIngest(
                         task_id=task_outcome.task_id,
@@ -98,15 +91,6 @@ class ExtractorAgent:
                     )
                 )
                 try:
-                    # https://docs.python.org/3/library/itertools.html#itertools.batched
-                    def batched(iterable, n):
-                        # batched('ABCDEFG', 3) --> ABC DEF G
-                        if n < 1:
-                            raise ValueError("n must be at least one")
-                        it = iter(iterable)
-                        while batch := tuple(islice(it, n)):
-                            yield batch
-
                     async with websockets.connect(
                         url, ping_interval=5, ping_timeout=30
                     ) as ws:
@@ -137,21 +121,18 @@ class ExtractorAgent:
                         )
                         await ws.send(finish_msg.model_dump_json())
                 except Exception as e:
-                    print(f"failed to report task {task_id}, exception: {e}")
+                    print(
+                        f"failed to report task {task_outcome.task_outcome}, exception: {e}"
+                    )
                     continue
 
-                self._task_outcomes.pop(task_id)
-                self._tasks.pop(task_id)
+                self._task_store.mark_reported(task_id=task_outcome.task_id)
 
     async def launch_tasks(self):
-        tasks = self._tasks.copy()
-        tasks_to_launch = {}
-        for task_id in tasks.keys():
-            if not task_id in self._task_outcomes:
-                tasks_to_launch[task_id] = tasks[task_id]
+        tasks_to_launch = self._task_store.get_runnable_tasks()
         if len(tasks_to_launch) == 0:
             return
-        print("launching tasks : ", ",".join(tasks.keys()))
+        print("launching tasks : ", ",".join(tasks_to_launch.keys()))
         content_list = {}
         for (_, task) in tasks_to_launch.items():
             try:
@@ -159,12 +140,16 @@ class ExtractorAgent:
                 content_list[task.id] = content
             except Exception as e:
                 print(f"failed to download content{e} for task {task.id}")
-                self._task_outcomes[task.id] = CompletedTask(
+                completed_task = CompletedTask(
                     task_id=task.id, task_outcome="Failed", new_content=[], features=[]
                 )
+                self._task_store.complete(outcome=completed_task)
                 continue
         try:
-            outputs: Dict[str, Union[List[Feature], List[Content]]] = await extract_content(
+            print(f"laucnhed tasks {len(content_list)}")
+            outputs: Dict[
+                str, Union[List[Feature], List[Content]]
+            ] = await extract_content(
                 loop=asyncio.get_running_loop(),
                 executor=self._executor,
                 content_list=content_list,
@@ -174,10 +159,12 @@ class ExtractorAgent:
             task_ids = ",".join(content_list.keys())
             print(f"failed to execute tasks {task_ids} {e}")
             for task_id in content_list.keys():
-                self._task_outcomes[task.id] = CompletedTask(
-                    task_id=task.id, task_outcome="Failed", new_content=[], features=[]
+                completed_task = CompletedTask(
+                    task_id=task_id, task_outcome="Failed", new_content=[], features=[]
                 )
+                self._task_store.complete(outcome=completed_task)
             return
+        print(f"completed task len {len(outputs)}")
         for (task_id, e_output) in outputs.items():
             print(f"completed task {task_id}")
             new_content: List[ApiContent] = []
@@ -185,35 +172,16 @@ class ExtractorAgent:
             out: Union[Feature, Content]
             for out in e_output:
                 if type(out) == Feature:
-                    new_features.append(
-                        ApiFeature(
-                            feature_type=out.feature_type, name=out.name, data=json.dumps(out.value)
-                            )
-                    )
+                    new_features.append(ApiFeature.from_feature(feature=out))
                     continue
-                content_features = []
-                for feature in out.features:
-                    content_features.append(
-                        ApiFeature(
-                            feature_type=feature.feature_type,
-                            name=feature.name,
-                            data=json.dumps(feature.value),
-                            )
-                    )
-                new_content.append(
-                    ApiContent(
-                    content_type=out.content_type,
-                    bytes=list(out.data),
-                    features=content_features,
-                    labels=out.labels,
-                    )
-                )
-            self._task_outcomes[task_id] = CompletedTask(
+                new_content.append(ApiContent.from_content(content=out))
+            completed_task = CompletedTask(
                 task_id=task_id,
                 task_outcome="Success",
                 new_content=new_content,
                 features=new_features,
             )
+            self._task_store.complete(outcome=completed_task)
 
     async def run(self):
         import signal
@@ -243,20 +211,10 @@ class ExtractorAgent:
                 hb_response_it = self._stub.Heartbeat(hb_ticker)
                 resp: coordinator_service_pb2.HeartbeatResponse
                 async for resp in hb_response_it:
-                    task: coordinator_service_pb2.Task
-                    for task in resp.tasks:
-                        if task.id not in self._tasks:
-                            self.add_task(task)
-                            print(f"added task {task.id} to queue")
+                    self._task_store.add_tasks(resp.tasks)
             except Exception as e:
                 print(f"failed to heartbeat{e}")
                 continue
-
-    def add_task(self, task: coordinator_service_pb2.Task):
-        self._tasks[task.id] = task
-
-    async def exeucte_task(self):
-        return {"status": "ok"}
 
     async def _shutdown(self, loop):
         print("shutting down agent ...")

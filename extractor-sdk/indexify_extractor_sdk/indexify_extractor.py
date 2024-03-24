@@ -73,8 +73,8 @@ def join(
     )
     try:
         asyncio.get_event_loop().run_until_complete(server.run())
-    except asyncio.CancelledError:
-        print("exiting gracefully")
+    except asyncio.CancelledError as ex:
+        print("exiting gracefully", ex)
 
 
 def describe_sync(extractor):

@@ -2,6 +2,7 @@ from typing import List, Union, Dict
 from .base_extractor import Content, ExtractorWrapper, Feature
 from pydantic import Json, BaseModel
 import concurrent
+import asyncio
 
 
 class ExtractorModule(BaseModel):
@@ -17,10 +18,12 @@ def create_extractor_wrapper(extractor_module: ExtractorModule) -> ExtractorWrap
     )
 
 
-def create_executor(extractor_module: ExtractorModule, workers:int):
+def create_executor(extractor_module: ExtractorModule, workers: int):
     print("creating executor")
     return concurrent.futures.ProcessPoolExecutor(
-        initializer=create_extractor_wrapper, max_workers=workers, initargs=(extractor_module,)
+        initializer=create_extractor_wrapper,
+        max_workers=workers,
+        initargs=(extractor_module,),
     )
 
 

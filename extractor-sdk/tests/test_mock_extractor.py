@@ -23,7 +23,11 @@ class TestMockExtractor(unittest.TestCase):
     def test_extractor_wrapper(self):
         e = ExtractorWrapper("indexify_extractor_sdk.mock_extractor", "MockExtractor")
         extracted_content = e.extract_batch(
-            {"task1":Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))},
+            {
+                "task1": Content(
+                    content_type="text", data=bytes("Hello World", encoding="utf-8")
+                )
+            },
             '{"a": 1, "b": "foo"}',
         )
         self.assertEqual(len(extracted_content), 1)
@@ -43,7 +47,11 @@ class TestMockExtractor(unittest.TestCase):
             "indexify_extractor_sdk.mock_extractor", "MockExtractorsReturnsFeature"
         )
         extracted_features: List[Feature] = e.extract_batch(
-            {"task1" :Content(content_type="text", data=bytes("Hello World", encoding="utf-8"))},
+            {
+                "task1": Content(
+                    content_type="text", data=bytes("Hello World", encoding="utf-8")
+                )
+            },
             '{"a": 1, "b": "foo"}',
         )
         self.assertEqual(len(extracted_features), 1)

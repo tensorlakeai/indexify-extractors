@@ -39,7 +39,10 @@ class MockExtractor(Extractor):
         ]
 
     def sample_input(self) -> Tuple[Content, InputParams]:
-        return (Content.from_text("hello world"), InputParams(a=5, b="h").model_dump_json())
+        return (
+            Content.from_text("hello world"),
+            InputParams(a=5, b="h").model_dump_json(),
+        )
 
 
 class MockExtractorsReturnsFeature(Extractor):

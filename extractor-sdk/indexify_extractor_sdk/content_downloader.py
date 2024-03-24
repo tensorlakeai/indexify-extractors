@@ -55,6 +55,7 @@ def gcp_storage_loader(storage_url: str) -> bytes:
     blob = bucket.blob(blob_name)
     return blob.download_as_bytes()
 
+
 def http_loader(url: str) -> bytes:
     response = httpx.get(url, follow_redirects=True)
     response.raise_for_status()
@@ -68,7 +69,9 @@ def download_content(
         data = disk_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("s3://"):
         data = s3_loader(content_metadata.storage_url)
-    elif content_metadata.storage_url.startswith("https://") or content_metadata.storage_url.startswith("http://"):
+    elif content_metadata.storage_url.startswith(
+        "https://"
+    ) or content_metadata.storage_url.startswith("http://"):
         data = http_loader(content_metadata.storage_url)
     elif content_metadata.storage_url.startswith("gs://"):
         data = gcp_storage_loader(content_metadata.storage_url)

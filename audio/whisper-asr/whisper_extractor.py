@@ -81,8 +81,11 @@ class WhisperExtractor(Extractor):
         with self._accelerator.split_between_processes(content_list) as content_list:
             data = [content.data for content in content_list]
             results = self._pipe(data)
-            texts = [result['text'] for result in results]
-            out.append([Content.from_text(text) for text in texts])
+            texts = []
+            for result in results:
+                texts.append(result["text"])
+            for text in texts:
+                out.append([Content.from_text(text)])
         results_gathered = gather_object(out)
         return results_gathered
 
@@ -91,7 +94,9 @@ class WhisperExtractor(Extractor):
         return self.sample_mp3()
 
 if __name__ == "__main__":
-    contents = WhisperExtractor().extract_sample_input()
+    extractor = WhisperExtractor()
+    content_list = [extractor.sample_mp3(), extractor.sample_mp3()]
+    contents = extractor.extract_batch(content_list)
     print(len(contents))
     for content in contents:
         print(len(content.features))

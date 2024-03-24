@@ -9,6 +9,7 @@ from genson import SchemaBuilder
 import requests
 import os
 
+
 class EmbeddingSchema(BaseModel):
     dim: int
     distance: str
@@ -138,7 +139,6 @@ class Extractor(ABC):
         except requests.exceptions.RequestException as e:
             print(f"Error downloading the file: {e}")
 
-
     def sample_mp3(self, features: List[Feature] = []) -> Content:
         file_name = "sample.mp3"
         self._download_file(
@@ -149,7 +149,7 @@ class Extractor(ABC):
         return Content(content_type="audio/mpeg", data=f.read(), features=features)
 
     def sample_mp4(self, features: List[Feature] = []) -> Content:
-        file_name="sample.mp4"
+        file_name = "sample.mp4"
         self._download_file(
             "https://extractor-files.diptanu-6d5.workers.dev/sample.mp4",
             file_name,
@@ -183,7 +183,7 @@ class Extractor(ABC):
         )
         f = open(file_name, "rb")
         return Content(content_type="application/pdf", data=f.read(), features=features)
-    
+
     def sample_image_based_pdf(self, features: List[Feature] = []) -> Content:
         file_name = "sample.pdf"
         self._download_file(
@@ -192,7 +192,7 @@ class Extractor(ABC):
         )
         f = open(file_name, "rb")
         return Content(content_type="application/pdf", data=f.read(), features=features)
-    
+
     def sample_scientific_pdf(self, features: List[Feature] = []) -> Content:
         file_name = "sample.pdf"
         self._download_file(
@@ -212,7 +212,9 @@ class ExtractorWrapper:
         extract_batch = getattr(self._instance, "extract_batch", None)
         self._has_batch_extract = True if callable(extract_batch) else False
 
-    def extract_batch(self, content_list: Dict[str, Content], params: Json) -> Dict[str, List[Union[Feature, Content]]]:
+    def extract_batch(
+        self, content_list: Dict[str, Content], params: Json
+    ) -> Dict[str, List[Union[Feature, Content]]]:
         params = "{}" if params is None else params
         params_dict = json.loads(params)
         param_instance = (
@@ -227,7 +229,7 @@ class ExtractorWrapper:
                 keys.append(k)
                 values.append(v)
             result = self._instance.extract_batch(values, param_instance)
-            out:Dict[str, List[Union[Feature, Content]]] = {}
+            out: Dict[str, List[Union[Feature, Content]]] = {}
             for i, extractor_out in enumerate(result):
                 out[keys[i]] = extractor_out
             return out
@@ -236,32 +238,31 @@ class ExtractorWrapper:
             out[task_id] = self._instance.extract(content, param_instance)
         return out
 
-
     def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
         s_input = self._instance.sample_input()
         if type(s_input) == tuple:
             (s_input, input_params) = s_input
         # Come back to this when we can support schemas based on user defined input params
         if input_params is None:
-            input_params = self._param_cls().model_dump_json() if self._param_cls is not None else None
+            input_params = (
+                self._param_cls().model_dump_json()
+                if self._param_cls is not None
+                else None
+            )
         outputs: Dict[str, List[Union[Feature, Content]]] = self.extract_batch(
             {"task_id": s_input}, input_params
         )
         embedding_schemas = {}
         metadata_schemas = {}
         json_schema = (
-            self._param_cls.model_json_schema()
-            if self._param_cls is not None
-            else None
+            self._param_cls.model_json_schema() if self._param_cls is not None else None
         )
-        outputs = outputs["task_id"]
-        for out in outputs:
+        output = outputs["task_id"]
+        for out in output:
             features = out.features if type(out) == Content else [out]
             for feature in features:
                 if feature.feature_type == "embedding":
-                    embedding_value: Embedding = Embedding.model_validate(
-                        feature.value
-                    )
+                    embedding_value: Embedding = Embedding.model_validate(feature.value)
                     embedding_schema = EmbeddingSchema(
                         dim=len(embedding_value.values),
                         distance=embedding_value.distance,
