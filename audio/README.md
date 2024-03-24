@@ -1,4 +1,4 @@
-# PDF Extractors
+# Audio Extractors
 
 To begin utilizing these extractors install the indexify-extractor CLI.
 
