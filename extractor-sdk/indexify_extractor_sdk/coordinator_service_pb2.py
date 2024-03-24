@@ -143,9 +143,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_EXTRACTIONPOLICYRESPONSE_INDEXNAMETABLEMAPPINGENTRY"
     ]._serialized_start = 4180
-    _globals[
-        "_EXTRACTIONPOLICYRESPONSE_INDEXNAMETABLEMAPPINGENTRY"
-    ]._serialized_end = 4240
+    _globals["_EXTRACTIONPOLICYRESPONSE_INDEXNAMETABLEMAPPINGENTRY"]._serialized_end = (
+        4240
+    )
     _globals[
         "_EXTRACTIONPOLICYRESPONSE_OUTPUTINDEXNAMEMAPPINGENTRY"
     ]._serialized_start = 4242

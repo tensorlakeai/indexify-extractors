@@ -7,6 +7,8 @@ from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
 from google.cloud import storage
 import httpx
+from typing import Dict
+import asyncio
 
 
 def disk_loader(file_path: str):
@@ -56,31 +58,56 @@ def gcp_storage_loader(storage_url: str) -> bytes:
     return blob.download_as_bytes()
 
 
-def http_loader(url: str) -> bytes:
-    response = httpx.get(url, follow_redirects=True)
-    response.raise_for_status()
-    return response.read()
+async def fetch_url(id, url):
+    try:
+        async with httpx.AsyncClient() as client:
+            print(f"downloading url {url}")
+            response = await client.get(url, follow_redirects=True)
+            response.raise_for_status()
+            return id, response.read()
+    except Exception as e:
+        return id, e
 
 
-def download_content(
-    content_metadata: coordinator_service_pb2.ContentMetadata,
-) -> Content:
-    if content_metadata.storage_url.startswith("file://"):
-        data = disk_loader(content_metadata.storage_url)
-    elif content_metadata.storage_url.startswith("s3://"):
-        data = s3_loader(content_metadata.storage_url)
-    elif content_metadata.storage_url.startswith(
-        "https://"
-    ) or content_metadata.storage_url.startswith("http://"):
-        data = http_loader(content_metadata.storage_url)
-    elif content_metadata.storage_url.startswith("gs://"):
-        data = gcp_storage_loader(content_metadata.storage_url)
-    else:
-        raise Exception(f"Unsupported storage url: {content_metadata.storage_url}")
+async def download_parallel(urls):
+    tasks = [fetch_url(id, url) for id, url in urls.items()]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    return results
 
+
+async def download_content(urls: Dict[str, str]) -> Dict[str, Content]:
+    out = {}
+    disk_urls = {}
+    s3_urls = {}
+    http_urls = {}
+    gs_urls = {}
+    for task_id, url in urls.items():
+        if url.startswith("file://"):
+            disk_urls[task_id] = url
+        elif url.startswith("s3://"):
+            s3_urls[task_id] = url
+        elif url.startswith("https://") or url.startswith("http://"):
+            http_urls[task_id] = url
+        elif url.startswith("gs://"):
+            gs_urls[task_id] = url
+        else:
+            out[task_id] = Exception(f"unsupported storage url {url}")
+    for task_id, url in gs_urls.items():
+        out[task_id] = gcp_storage_loader(url)
+    for task_id, url in s3_urls.items():
+        out[task_id] = s3_loader(url)
+    for task_id, url in disk_urls.items():
+        out[task_id] = disk_loader(url)
+
+    result = await download_parallel(http_urls)
+    for task_id, b in result:
+        out[task_id] = b
+
+    return out
+
+
+def create_content(bytes, task: coordinator_service_pb2.Task) -> Content:
+    metadata = task.content_metadata
     return Content(
-        content_type=content_metadata.mime,
-        data=data,
-        labels=content_metadata.labels,
-        features=[],
+        content_type=metadata.mime, data=bytes, features=[], labels=metadata.labels
     )

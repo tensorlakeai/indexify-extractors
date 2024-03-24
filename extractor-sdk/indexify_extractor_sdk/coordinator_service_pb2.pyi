@@ -299,6 +299,7 @@ class Task(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     ID_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
@@ -368,6 +369,7 @@ class Extractor(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
@@ -416,6 +418,7 @@ class ListContentRequest(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -501,6 +504,7 @@ class ExtractionPolicy(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
@@ -562,6 +566,7 @@ class ExtractionPolicyResponse(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
     INDEX_NAME_TABLE_MAPPING_FIELD_NUMBER: _ClassVar[int]
@@ -601,6 +606,7 @@ class ContentMetadata(_message.Message):
         def __init__(
             self, key: _Optional[str] = ..., value: _Optional[str] = ...
         ) -> None: ...
+
     ID_FIELD_NUMBER: _ClassVar[int]
     FILE_NAME_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]

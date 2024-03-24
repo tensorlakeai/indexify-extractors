@@ -4,7 +4,7 @@ from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
 from typing import List, Dict, Union
 from .base_extractor import Content, Feature
-from .content_downloader import download_content
+from .content_downloader import download_content, create_content
 from .extractor_worker import extract_content
 from .ingestion_api_models import (
     ApiContent,
@@ -134,26 +134,31 @@ class ExtractorAgent:
             return
         print("launching tasks : ", ",".join(tasks_to_launch.keys()))
         content_list = {}
-        for (_, task) in tasks_to_launch.items():
-            try:
-                content = download_content(task.content_metadata)
-                content_list[task.id] = content
-            except Exception as e:
-                print(f"failed to download content{e} for task {task.id}")
+        content_urls = {}
+        for _, task in tasks_to_launch.items():
+            content_urls[task.id] = task.content_metadata.storage_url
+        content_bytes = await download_content(content_urls)
+        for task_id, bytes in content_bytes.items():
+            if isinstance(bytes, Exception):
+                print(f"failed to download content{bytes} for task {task_id}")
                 completed_task = CompletedTask(
-                    task_id=task.id, task_outcome="Failed", new_content=[], features=[]
+                    task_id=task_id, task_outcome="Failed", new_content=[], features=[]
                 )
                 self._task_store.complete(outcome=completed_task)
                 continue
+            c = create_content(bytes, tasks_to_launch[task_id])
+            content_list[task_id] = c
+        if len(content_list) == 0:
+            return
         try:
-            print(f"laucnhed tasks {len(content_list)}")
-            outputs: Dict[
-                str, Union[List[Feature], List[Content]]
-            ] = await extract_content(
-                loop=asyncio.get_running_loop(),
-                executor=self._executor,
-                content_list=content_list,
-                params=task.input_params,
+            print(f"launching tasks {len(content_list)}")
+            outputs: Dict[str, Union[List[Feature], List[Content]]] = (
+                await extract_content(
+                    loop=asyncio.get_running_loop(),
+                    executor=self._executor,
+                    content_list=content_list,
+                    params=task.input_params,
+                )
             )
         except Exception as e:
             task_ids = ",".join(content_list.keys())
@@ -165,7 +170,7 @@ class ExtractorAgent:
                 self._task_store.complete(outcome=completed_task)
             return
         print(f"completed task len {len(outputs)}")
-        for (task_id, e_output) in outputs.items():
+        for task_id, e_output in outputs.items():
             print(f"completed task {task_id}")
             new_content: List[ApiContent] = []
             new_features: List[ApiFeature] = []
