@@ -62,7 +62,7 @@ class Feature(BaseModel):
             metadata_schema = schema_builder.to_schema()
             schema = {}
             print(metadata_schema)
-            for (k, v) in metadata_schema["properties"].items():
+            for k, v in metadata_schema["properties"].items():
                 schema[k] = {"type": v["type"]}
             return schema
 
@@ -225,7 +225,7 @@ class ExtractorWrapper:
         if self._has_batch_extract:
             keys = []
             values = []
-            for (k, v) in content_list.items():
+            for k, v in content_list.items():
                 keys.append(k)
                 values.append(v)
             result = self._instance.extract_batch(values, param_instance)
@@ -234,7 +234,7 @@ class ExtractorWrapper:
                 out[keys[i]] = extractor_out
             return out
         out = {}
-        for (task_id, content) in content_list.items():
+        for task_id, content in content_list.items():
             out[task_id] = self._instance.extract(content, param_instance)
         return out
 
