@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModel
 from typing import List
 from indexify_extractor_sdk import Content
-from indexify_extractor_sdk.base_embedding import (
+from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
     EmbeddingInputParams,
 )
@@ -10,7 +10,6 @@ import torch
 class ColBERTv2Base(BaseEmbeddingExtractor):
     name = "tensorlake/colbert"
     description = "This ColBERTv2-based extractor is a Python class that encapsulates the functionality to convert text inputs into vector embeddings using the ColBERTv2 model. It leverages ColBERTv2's transformer-based architecture to generate context-aware embeddings suitable for various natural language processing tasks."
-    python_dependencies = ["torch", "transformers"]
     system_dependencies = []
 
 

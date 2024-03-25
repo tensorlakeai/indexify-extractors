@@ -2,18 +2,19 @@ import hashlib
 import numpy as np
 from typing import List
 
-from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
+from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtractor
 
 
 class IdentityHashEmbedding(BaseEmbeddingExtractor):
-    """
-    Implements a Hash Extractor, which can be used to find duplicates within the dataset.
+    name = "yenicelik/identity-hash-extractor"
+    description = """Hash Extractor, which can be used to find duplicates within the dataset. 
     It hashes the text into bytes, and interprets these are a numpy array.
 
     We can extend this by LocalitySensitiveHashing, to also account for small perturbations in the input bytes.
 
     This is equivalent to an identity mapping (with the sample-size n large enough, there will be collisions, but this is highly unlikely )
     """
+    system_dependencies = []
 
     def __init__(self):
         super(IdentityHashEmbedding, self).__init__(max_context_length=128)

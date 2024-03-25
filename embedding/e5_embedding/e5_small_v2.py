@@ -1,8 +1,7 @@
 from typing import List
 from indexify_extractor_sdk import Content
-from indexify_extractor_sdk.base_embedding import (
+from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
-    EmbeddingInputParams,
 )
 from transformers import AutoTokenizer, AutoModel
 import torch.nn.functional as F
@@ -11,7 +10,6 @@ from torch import Tensor
 class E5SmallEmbeddings(BaseEmbeddingExtractor):
     name = "tensorlake/E5_Small_Embedding"
     description = "E5 Small V2 model. HF Link - https://huggingface.co/intfloat/e5-small-v2"
-    python_dependencies = ["torch", "transformers"]
     system_dependencies = []
 
     def __init__(self):
