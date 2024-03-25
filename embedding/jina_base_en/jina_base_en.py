@@ -1,8 +1,6 @@
 from typing import List
-from indexify_extractor_sdk import Content
-from indexify_extractor_sdk.base_embedding import (
+from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
-    EmbeddingInputParams,
 )
 from transformers import AutoModel
 

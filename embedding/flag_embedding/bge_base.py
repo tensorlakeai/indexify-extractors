@@ -1,7 +1,7 @@
 from typing import List
 import torch
 from transformers import AutoModel, AutoTokenizer
-from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
+from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtractor
 
 class BGEBase(BaseEmbeddingExtractor):
     name = "BAAI/bge-base-en"

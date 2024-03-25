@@ -2,7 +2,7 @@ import hashlib
 import numpy as np
 from typing import List
 
-from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
+from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtractor
 
 
 class IdentityHashEmbedding(BaseEmbeddingExtractor):
