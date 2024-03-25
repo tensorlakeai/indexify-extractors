@@ -6,7 +6,7 @@ from indexify_extractor_sdk.embedding.sentence_transformer import SentenceTransf
 class MiniLML6Extractor(BaseEmbeddingExtractor):
     name = "tensorlake/minilm-l6"
     description = "MiniLM-L6 Sentence Transformer"
-    python_dependencies = ["torch", "transformers"]
+    python_dependencies = ["torch", "transformers", "langchain"]
     system_dependencies = []
 
     def __init__(self):
