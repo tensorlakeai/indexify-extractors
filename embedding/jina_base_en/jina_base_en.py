@@ -9,7 +9,6 @@ from transformers import AutoModel
 class JinaEmbeddingsBase(BaseEmbeddingExtractor):
     name = "tensorlake/jina-embeddings-base-en"
     description = "Jina AI Base Embedding Model. HF Link - https://huggingface.co/jinaai/jina-embeddings-v2-base-en"
-    python_dependencies = ["torch", "transformers"]
     system_dependencies = []
 
     def __init__(self):

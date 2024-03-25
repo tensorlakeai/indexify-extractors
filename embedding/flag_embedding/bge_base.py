@@ -6,7 +6,6 @@ from indexify_extractor_sdk.base_embedding import BaseEmbeddingExtractor
 class BGEBase(BaseEmbeddingExtractor):
     name = "BAAI/bge-base-en"
     description = "BGE Base English Model for Sentence Embeddings"
-    python_dependencies = ["torch", "transformers"]
     system_dependencies = []
 
     def __init__(self):
