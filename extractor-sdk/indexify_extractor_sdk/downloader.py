@@ -56,14 +56,14 @@ def install_dependencies(directory_path):
         
     if os.environ.get("VIRTUAL_ENV"):
         # install requirements to current env
-        subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '-r', requirements_path])
+        subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '--no-deps', '-r', requirements_path])
     else:
         # create env and install requirements
         print("Creating virtual environment...")
         subprocess.check_call(['virtualenv', '-p', "python3.11", venv_path])
         pip_path = os.path.join(venv_path, 'bin', 'pip')
 
-        subprocess.check_call([pip_path, 'install', '-r', requirements_path])
+        subprocess.check_call([pip_path, 'install', '--no-deps', '-r', requirements_path])
         subprocess.check_call([pip_path, 'install', 'indexify-extractor-sdk'])
 
     # print instructions for next steps
