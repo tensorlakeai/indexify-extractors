@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Json
-from typing import Optional, List
+from typing import Dict, Optional, List
 from .ingestion_api_models import ApiContent, ApiFeature
 from .base_extractor import Content
 from .extractor_worker import extract_content, ExtractorModule
@@ -32,7 +32,6 @@ class ServerRouter:
         return {"Indexify Extractor"}
 
     async def extract(self, request: ExtractionRequest):
-        print(f"Received extraction request {request}")
         loop = asyncio.get_event_loop()
         content = Content(
             content_type=request.content.content_type,
@@ -40,31 +39,35 @@ class ServerRouter:
             features=[],
             labels=request.content.labels,
         )
+        task_id = "dummy_task_id"
+        content_dict: Dict[str, Content] = { task_id: content }
         input_params = (
             json.dumps(request.input_params) if request.input_params else None
         )
-        content_out: List[Content] = await extract_content(
-            loop, self._executor, content, params=input_params
+        content_out: Dict[str, List[Content]] = await extract_content(
+            loop, self._executor, content_dict, params=input_params
         )
         api_content: List[ApiContent] = []
-        for content in content_out:
-            api_features = []
-            for feature in content.features:
-                api_features.append(
-                    ApiFeature(
-                        feature_type=feature.feature_type,
-                        name=feature.name,
-                        data=json.dumps(feature.value),
+        
+        for content_list in content_out.values():
+            for content in content_list:
+                api_features = []
+                for feature in content.features:
+                    api_features.append(
+                        ApiFeature(
+                            feature_type=feature.feature_type,
+                            name=feature.name,
+                            data=json.dumps(feature.value),
+                        )
+                    )
+                api_content.append(
+                    ApiContent(
+                        content_type=content.content_type,
+                        bytes=list(content.data),
+                        features=api_features,
+                        labels=content.labels,
                     )
                 )
-            api_content.append(
-                ApiContent(
-                    content_type=content.content_type,
-                    bytes=list(content.data),
-                    features=api_features,
-                    labels=content.labels,
-                )
-            )
         return ExtractionResponse(content=api_content)
 
 
