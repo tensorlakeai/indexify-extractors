@@ -2,6 +2,11 @@ import fsspec
 import os
 import ast
 import subprocess
+from rich.console import Console
+from rich.panel import Panel
+
+console = Console()
+
 
 class ClassVisitor(ast.NodeVisitor):
     def __init__(self):
@@ -9,7 +14,7 @@ class ClassVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node):
         for base in node.bases:
-            if isinstance(base, ast.Name) and base.id == 'Extractor':
+            if isinstance(base, ast.Name) and base.id in ['Extractor', 'BaseEmbeddingExtractor']:
                 self.classes.append(node.name)
         self.generic_visit(node)
 
@@ -29,16 +34,20 @@ def find_extractor_subclasses(root_dir):
                     print(f"Syntax error in {filename}: {e}")
 
 
-
 def print_instructions(directory_path):
     venv_path = os.path.join(directory_path, "ve")
-    print("To run extractor run the following:")
+
+    message = """To run extractor, run the following:\n[bold #4AA4F4]"""
+
     if not os.environ.get("VIRTUAL_ENV"):
-        print(f"source {venv_path}/bin/activate")
-    print(f"indexify-extractor join {os.path.basename(directory_path)}/{find_extractor_subclasses(directory_path)}")
+        message += f"source {venv_path}/bin/activate\n"
+
+    message += f"indexify-extractor join {os.path.basename(directory_path)}.{find_extractor_subclasses(directory_path)}[/]"
+    console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
     
     
 def install_dependencies(directory_path):
+    console.print("[bold #4AA4F4]Installing dependencies...[/]")
     venv_path = os.path.join(directory_path, "ve")
     requirements_path = os.path.join(directory_path, "requirements.txt")
     
@@ -46,10 +55,10 @@ def install_dependencies(directory_path):
             raise ValueError("Unable to find requirements.txt")
         
     if os.environ.get("VIRTUAL_ENV"):
-        # install requirements
+        # install requirements to current env
         subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '-r', requirements_path])
     else:
-        # create virtual env and install requirements
+        # create env and install requirements
         print("Creating virtual environment...")
         subprocess.check_call(['virtualenv', '-p', "python3.11", venv_path])
         pip_path = os.path.join(venv_path, 'bin', 'pip')
@@ -62,6 +71,7 @@ def install_dependencies(directory_path):
         
 
 def download_extractor(extractor_path):
+    console.print("[bold #4AA4F4]Downloading Extractor...[/]")
     extractor_path = extractor_path.removeprefix("hub://")
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
     directory_path = os.path.join(
