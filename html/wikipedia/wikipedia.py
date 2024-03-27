@@ -1,11 +1,7 @@
-import json
-
 from utils.utils import extract_images, extract_infobox, extract_sections, extract_title
 
 from typing import List, Union
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 
 
 class WikipediaExtractor(Extractor):
