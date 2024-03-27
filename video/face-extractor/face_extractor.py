@@ -34,7 +34,7 @@ class FaceExtractor(Extractor):
     system_dependencies = []
     input_mime_types = ["video", "video/mp4"]
 
-    def extract(self, content: Content, params: None) -> List[Content]:
+    def extract(self, content: Content, params = None) -> List[Content]:
         content.content_type
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
             tmpfile_name = tmpfile.name

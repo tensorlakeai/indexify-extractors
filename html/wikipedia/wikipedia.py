@@ -18,7 +18,7 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, content: Content, params: None) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         output = []
 
         # add metadata if infobox found

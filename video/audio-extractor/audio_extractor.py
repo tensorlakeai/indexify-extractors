@@ -12,7 +12,7 @@ class AudioExtractor(Extractor):
     def __init__(self):
         super(AudioExtractor, self).__init__()
 
-    def extract(self, content: Content, params: None) -> List[Content]:
+    def extract(self, content: Content, params = None) -> List[Content]:
         suffix = f'.{content.content_type.split("/")[-1]}'
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=True) as tmpfile:
             # write bytes to temp file
