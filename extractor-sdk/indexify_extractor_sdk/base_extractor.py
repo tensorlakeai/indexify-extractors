@@ -215,8 +215,7 @@ class ExtractorWrapper:
     def extract_batch(
         self, content_list: Dict[str, Content], params: Json
     ) -> Dict[str, List[Union[Feature, Content]]]:
-        params = "{}" if params is None else params
-        params_dict = json.loads(params)
+        params_dict = json.loads(params) if params is not None else {}
         param_instance = (
             self._param_cls.model_validate(params_dict)
             if self._param_cls is not None

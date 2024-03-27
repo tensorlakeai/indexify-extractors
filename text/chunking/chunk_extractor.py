@@ -85,9 +85,7 @@ class ChunkExtractor(Extractor):
 
     def sample_input(self) -> Content:
         return Content.from_text(
-            "This is a test string to be split into chunks",
-            features=[Feature.metadata({"filename": "test.txt"})],
-        )
+            "This is a test string to be split into chunks")
 
     def extract_sample_input(self) -> List[Content]:
         input = self.sample_input()
