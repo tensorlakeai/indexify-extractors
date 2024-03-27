@@ -13,6 +13,15 @@ A given audio file will go through the following steps:
 
 ### Example
 
+### Install requirements on mac / cpu
+```pip install --no-deps -r requirements.Darwin.txt```
+
+### Install requirements for Linux on GPUs
+You might need to run the following script before running the extractor on Linux with CUDA - 
+```
+export LD_LIBRARY_PATH=`python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))'`
+```
+
 ##### input params:
  language: Optional[str] = None
  stemming: bool = True
@@ -71,9 +80,6 @@ short-podcast-clip.mp3
   }
 ]
 ```
-
-### Install requirements on mac / cpu
-```pip install --no-deps -r requirements.cpu.txt```
 
 
 ### Acknowledgements
