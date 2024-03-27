@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Callable, List, Literal
+from typing import Any, Callable, List, Literal, Type, Union
 from langchain import text_splitter
 from pydantic import BaseModel
 
@@ -10,48 +10,28 @@ from indexify_extractor_sdk.base_extractor import (
 )
 
 
-class EmbeddingInputParams(BaseModel):
-    overlap: int = 0
-    chunk_size: int = 100
-    text_splitter: str = "recursive"
-
-
 class BaseEmbeddingExtractor(Extractor):
     input_mimes = ["text/plain"]
 
     def __init__(self, max_context_length: int):
         self._model_context_length: int = max_context_length
 
-    def extract(self, content: Content, params: EmbeddingInputParams) -> List[Content]:
-        if params.chunk_size == 0:
-            params.chunk_size = self._model_context_length
-        splitter: Callable[[str], List[str]] = self._create_splitter(params)
-        extracted_embeddings = []
+    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         text = content.data.decode("utf-8")
-        chunks: List[str] = splitter(text)
-        embeddings_list = self.extract_embeddings(chunks)
-        for chunk, embeddings in zip(chunks, embeddings_list):
-            content = Content.from_text(
-                text=chunk,
-                features=[Feature.embedding(values=embeddings)],
-            )
-            extracted_embeddings.append(content)
-        return extracted_embeddings
+        embedding_list = self.extract_embeddings([text])
+        if len(embedding_list) == 0:
+            return []
+        embedding = embedding_list[0]
+        return [Feature.embedding(values=embedding)]
 
-    def _create_splitter(
-        self, input_params: EmbeddingInputParams
-    ) -> Callable[[str], List[str]]:
-        if input_params.text_splitter == "recursive":
-            return text_splitter.RecursiveCharacterTextSplitter(
-                chunk_size=input_params.chunk_size,
-                chunk_overlap=input_params.overlap,
-            ).split_text
-        elif input_params.text_splitter == "char":
-            return text_splitter.CharacterTextSplitter(
-                chunk_size=input_params.chunk_size,
-                chunk_overlap=input_params.overlap,
-                separator="\n\n",
-            ).split_text
+    def extract_batch(self, content_list: List[Content], params  = None) -> List[List[Union[Feature, Content]]]:
+        out = []
+        texts = [content.data.decode("utf-8") for content in content_list]
+        embeddings_list = self.extract_embeddings(texts)
+        for embedding in embeddings_list:
+            feature = Feature.embedding(values=embedding)
+            out.append([feature])
+        return out
 
     @abstractmethod
     def extract_embeddings(self, texts: List[str]) -> List[List[float]]: ...

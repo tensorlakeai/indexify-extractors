@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Json
 from typing import Dict, Optional, List
 from .ingestion_api_models import ApiContent, ApiFeature
-from .base_extractor import Content
+from .base_extractor import Content, Feature
 from .extractor_worker import extract_content, ExtractorModule
 import uvicorn
 import asyncio
@@ -19,6 +19,7 @@ class ExtractionRequest(BaseModel):
 
 class ExtractionResponse(BaseModel):
     content: List[ApiContent]
+    features: List[ApiFeature]
 
 
 class ServerRouter:
@@ -44,31 +45,19 @@ class ServerRouter:
         input_params = (
             json.dumps(request.input_params) if request.input_params else None
         )
-        content_out: Dict[str, List[Content]] = await extract_content(
+        extractor_out: Dict[str, List[Content]] = await extract_content(
             loop, self._executor, content_dict, params=input_params
         )
         api_content: List[ApiContent] = []
+        api_features: List[ApiFeature] = []
         
-        for content_list in content_out.values():
-            for content in content_list:
-                api_features = []
-                for feature in content.features:
-                    api_features.append(
-                        ApiFeature(
-                            feature_type=feature.feature_type,
-                            name=feature.name,
-                            data=json.dumps(feature.value),
-                        )
-                    )
-                api_content.append(
-                    ApiContent(
-                        content_type=content.content_type,
-                        bytes=list(content.data),
-                        features=api_features,
-                        labels=content.labels,
-                    )
-                )
-        return ExtractionResponse(content=api_content)
+        for out_list in extractor_out.values():
+            for out in out_list:
+                if type(out) == Feature:
+                    api_features.append(ApiFeature.from_feature(out))
+                    continue
+                api_content.append(ApiContent.from_content(out))
+        return ExtractionResponse(content=api_content,features=api_features)
 
 
 class ServerWithNoSigHandler(uvicorn.Server):
