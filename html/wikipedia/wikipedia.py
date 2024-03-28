@@ -1,18 +1,13 @@
-import json
-
 from utils.utils import extract_images, extract_infobox, extract_sections, extract_title
 
 from typing import List, Union
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 
 
 class WikipediaExtractor(Extractor):
     name = "tensorlake/wikipedia"
     description = "Extract text content from wikipedia html pages"
     input_mime_types = ["text/html", "text/plain"]
-    python_dependencies = ["aiohttp", "beautifulsoup4"]
     system_dependencies = []
 
     def __init__(self):
