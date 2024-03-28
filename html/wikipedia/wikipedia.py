@@ -8,7 +8,6 @@ class WikipediaExtractor(Extractor):
     name = "tensorlake/wikipedia"
     description = "Extract text content from wikipedia html pages"
     input_mime_types = ["text/html", "text/plain"]
-    python_dependencies = ["aiohttp", "beautifulsoup4"]
     system_dependencies = []
 
     def __init__(self):
