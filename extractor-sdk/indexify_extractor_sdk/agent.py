@@ -67,22 +67,7 @@ async def send_extracted_content(ws, content: ApiContent, id: int, frame_size):
         )
         await ws.send(content_frame.model_dump_json())
 
-    # send all embeddings one at a time and remove them from the list
-    for feature in content.features:
-        if feature.feature_type == "embedding":
-            await ws.send(
-                ApiMultipartContentFeature(
-                    MultipartContentFeature=MultipartContentFeature(
-                        name=feature.name, values=feature.data["values"]
-                    )
-                ).model_dump_json()
-            )
-
-    content.features = [
-        feature for feature in content.features if feature.feature_type != "embedding"
-    ]
-
-    # finish multipart content with the remaining metadata features
+    # finish multipart content with features
     await ws.send(
         ApiFinishMultipartContent(
             FinishMultipartContent=FinishMultipartContent(
