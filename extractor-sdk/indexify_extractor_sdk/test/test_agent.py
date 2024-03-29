@@ -9,9 +9,8 @@ from indexify_extractor_sdk.ingestion_api_models import (
     Content,
     Feature,
     ApiFeature,
-    ApiContentFrame,
-    ApiAddContentFeature,
-    ApiExtractedContent,
+    ApiMultipartContentFrame,
+    ApiMultipartContentFeature,
     ApiBeginMultipartContent,
     ApiFinishMultipartContent,
     ApiBeginExtractedContentIngest,
@@ -22,6 +21,7 @@ from indexify_extractor_sdk.base_extractor import Embedding
 import websockets
 
 CONTENT_FRAME_SIZE = 2
+
 
 class TestProcessTaskOutcome(asynctest.TestCase):
     def setUp(self):
@@ -55,47 +55,56 @@ class TestProcessTaskOutcome(asynctest.TestCase):
                 message_dict = json.loads(message)
                 begin_multipart_content = ApiBeginMultipartContent.model_validate(
                     message_dict
-                )
+                ).BeginMultipartContent
                 assert begin_multipart_content.id == i + 1
 
                 # check if next messages are ApiContentFrame covering expected_data[i]
                 for j in range(0, len(expected_data[i]), CONTENT_FRAME_SIZE):
                     message = await websocket.recv()
                     message_dict = json.loads(message)
-                    content_frame = ApiContentFrame.model_validate(message_dict)
-                    assert content_frame.bytes == expected_data[i][j:j + CONTENT_FRAME_SIZE]
+                    content_frame = ApiMultipartContentFrame.model_validate(
+                        message_dict
+                    ).MultipartContentFrame
+                    assert (
+                        content_frame.bytes
+                        == expected_data[i][j : j + CONTENT_FRAME_SIZE]
+                    )
 
                 # check if next messages are AddExtractedFeatures for each embedding
                 for j in range(2):
                     message = await websocket.recv()
                     message_dict = json.loads(message)
-                    feature = ApiAddContentFeature.model_validate(message_dict)
+                    feature = ApiMultipartContentFeature.model_validate(
+                        message_dict
+                    ).MultipartContentFeature
                     name = "name1" if j == 0 else "name3"
                     assert feature.name == name
                     data = [1, 2, 3] if j == 0 else [4, 5, 6]
-                    assert feature.data == data 
+                    assert feature.values == data
 
-                # check if next message is ApiFinishMultipartContent
+                # check if next message is FinishMultipartContent
                 message = await websocket.recv()
-                message_dict = json.loads(message)
-                finish_multipart_content = ApiFinishMultipartContent.model_validate(
-                    message_dict
+                message_dict = json.loads(message)["FinishMultipartContent"]
+                assert message_dict["content_type"] == "type1" if i == 0 else "type2"
+                assert (
+                    message_dict["labels"] == {"label1": "value1"}
+                    if i == 0
+                    else {"label2": "value2"}
                 )
-                assert finish_multipart_content.content_type == "type1" if i == 0 else "type2"
-                assert finish_multipart_content.labels == {"label1": "value1"} if i == 0 else {"label2": "value2"}
-                assert len(finish_multipart_content.features) == 1
+                assert len(message_dict["features"]) == 1
 
             # receive features associated with content one by one
             for i in range(2):
                 message = await websocket.recv()
                 message_dict = json.loads(message)
-                features = ApiExtractedFeatures.model_validate(message_dict).ExtractedFeatures
-                features.content_id == "test_content_id"
-                assert len(features.features) == 1
-                feature = features.features[0]
+                features = message_dict["ExtractedFeatures"]
+                assert features["content_id"] == "test_content_id"
+                assert len(features["features"]) == 1
+                feature = features["features"][0]
                 name = "name1" if i == 0 else "name2"
-                assert feature.name == name
+                assert feature["name"] == name
                 type = "embedding" if i == 0 else "metadata"
+                assert feature["feature_type"] == type
 
             # check if next message is ApiFinishExtractedContentIngest
             message = await websocket.recv()

@@ -19,9 +19,13 @@ from .ingestion_api_models import (
     ApiExtractedFeatures,
     ApiFinishExtractedContentIngest,
     ApiBeginMultipartContent,
+    BeginMultipartContent,
     ApiFinishMultipartContent,
-    ApiAddContentFeature,
-    ApiContentFrame,
+    ApiMultipartContentFeature,
+    MultipartContentFeature,
+    ApiMultipartContentFrame,
+    MultipartContentFrame,
+    FinishMultipartContent,
 )
 from .utils import batched
 from .server import http_server, ServerRouter, get_server_advertise_addr
@@ -32,7 +36,7 @@ from .task_store import TaskStore, CompletedTask
 CONTENT_FRAME_SIZE = 1024 * 1024
 
 
-def begin_message(task_outcome, task, _executor_id):
+def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id):
     return ApiBeginExtractedContentIngest(
         BeginExtractedContentIngest=BeginExtractedContentIngest(
             task_id=task_outcome.task_id,
@@ -49,23 +53,31 @@ def begin_message(task_outcome, task, _executor_id):
 
 async def send_extracted_content(ws, content: ApiContent, id: int, frame_size):
     # start new multipart content
-    await ws.send(ApiBeginMultipartContent(id=id).model_dump_json())
+    await ws.send(
+        ApiBeginMultipartContent(
+            BeginMultipartContent=BeginMultipartContent(id=id)
+        ).model_dump_json()
+    )
 
     # send data in chunks of frame_size
     for i in range(0, len(content.bytes), frame_size):
         slice = content.bytes[i : i + frame_size]
-        content_frame = ApiContentFrame(bytes=slice)
+        content_frame = ApiMultipartContentFrame(
+            MultipartContentFrame=MultipartContentFrame(bytes=slice)
+        )
         await ws.send(content_frame.model_dump_json())
 
     # send all embeddings one at a time and remove them from the list
     for feature in content.features:
         if feature.feature_type == "embedding":
-            embedding = Embedding.model_validate_json(feature.data)
             await ws.send(
-                ApiAddContentFeature(
-                    name=feature.name, data=embedding.values
+                ApiMultipartContentFeature(
+                    MultipartContentFeature=MultipartContentFeature(
+                        name=feature.name, values=feature.data["values"]
+                    )
                 ).model_dump_json()
             )
+
     content.features = [
         feature for feature in content.features if feature.feature_type != "embedding"
     ]
@@ -73,14 +85,21 @@ async def send_extracted_content(ws, content: ApiContent, id: int, frame_size):
     # finish multipart content with the remaining metadata features
     await ws.send(
         ApiFinishMultipartContent(
-            content_type=content.content_type,
-            features=content.features,
-            labels=content.labels,
+            FinishMultipartContent=FinishMultipartContent(
+                content_type=content.content_type,
+                features=content.features,
+                labels=content.labels,
+            )
         ).model_dump_json()
     )
 
+
 async def process_task_outcome(
-    task_outcome, task, url, _executor_id, frame_size=CONTENT_FRAME_SIZE
+    task_outcome,
+    task: coordinator_service_pb2.Task,
+    url,
+    _executor_id,
+    frame_size=CONTENT_FRAME_SIZE,
 ):
     async with websockets.connect(url, ping_interval=5, ping_timeout=30) as ws:
         # start new extracted content ingest

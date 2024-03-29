@@ -7,7 +7,7 @@ from .base_extractor import Feature, Content
 class ApiFeature(BaseModel):
     feature_type: str
     name: str
-    data: str
+    data: Json
 
     @classmethod
     def from_feature(cls, feature: Feature):
@@ -56,11 +56,14 @@ class ExtractedFeatures(BaseModel):
 class ExtractedContent(BaseModel):
     content_list: List[ApiContent]
 
+
 class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
 
+
 class BeginMultipartContent(BaseModel):
     id: int
+
 
 class ApiBeginExtractedContentIngest(BaseModel):
     BeginExtractedContentIngest: BeginExtractedContentIngest
@@ -73,21 +76,41 @@ class ApiExtractedContent(BaseModel):
 class ApiFinishExtractedContentIngest(BaseModel):
     FinishExtractedContentIngest: FinishExtractedContentIngest
 
+
 class ApiExtractedFeatures(BaseModel):
     ExtractedFeatures: ExtractedFeatures
 
-class ApiBeginMultipartContent(BaseModel):
+
+class BeginMultipartContent(BaseModel):
     id: int
 
-class ApiFinishMultipartContent(BaseModel):
+
+class ApiBeginMultipartContent(BaseModel):
+    BeginMultipartContent: BeginMultipartContent
+
+
+class FinishMultipartContent(BaseModel):
     content_type: str
     features: List[ApiFeature] = []
     labels: Dict[str, str] = {}
 
 
-class ApiContentFrame(BaseModel):
+class ApiFinishMultipartContent(BaseModel):
+    FinishMultipartContent: FinishMultipartContent
+
+
+class MultipartContentFrame(BaseModel):
     bytes: List[int]
 
-class ApiAddContentFeature(BaseModel):
+
+class ApiMultipartContentFrame(BaseModel):
+    MultipartContentFrame: MultipartContentFrame
+
+
+class MultipartContentFeature(BaseModel):
     name: str
-    data: List[float]
+    values: List[float]
+
+
+class ApiMultipartContentFeature(BaseModel):
+    MultipartContentFeature: MultipartContentFeature
