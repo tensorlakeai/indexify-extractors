@@ -27,4 +27,4 @@ class BGEBase(BaseEmbeddingExtractor):
         return embeddings
 
 if __name__ == "__main__":
-    BGEBase().run_sample_input()
+    BGEBase().extract_sample_input()

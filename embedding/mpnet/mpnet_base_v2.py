@@ -1,10 +1,6 @@
 from typing import List
-from indexify_extractor_sdk import (
-    Content,
-)
 from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
-    EmbeddingInputParams,
 )
 from sentence_transformers import SentenceTransformer
 
@@ -20,7 +16,7 @@ class MPNetV2(BaseEmbeddingExtractor):
         embeddings = self._model.encode(texts)
         return embeddings.tolist()
 
+
 if __name__ == "__main__":
     extractor = MPNetV2()
-    print(extractor.schemas())
-    print(extractor.extract([Content.from_text(text="Hello World")], EmbeddingInputParams()))
+    extractor.extract_sample_input()

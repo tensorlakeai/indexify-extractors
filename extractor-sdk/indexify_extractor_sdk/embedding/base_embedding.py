@@ -1,7 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Callable, List, Literal, Type, Union
-from langchain import text_splitter
-from pydantic import BaseModel
+from typing import List, Union
 
 from indexify_extractor_sdk.base_extractor import (
     Content,
