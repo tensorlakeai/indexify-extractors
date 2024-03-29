@@ -1,18 +1,19 @@
 name: Publish Extractor
 
 on: 
-  workflow_dispatch
-  inputs:
-    release_message:
-      type: string
-      description: Release message
-      required: true
+  pull_request:
+    branches:
+      - "main"
+    # inputs:
+    #   release_message:
+    #     type: string
+    #     description: Release message
+    #     required: true
 
 jobs:
   detect-extractors:
     runs-on: ubuntu-latest
-    needs: check-if-job-needs-to-be-run
     steps:
       - uses: actions/checkout@v4
-        run: pip install ./extractor-sdk
+      - run: pip install ./extractor-sdk
 
