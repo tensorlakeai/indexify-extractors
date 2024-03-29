@@ -1,9 +1,7 @@
 from transformers import AutoTokenizer, AutoModel
 from typing import List
-from indexify_extractor_sdk import Content
 from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
-    EmbeddingInputParams,
 )
 import torch
 
@@ -30,9 +28,4 @@ class ColBERTv2Base(BaseEmbeddingExtractor):
         return embeddings
 
 if __name__ == "__main__":
-    extractor = ColBERTv2Base()
-    print(extractor.schemas())
-    # How is EmbeddingInputParams() and Content.from_text() defined in the SDK
-    embedding_input_params = EmbeddingInputParams()
-    contents = [Content.from_text(text="Hello World")]
-    print(extractor.extract(contents, embedding_input_params))
+    ColBERTv2Base().extract_sample_input()

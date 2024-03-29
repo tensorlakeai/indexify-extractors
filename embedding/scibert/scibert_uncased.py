@@ -1,11 +1,6 @@
 from typing import List
-from indexify_extractor_sdk import (
-    EmbeddingSchema,
-    Content,
-)
 from indexify_extractor_sdk.embedding.base_embedding import (
     BaseEmbeddingExtractor,
-    EmbeddingInputParams,
 )
 from sentence_transformers import SentenceTransformer
 
@@ -24,5 +19,4 @@ class SciBERTExtractor(BaseEmbeddingExtractor):
 
 if __name__ == "__main__":
     extractor = SciBERTExtractor()
-    print(extractor.schemas())
-    print(extractor.extract([Content.from_text(text="Scientific discovery is fascinating")], EmbeddingInputParams()))
+    extractor.extract_sample_input()

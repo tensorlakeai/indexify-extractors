@@ -30,4 +30,4 @@ class E5SmallEmbeddings(BaseEmbeddingExtractor):
         return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 if __name__ == "__main__":
-    E5SmallEmbeddings().run_sample_input()
+    E5SmallEmbeddings().extract_sample_input()
