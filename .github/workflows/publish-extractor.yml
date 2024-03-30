@@ -1,14 +1,12 @@
 name: Publish Extractor
 
 on: 
-  pull_request:
-    branches:
-      - "main"
-    # inputs:
-    #   extractor_path:
-    #     type: string
-    #     description: Release message
-    #     required: true
+  workflow_dispatch:
+    inputs:
+      extractor_path:
+        type: string
+        description: "Path to extractor, ex: embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
+        required: true
 
 jobs:
   publish-extractor:
@@ -20,16 +18,16 @@ jobs:
       - run: pip install ./extractor-sdk
       - name: Package Extractor
         run: |
-          DIRECTORY=$(dirname ${{ env.EXTRACTOR_PATH }} | cut -d':' -f1)
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           pip install -r $DIRECTORY/requirements.txt
-          indexify-extractor package ${{ env.EXTRACTOR_PATH }}
+          indexify-extractor package ${{ github.event.inputs.extractor_path }}
       - name: Extract package name
         id: extract_name
         run: |
-          DIRECTORY=$(dirname ${{ env.EXTRACTOR_PATH }} | cut -d':' -f1)
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           cd $DIRECTORY
-          MODULE_CLASS=$(echo ${{ env.EXTRACTOR_PATH }} | cut -d':' -f2)
-          FILE_NAME=$(echo ${{ env.EXTRACTOR_PATH }} | awk -F'[:/]' '{print $(NF-1)}')
+          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
           output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
           echo "::set-output name=package_name::$output"
       - name: Login to Docker Hub
