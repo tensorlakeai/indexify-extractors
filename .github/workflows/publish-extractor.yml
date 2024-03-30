@@ -11,6 +11,10 @@ on:
     #     required: true
 
 jobs:
+  extract-class-name:
+    runs-on: ubuntu-latest
+    outputs:
+      package_name: ${{ steps.extract_class_name.outputs.package_name }}
   publish-extractor:
     runs-on: ubuntu-latest
     env: # debug
@@ -18,8 +22,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pip install ./extractor-sdk
-      - run: |
+      - name: Package Extractor
+        run: |
           DIRECTORY=$(dirname ${{ env.EXTRACTOR_PATH }} | cut -d':' -f1)
           pip install -r $DIRECTORY/requirements.txt
           indexify-extractor package ${{ env.EXTRACTOR_PATH }}
-
+      - name: Extract package name
+        id: extract_name
+        run: |
+          DIRECTORY=$(dirname ${{ env.EXTRACTOR_PATH }} | cut -d':' -f1)
+          cd $DIRECTORY
+          MODULE_CLASS=$(echo ${{ env.EXTRACTOR_PATH }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ env.EXTRACTOR_PATH }} | awk -F'[:/]' '{print $(NF-1)}')
+          output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
+          echo "::set-output name=package_name::$output"
+      - name: Docker Push
+        run: docker push ${{ steps.python_step.outputs.package_name }}
