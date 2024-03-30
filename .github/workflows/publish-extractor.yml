@@ -11,8 +11,6 @@ on:
 jobs:
   publish-extractor:
     runs-on: ubuntu-latest
-    env: # debug
-      EXTRACTOR_PATH: "embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
     steps:
       - uses: actions/checkout@v4
       - run: pip install ./extractor-sdk
