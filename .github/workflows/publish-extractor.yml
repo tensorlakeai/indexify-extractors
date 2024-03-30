@@ -1,0 +1,39 @@
+name: Publish Extractor
+
+on: 
+  workflow_dispatch:
+    inputs:
+      extractor_path:
+        type: string
+        description: "Path to extractor, ex: embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
+        required: true
+
+jobs:
+  publish-extractor:
+    runs-on: ubuntu-latest
+    env: # debug
+      EXTRACTOR_PATH: "embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install ./extractor-sdk
+      - name: Package Extractor
+        run: |
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
+          pip install -r $DIRECTORY/requirements.txt
+          indexify-extractor package ${{ github.event.inputs.extractor_path }}
+      - name: Extract package name
+        id: extract_name
+        run: |
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
+          cd $DIRECTORY
+          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
+          output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
+          echo "::set-output name=package_name::$output"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker Push
+        run: docker push ${{ steps.extract_name.outputs.package_name }}
