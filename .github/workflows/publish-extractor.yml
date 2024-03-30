@@ -37,4 +37,4 @@ jobs:
           output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
           echo "::set-output name=package_name::$output"
       - name: Docker Push
-        run: docker push ${{ steps.python_step.outputs.package_name }}
+        run: docker push ${{ steps.extract_name.outputs.package_name }}
