@@ -17,8 +17,11 @@ jobs:
       - name: Package Extractor
         run: |
           DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
-          pip install -r $DIRECTORY/requirements.txt
-          indexify-extractor package ${{ github.event.inputs.extractor_path }}
+          cd $DIRECTORY
+          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
+          pip install -r requirements.txt
+          indexify-extractor package ${FILE_NAME}:${MODULE_CLASS}
       - name: Extract package name
         id: extract_name
         run: |
