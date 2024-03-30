@@ -5,15 +5,21 @@ on:
     branches:
       - "main"
     # inputs:
-    #   release_message:
+    #   extractor_path:
     #     type: string
     #     description: Release message
     #     required: true
 
 jobs:
-  detect-extractors:
+  publish-extractor:
     runs-on: ubuntu-latest
+    env: # debug
+      EXTRACTOR_PATH: "embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
     steps:
       - uses: actions/checkout@v4
       - run: pip install ./extractor-sdk
+      - run: |
+          DIRECTORY=$(dirname ${{ env.EXTRACTOR_PATH }} | cut -d':' -f1)
+          pip install -r $DIRECTORY/requirements.txt
+          indexify-extractor package ${{ env.EXTRACTOR_PATH }}
 
