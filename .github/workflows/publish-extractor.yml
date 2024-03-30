@@ -11,10 +11,6 @@ on:
     #     required: true
 
 jobs:
-  extract-class-name:
-    runs-on: ubuntu-latest
-    outputs:
-      package_name: ${{ steps.extract_class_name.outputs.package_name }}
   publish-extractor:
     runs-on: ubuntu-latest
     env: # debug
