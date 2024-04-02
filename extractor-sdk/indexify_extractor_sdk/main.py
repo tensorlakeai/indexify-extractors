@@ -76,7 +76,7 @@ def join(
     ingestion_addr: str = "localhost:8900",
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
-    ] = cpu_count,
+    ] = 2,
 ):
     print_version()
     if not extractor:
