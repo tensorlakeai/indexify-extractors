@@ -1,5 +1,6 @@
 import fsspec
 import os
+import sys
 import ast
 import subprocess
 from rich.console import Console
@@ -60,7 +61,8 @@ def install_dependencies(directory_path):
     else:
         # create env and install requirements
         print("Creating virtual environment...")
-        subprocess.check_call(['virtualenv', '-p', "python3.11", venv_path])
+        version_str = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
         pip_path = os.path.join(venv_path, 'bin', 'pip')
 
         subprocess.check_call([pip_path, 'install', '--no-deps', '-r', requirements_path])
