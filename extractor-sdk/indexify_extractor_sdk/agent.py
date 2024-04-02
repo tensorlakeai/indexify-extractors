@@ -2,8 +2,9 @@ import asyncio
 from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
+import json
 from typing import List, Dict, Union
-from .base_extractor import Content, Feature
+from .base_extractor import Content, Feature, Embedding
 from .content_downloader import download_content, create_content
 from .extractor_worker import extract_content
 from .ingestion_api_models import (
@@ -17,6 +18,14 @@ from .ingestion_api_models import (
     ApiExtractedContent,
     ApiExtractedFeatures,
     ApiFinishExtractedContentIngest,
+    ApiBeginMultipartContent,
+    BeginMultipartContent,
+    ApiFinishMultipartContent,
+    ApiMultipartContentFeature,
+    MultipartContentFeature,
+    ApiMultipartContentFrame,
+    MultipartContentFrame,
+    FinishMultipartContent,
 )
 from .utils import batched
 from .server import http_server, ServerRouter, get_server_advertise_addr
@@ -24,7 +33,86 @@ import concurrent
 import websockets
 from .task_store import TaskStore, CompletedTask
 
-CONTENT_UPLOAD_BATCH_SIZE = 5
+CONTENT_FRAME_SIZE = 1024 * 1024
+
+
+def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id):
+    return ApiBeginExtractedContentIngest(
+        BeginExtractedContentIngest=BeginExtractedContentIngest(
+            task_id=task_outcome.task_id,
+            namespace=task.namespace,
+            output_to_index_table_mapping=task.output_index_mapping,
+            parent_content_id=task.content_metadata.id,
+            executor_id=_executor_id,
+            task_outcome=task_outcome.task_outcome,
+            extraction_policy=task.extraction_policy,
+            extractor=task.extractor,
+        )
+    )
+
+
+async def send_extracted_content(ws, content: ApiContent, id: int, frame_size):
+    # start new multipart content
+    await ws.send(
+        ApiBeginMultipartContent(
+            BeginMultipartContent=BeginMultipartContent(id=id)
+        ).model_dump_json()
+    )
+
+    # send data in chunks of frame_size
+    for i in range(0, len(content.bytes), frame_size):
+        slice = content.bytes[i : i + frame_size]
+        content_frame = ApiMultipartContentFrame(
+            MultipartContentFrame=MultipartContentFrame(bytes=slice)
+        )
+        await ws.send(content_frame.model_dump_json())
+
+    # finish multipart content with features
+    await ws.send(
+        ApiFinishMultipartContent(
+            FinishMultipartContent=FinishMultipartContent(
+                content_type=content.content_type,
+                features=content.features,
+                labels=content.labels,
+            )
+        ).model_dump_json()
+    )
+
+
+async def process_task_outcome(
+    task_outcome,
+    task: coordinator_service_pb2.Task,
+    url,
+    _executor_id,
+    frame_size=CONTENT_FRAME_SIZE,
+):
+    async with websockets.connect(url, ping_interval=5, ping_timeout=30) as ws:
+        # start new extracted content ingest
+        await ws.send(begin_message(task_outcome, task, _executor_id).model_dump_json())
+
+        # send all contents one at a time
+        for i, content in enumerate(task_outcome.new_content):
+            await send_extracted_content(ws, content, id=i + 1, frame_size=frame_size)
+
+        # send all features one at a time
+        for feature in task_outcome.features:
+            extracted_features = ApiExtractedFeatures(
+                ExtractedFeatures=ExtractedFeatures(
+                    content_id=task.content_metadata.id, features=[feature]
+                )
+            )
+            await ws.send(extracted_features.model_dump_json())
+        print(
+            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
+        )
+
+        # finish extracted content ingest
+        finish_msg = ApiFinishExtractedContentIngest(
+            FinishExtractedContentIngest=FinishExtractedContentIngest(
+                num_extracted_content=len(task_outcome.new_content)
+            )
+        )
+        await ws.send(finish_msg.model_dump_json())
 
 
 class ExtractorAgent:
@@ -78,48 +166,10 @@ class ExtractorAgent:
                 task: coordinator_service_pb2.Task = self._task_store.get_task(
                     task_outcome.task_id
                 )
-                begin_msg = ApiBeginExtractedContentIngest(
-                    BeginExtractedContentIngest=BeginExtractedContentIngest(
-                        task_id=task_outcome.task_id,
-                        namespace=task.namespace,
-                        output_to_index_table_mapping=task.output_index_mapping,
-                        parent_content_id=task.content_metadata.id,
-                        executor_id=self._executor_id,
-                        task_outcome=task_outcome.task_outcome,
-                        extraction_policy=task.extraction_policy,
-                        extractor=task.extractor,
-                    )
-                )
                 try:
-                    async with websockets.connect(
-                        url, ping_interval=5, ping_timeout=30
-                    ) as ws:
-                        await ws.send(begin_msg.model_dump_json())
-                        for batch in batched(
-                            task_outcome.new_content, CONTENT_UPLOAD_BATCH_SIZE
-                        ):
-                            extracted_content = ApiExtractedContent(
-                                ExtractedContent=ExtractedContent(content_list=batch)
-                            )
-                            await ws.send(extracted_content.model_dump_json())
-                        print(
-                            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
-                        )
-                        for batch in batched(
-                            task_outcome.features, CONTENT_UPLOAD_BATCH_SIZE
-                        ):
-                            extracted_features = ApiExtractedFeatures(
-                                ExtractedFeatures=ExtractedFeatures(
-                                    content_id=task.content_metadata.id, features=batch
-                                )
-                            )
-                            await ws.send(extracted_features.model_dump_json())
-                        finish_msg = ApiFinishExtractedContentIngest(
-                            FinishExtractedContentIngest=FinishExtractedContentIngest(
-                                num_extracted_content=len(task_outcome.new_content)
-                            )
-                        )
-                        await ws.send(finish_msg.model_dump_json())
+                    await process_task_outcome(
+                        task_outcome, task, url, self._executor_id
+                    )
                 except Exception as e:
                     print(
                         f"failed to report task {task_outcome.task_outcome}, exception: {e}"

@@ -61,6 +61,10 @@ class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
 
 
+class BeginMultipartContent(BaseModel):
+    id: int
+
+
 class ApiBeginExtractedContentIngest(BaseModel):
     BeginExtractedContentIngest: BeginExtractedContentIngest
 
@@ -75,3 +79,38 @@ class ApiFinishExtractedContentIngest(BaseModel):
 
 class ApiExtractedFeatures(BaseModel):
     ExtractedFeatures: ExtractedFeatures
+
+
+class BeginMultipartContent(BaseModel):
+    id: int
+
+
+class ApiBeginMultipartContent(BaseModel):
+    BeginMultipartContent: BeginMultipartContent
+
+
+class FinishMultipartContent(BaseModel):
+    content_type: str
+    features: List[ApiFeature] = []
+    labels: Dict[str, str] = {}
+
+
+class ApiFinishMultipartContent(BaseModel):
+    FinishMultipartContent: FinishMultipartContent
+
+
+class MultipartContentFrame(BaseModel):
+    bytes: List[int]
+
+
+class ApiMultipartContentFrame(BaseModel):
+    MultipartContentFrame: MultipartContentFrame
+
+
+class MultipartContentFeature(BaseModel):
+    name: str
+    values: List[float]
+
+
+class ApiMultipartContentFeature(BaseModel):
+    MultipartContentFeature: MultipartContentFeature
