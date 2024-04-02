@@ -4,7 +4,7 @@ from .packager import ExtractorPackager
 from typing import Optional
 import logging
 import os
-
+from .list_extractors import list_extractors
 import sys
 
 import multiprocessing
@@ -120,3 +120,8 @@ def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
     from .downloader import download_extractor
 
     download_extractor(extractor_path)
+
+
+@typer_app.command()
+def list(extractor_type: Optional[str] = typer.Option(None, "--type", help="Type of extractors")):
+    list_extractors(extractor_type)
