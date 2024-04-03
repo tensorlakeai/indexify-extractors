@@ -35,7 +35,7 @@ indexify-extractor local minilm_l6:MiniLML6Extractor --text "hello world"
 
 To run the extractor with Indexify's control plane such that it can continuously extract from content -
 ```
-indexify-extractor join minilm_l6:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
+indexify-extractor join-server minilm_l6:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 The `coordinator-addr` and `ingestion-addr` above are the default addresses exposed by the Indexify server to get extraction instructions and to upload extracted data, they can be configured in the server configuration.
 
@@ -82,7 +82,7 @@ Once you have developed the extractor you can test the extractor locally by runn
 ### Deploy the extractor
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
 ```
-indexify-extractor join my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
+indexify-extractor join-server my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 
 ### Package the Extractor 
@@ -94,5 +94,5 @@ indexify-extractor package my_extractor:MyExtractor
 ### Running Your packaged extractor
 To run your packaged extractor image you can run the following command
 ```bash
-docker run ExtractorImageName indexify-extractor join --coordinator-addr=host.docker.internal:8950 --ingestion-addr=host.docker.internal:8900
+docker run ExtractorImageName indexify-extractor join-server --coordinator-addr=host.docker.internal:8950 --ingestion-addr=host.docker.internal:8900
 ```
