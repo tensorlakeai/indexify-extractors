@@ -201,6 +201,15 @@ class Extractor(ABC):
         )
         f = open(file_name, "rb")
         return Content(content_type="application/pdf", data=f.read(), features=features)
+    
+    def sample_html(self, features: List[Feature] = []) -> Content:
+        file_name = "sample.html"
+        self._download_file(
+            "https://extractor-files.diptanu-6d5.workers.dev/sample.html",
+            file_name,
+        )
+        f = open(file_name, "rb")
+        return Content(content_type="text/html", data=f.read(), features=features)
 
 
 class ExtractorWrapper:

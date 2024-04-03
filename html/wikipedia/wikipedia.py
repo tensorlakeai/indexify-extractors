@@ -1,4 +1,4 @@
-from utils.utils import extract_images, extract_infobox, extract_sections, extract_title
+from .utils.utils import extract_images, extract_infobox, extract_sections, extract_title
 
 from typing import List, Union
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
@@ -43,13 +43,7 @@ class WikipediaExtractor(Extractor):
         return output
 
     def sample_input(self) -> Content:
-        with open("sample.html", "r") as f:
-            data = f.read()
-
-        return Content(
-            data=data,
-            content_type="text/html",
-        )
+        return self.sample_html()
 
 
 if __name__ == "__main__":
