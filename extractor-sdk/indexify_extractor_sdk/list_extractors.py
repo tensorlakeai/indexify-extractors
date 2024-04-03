@@ -41,7 +41,7 @@ def list_extractors(extractor_type: Optional[str] = None):
             module_name.split(".")[0],
             extractor.get("type"),
             f"hub://{extractor.get('type')}/{name}",
-            f"indexify-extractor join {module_name}",
+            f"indexify-extractor join-server {module_name}",
         )
 
     console = Console()
