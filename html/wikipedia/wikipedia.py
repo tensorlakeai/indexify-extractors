@@ -1,5 +1,13 @@
-from .utils.utils import extract_images, extract_infobox, extract_sections, extract_title
+import os
+import sys
 
+current_file_path = os.path.abspath(__file__)
+current_directory = os.path.dirname(current_file_path)
+
+if current_directory not in sys.path:
+    sys.path.append(current_directory)
+
+from utils.utils import extract_images, extract_infobox, extract_sections, extract_title
 from typing import List, Union
 from indexify_extractor_sdk.base_extractor import Content, Extractor, Feature
 
@@ -13,7 +21,7 @@ class WikipediaExtractor(Extractor):
     def __init__(self):
         super(WikipediaExtractor, self).__init__()
 
-    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params=None) -> List[Union[Feature, Content]]:
         output = []
 
         # add metadata if infobox found
@@ -25,7 +33,6 @@ class WikipediaExtractor(Extractor):
         title = extract_title(content)
         sections = extract_sections(content)
         images = extract_images(content)
-
 
         new_content: List[Content] = []
         new_content.extend(sections)
