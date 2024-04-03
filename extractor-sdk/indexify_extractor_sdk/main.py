@@ -48,25 +48,25 @@ def print_version():
     print(f"indexify-extractor-sdk version {version.__version__}")
 
 
-@typer_app.command()
+@typer_app.command(help="Describe the extractor")
 def describe(extractor: str):
     indexify_extractor.describe_sync(extractor)
 
 
-@typer_app.command()
-def local(
+@typer_app.command(help="Run the extractor locally on the given text or file")
+def run_local(
     extractor: str = typer.Argument(
         None,
         help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
     ),
-    text: Optional[str] = None,
-    file: Optional[str] = None,
+    text: Optional[str] = typer.Argument(None, help="Text to extract from"),
+    file: Optional[str] = typer.Argument(None, help="File to extract from"),
 ):
     indexify_extractor.local(extractor, text, file)
 
 
-@typer_app.command()
-def join(
+@typer_app.command(help="Joins the extractor to the coordinator server")
+def join_server(
     # optional, default to $EXTRACTOR_PATH if not provided. If $EXTRACTOR_PATH is not set, it will raise an error.
     extractor: str = typer.Argument(
         None,
@@ -89,7 +89,7 @@ def join(
     indexify_extractor.join(extractor, workers, coordinator_addr, ingestion_addr)
 
 
-@typer_app.command()
+@typer_app.command(help="Package the extractor into a Docker image.")
 def package(
     extractor: str = typer.Argument(
         ...,
@@ -115,13 +115,13 @@ def package(
     packager.package()
 
 
-@typer_app.command()
+@typer_app.command(help="Download an extractor with the given url")
 def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
     from .downloader import download_extractor
 
     download_extractor(extractor_path)
 
 
-@typer_app.command()
-def list(extractor_type: Optional[str] = typer.Option(None, "--type", help="Type of extractors")):
+@typer_app.command(help="List all the available extractors")
+def list(extractor_type: Optional[str] = typer.Option(None, "--type", help="Type of extractor(embedding, text, image, pdf, audio, video)")):
     list_extractors(extractor_type)
