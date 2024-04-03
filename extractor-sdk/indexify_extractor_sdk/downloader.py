@@ -43,7 +43,7 @@ def print_instructions(directory_path):
     if not os.environ.get("VIRTUAL_ENV"):
         message += f"source {venv_path}/bin/activate\n"
 
-    message += f"indexify-extractor join {os.path.basename(directory_path)}.{find_extractor_subclasses(directory_path)}[/]"
+    message += f"indexify-extractor join-server {os.path.basename(directory_path)}.{find_extractor_subclasses(directory_path)}[/]"
     console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
     
     
@@ -57,7 +57,7 @@ def install_dependencies(directory_path):
         
     if os.environ.get("VIRTUAL_ENV"):
         # install requirements to current env
-        subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '--no-deps', '-r', requirements_path])
+        subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '-r', requirements_path])
     else:
         # create env and install requirements
         print("Creating virtual environment...")
