@@ -40,7 +40,7 @@ def join(
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     listen_addr: str = "localhost:9500",
-    advertise_addr: str = None,
+    advertise_addr: Optional[str] = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
