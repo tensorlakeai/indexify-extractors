@@ -249,12 +249,7 @@ class ExtractorAgent:
         server_router = ServerRouter(self._executor)
         self._http_server = http_server(server_router, listen_addr=self._listen_addr)
         asyncio.create_task(self._http_server.serve())
-
-        if self._listen_addr:
-            self._advertise_addr = self._listen_addr 
-        else:
-            await get_server_advertise_addr(self._http_server)
-
+        self._advertise_addr = await get_server_advertise_addr(self._http_server)
         print(f"advertise addr is {self._advertise_addr}")
         asyncio.create_task(self.task_completion_reporter())
         self._should_run = True
