@@ -1,5 +1,5 @@
 [
-  {"type": "embedding", "module_name": "clip.openai_clip_extractor:ClipEmbeddingExtractor"},
+  {"type": "embedding", "module_name": "clip_embedding.openai_clip_extractor:ClipEmbeddingExtractor"},
   {"type": "embedding", "module_name": "colbert.colbertv2:ColBERTv2Base"},
   {"type": "embedding", "module_name": "e5_embedding.e5_small_v2:E5SmallEmbeddings"},
   {"type": "embedding", "module_name": "flag_embedding.bge_base:BGEBase"},
