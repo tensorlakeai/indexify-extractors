@@ -11,8 +11,8 @@ class LayoutLMDocumentQAConfig(BaseModel):
 
 
 class LayoutLMDocumentQA(Extractor):
-    name = "tensorlake/layoutlm-document-qa-extractor"
-    description = "Layoutlm document qa"
+    name = "tensorlake/layoutlm-document-qa"
+    description = "LayoutLM Document QA"
     input_mime_types = ["application/pdf", "image/jpeg", "image/png"]
     system_dependencies = ["tesseract-ocr", "tesseract-ocr-spa", "tesseract-ocr-chi-sim", "tesseract-ocr-fra", "tesseract-ocr-deu", "poppler-utils"]
 
