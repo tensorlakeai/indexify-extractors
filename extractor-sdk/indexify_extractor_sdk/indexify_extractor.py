@@ -39,6 +39,7 @@ def join(
     workers: int,
     coordinator: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
+    listen_addr: str = "localhost:9500"
 ):
     print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
@@ -69,7 +70,7 @@ def join(
     id = nanoid.generate()
     print(f"extractor id is {id}")
     server = ExtractorAgent(
-        id, api_extractor_description, coordinator, executor, ingestion_addr
+        id, api_extractor_description, coordinator, executor, listen_addr, ingestion_addr
     )
     try:
         asyncio.get_event_loop().run_until_complete(server.run())

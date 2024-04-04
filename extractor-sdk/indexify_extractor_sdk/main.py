@@ -74,6 +74,10 @@ def join_server(
     ),
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
+    listen_addr: str = typer.Option(
+        "localhost:9500",
+        help="The listen address for extractor API extract functions.",
+    ),
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
     ] = 2,
@@ -86,7 +90,7 @@ def join_server(
 
     print("workers ", workers)
 
-    indexify_extractor.join(extractor, workers, coordinator_addr, ingestion_addr)
+    indexify_extractor.join(extractor, workers, coordinator_addr, ingestion_addr, listen_addr)
 
 
 @typer_app.command(help="Package the extractor into a Docker image.")
