@@ -68,7 +68,6 @@ class ServerWithNoSigHandler(uvicorn.Server):
 def http_server(server_router: ServerRouter, listen_addr: str) -> uvicorn.Server:
     print("starting extraction server endpoint")
     host, port = listen_addr.split(":")
-    print("host", host, "port", port)
     app = FastAPI()
     app.include_router(server_router.router)
     config = uvicorn.Config(
