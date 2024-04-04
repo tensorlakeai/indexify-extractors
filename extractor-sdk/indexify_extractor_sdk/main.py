@@ -75,8 +75,12 @@ def join_server(
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     listen_addr: str = typer.Option(
-        "localhost:9500",
+        "0.0.0.0:9500",
         help="The listen address for extractor API extract functions.",
+    ),
+    advertise_addr: str = typer.Option(
+        None,
+        help="Override advertise address.",
     ),
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
@@ -90,7 +94,14 @@ def join_server(
 
     print("workers ", workers)
 
-    indexify_extractor.join(extractor, workers, coordinator_addr, ingestion_addr, listen_addr)
+    indexify_extractor.join(
+        extractor=extractor,
+        workers=workers,
+        coordinator_addr=coordinator_addr,
+        ingestion_addr=ingestion_addr,
+        listen_addr=listen_addr,
+        advertise_addr=advertise_addr,
+    )
 
 
 @typer_app.command(help="Package the extractor into a Docker image.")
@@ -127,5 +138,11 @@ def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
 
 
 @typer_app.command(help="List all the available extractors")
-def list(extractor_type: Optional[str] = typer.Option(None, "--type", help="Type of extractor(embedding, text, image, pdf, audio, video)")):
+def list(
+    extractor_type: Optional[str] = typer.Option(
+        None,
+        "--type",
+        help="Type of extractor(embedding, text, image, pdf, audio, video)",
+    )
+):
     list_extractors(extractor_type)
