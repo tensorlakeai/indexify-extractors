@@ -122,7 +122,7 @@ class ExtractorAgent:
         extractor: coordinator_service_pb2.Extractor,
         coordinator_addr: str,
         executor: concurrent.futures.ProcessPoolExecutor,
-        listen_addr: str,
+        listen_port: int,
         advertise_addr: Optional[str],
         ingestion_addr: str = "localhost:8900",
     ):
@@ -132,7 +132,7 @@ class ExtractorAgent:
         self._has_registered = False
         self._coordinator_addr = coordinator_addr
         self._ingestion_addr = ingestion_addr
-        self._listen_addr = listen_addr
+        self._listen_port = listen_port
         self._advertise_addr = advertise_addr
         self._executor = executor
 
@@ -249,7 +249,7 @@ class ExtractorAgent:
             signal.SIGINT, self.shutdown, asyncio.get_event_loop()
         )
         server_router = ServerRouter(self._executor)
-        self._http_server = http_server(server_router, listen_addr=self._listen_addr)
+        self._http_server = http_server(server_router, port=self._listen_port)
         asyncio.create_task(self._http_server.serve())
         if not self._advertise_addr:
             self._advertise_addr = await get_server_advertise_addr(self._http_server)

@@ -74,9 +74,9 @@ def join_server(
     ),
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
-    listen_addr: str = typer.Option(
-        "0.0.0.0:9500",
-        help="The listen address for extractor API extract functions.",
+    listen_port: int = typer.Option(
+        9500,
+        help="The port to listen on for extractor API extract functions.",
     ),
     advertise_addr: str = typer.Option(
         None,
@@ -99,7 +99,7 @@ def join_server(
         workers=workers,
         coordinator_addr=coordinator_addr,
         ingestion_addr=ingestion_addr,
-        listen_addr=listen_addr,
+        listen_port=listen_port,
         advertise_addr=advertise_addr,
     )
 

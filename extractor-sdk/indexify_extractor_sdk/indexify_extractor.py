@@ -39,7 +39,7 @@ def join(
     workers: int,
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
-    listen_addr: str = "localhost:9500",
+    listen_port: int = 9500,
     advertise_addr: Optional[str] = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
@@ -75,7 +75,7 @@ def join(
         api_extractor_description,
         executor=executor,
         coordinator_addr=coordinator_addr,
-        listen_addr=listen_addr,
+        listen_port=listen_port,
         ingestion_addr=ingestion_addr,
         advertise_addr=advertise_addr
     )
