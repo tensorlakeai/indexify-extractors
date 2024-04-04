@@ -41,7 +41,7 @@ class ServerRouter:
             labels=request.content.labels,
         )
         task_id = "dummy_task_id"
-        content_dict: Dict[str, Content] = { task_id: content }
+        content_dict: Dict[str, Content] = {task_id: content}
         input_params = (
             json.dumps(request.input_params) if request.input_params else None
         )
@@ -50,14 +50,14 @@ class ServerRouter:
         )
         api_content: List[ApiContent] = []
         api_features: List[ApiFeature] = []
-        
+
         for out_list in extractor_out.values():
             for out in out_list:
                 if type(out) == Feature:
                     api_features.append(ApiFeature.from_feature(out))
                     continue
                 api_content.append(ApiContent.from_content(out))
-        return ExtractionResponse(content=api_content,features=api_features)
+        return ExtractionResponse(content=api_content, features=api_features)
 
 
 class ServerWithNoSigHandler(uvicorn.Server):
@@ -65,12 +65,12 @@ class ServerWithNoSigHandler(uvicorn.Server):
         pass
 
 
-def http_server(server_router: ServerRouter) -> uvicorn.Server:
+def http_server(server_router: ServerRouter, port: int) -> uvicorn.Server:
     print("starting extraction server endpoint")
     app = FastAPI()
     app.include_router(server_router.router)
     config = uvicorn.Config(
-        app, loop="asyncio", host="0.0.0.0", port=0, log_level="info", lifespan="off"
+        app, loop="asyncio", host="0.0.0.0", port=port, log_level="info", lifespan="off"
     )
 
     return ServerWithNoSigHandler(config)

@@ -37,10 +37,12 @@ def split_validate_extractor(name: str) -> Tuple[str, str]:
 def join(
     extractor: str,
     workers: int,
-    coordinator: str = "localhost:8950",
+    coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
+    listen_port: int = 9500,
+    advertise_addr: Optional[str] = None,
 ):
-    print(f"joining {coordinator} and sending extracted content to {ingestion_addr}")
+    print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
     extractor_module = ExtractorModule(module_name=module, class_name=cls)
     executor = create_executor(extractor_module, workers=workers)
@@ -69,7 +71,13 @@ def join(
     id = nanoid.generate()
     print(f"extractor id is {id}")
     server = ExtractorAgent(
-        id, api_extractor_description, coordinator, executor, ingestion_addr
+        id,
+        api_extractor_description,
+        executor=executor,
+        coordinator_addr=coordinator_addr,
+        listen_port=listen_port,
+        ingestion_addr=ingestion_addr,
+        advertise_addr=advertise_addr
     )
     try:
         asyncio.get_event_loop().run_until_complete(server.run())
