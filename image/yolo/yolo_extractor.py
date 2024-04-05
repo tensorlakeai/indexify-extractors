@@ -9,6 +9,7 @@ class YoloExtractor(Extractor):
     name = "tensorlake/yolo-extractor"
     description = "Extract yolo features from images"
     input_mime_types = ["image", "image/jpeg", "image/png"]
+    system_dependencies = ["ffmpeg", "libsm6", "libxext6"]
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
