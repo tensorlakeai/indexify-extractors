@@ -75,7 +75,7 @@ def join_server(
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     listen_port: int = typer.Option(
-        9500,
+        0,
         help="The port to listen on for extractor API extract functions.",
     ),
     advertise_addr: str = typer.Option(

@@ -12,7 +12,7 @@ class ClipInputParams(BaseModel):
 class ClipEmbeddingExtractor(Extractor):
     name = "tensorlake/clip-extractor"
     description = "OpenAI Clip Embedding Extractor"
-    input_mime_types = ["image/jpeg", "image/png", "text/plain"]
+    input_mime_types = ["image/jpeg", "image/png", "image/gif", "text/plain"]
 
     def __init__(self):
         super(ClipEmbeddingExtractor, self).__init__()
@@ -33,13 +33,7 @@ class ClipEmbeddingExtractor(Extractor):
             embedding = self._model.encode_text(clip.tokenize(text))
             embedding = embedding.tolist()[0]
 
-            return [
-                Content(
-                    data=content.data,
-                    content_type=content.content_type,
-                    features=[Feature.embedding(values=embedding)],
-                )
-            ]
+            return [Feature.embedding(values=embedding)]
         else:
             raise ValueError("Unsupported Content Type")
 
