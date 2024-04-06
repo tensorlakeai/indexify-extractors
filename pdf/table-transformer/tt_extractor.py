@@ -2,7 +2,7 @@ from typing import List, Union
 import io
 import json
 from indexify_extractor_sdk import Content, Extractor, Feature
-from tt_module import get_tables
+from utils.tt_module import get_tables
 from pypdf import PdfReader
 
 class TTExtractor(Extractor):
