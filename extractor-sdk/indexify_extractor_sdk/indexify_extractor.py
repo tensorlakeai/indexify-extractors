@@ -37,9 +37,9 @@ def split_validate_extractor(name: str) -> Tuple[str, str]:
 def join(
     extractor: str,
     workers: int,
+    listen_port: int,
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
-    listen_port: int = 9500,
     advertise_addr: Optional[str] = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")

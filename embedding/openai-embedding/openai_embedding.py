@@ -3,7 +3,7 @@ from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtract
 from openai import OpenAI
 
 class OpenAIEmbeddingExtractor(BaseEmbeddingExtractor):
-    name = "openai-embedding-ada-002-extractor"
+    name = "tensorlake/openai-embedding-ada-002-extractor"
     description = "OpenAI Embedding extractor"
     python_dependencies = ["openai"]
     system_dependencies = []
