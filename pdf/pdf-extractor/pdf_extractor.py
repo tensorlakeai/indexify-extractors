@@ -5,9 +5,9 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 from utils.tt_module import get_tables
 from pypdf import PdfReader
 
-class TTExtractor(Extractor):
-    name = "tensorlake/table-transformer"
-    description = "Table Transformer Extractor"
+class PDFExtractor(Extractor):
+    name = "tensorlake/pdf-extractor"
+    description = "PDF Extractor for Texts, Images & Tables"
     system_dependencies = ["poppler-utils"]
     input_mime_types = ["application/pdf"]
 
@@ -43,6 +43,6 @@ class TTExtractor(Extractor):
 if __name__ == "__main__":
     f = open("2310.16944.pdf", "rb")
     pdf_data = Content(content_type="application/pdf", data=f.read())
-    extractor = TTExtractor()
+    extractor = PDFExtractor()
     results = extractor.extract(pdf_data)
     print(results)
