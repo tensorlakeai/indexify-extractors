@@ -1,0 +1,5 @@
+easyocr==1.7.1
+pdf2image==1.17.0
+pypdf==4.1.0
+torch==2.2.1
+torchvision==0.17.1
