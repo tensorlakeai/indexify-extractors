@@ -46,8 +46,7 @@ class BeginExtractedContentIngest(BaseModel):
     task_outcome: str
     extraction_policy: str
     extractor: str
-    index_tables: List[str]
-    
+
 
 class ExtractedFeatures(BaseModel):
     content_id: str

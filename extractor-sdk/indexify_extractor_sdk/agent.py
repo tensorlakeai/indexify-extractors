@@ -45,9 +45,8 @@ def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id
             parent_content_id=task.content_metadata.id,
             executor_id=_executor_id,
             task_outcome=task_outcome.task_outcome,
-            extraction_policy=task.extraction_policy_id,
+            extraction_policy=task.extraction_policy,
             extractor=task.extractor,
-            index_tables=task.index_tables,
         )
     )
 
