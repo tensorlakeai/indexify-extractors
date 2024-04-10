@@ -37,8 +37,7 @@ class PDFExtractor(Extractor):
         return contents
 
     def sample_input(self) -> Content:
-        f = open("2310.16944.pdf", "rb")
-        return Content(content_type="application/pdf", data=f.read())
+        return self.sample_scientific_pdf()
 
 if __name__ == "__main__":
     f = open("2310.16944.pdf", "rb")
