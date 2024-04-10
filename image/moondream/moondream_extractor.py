@@ -33,7 +33,7 @@ class MoondreamExtractor(Extractor):
         image = Image.open(io.BytesIO(content.data))
         enc_image = self.model.encode_image(image)
         answer = self.model.answer_question(enc_image, params.prompt, self.tokenizer)
-        return answer
+        return [Content.from_text(answer)]
 
     def sample_input(self) -> Content:
         return self.sample_jpg()
