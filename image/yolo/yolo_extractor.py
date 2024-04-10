@@ -38,4 +38,6 @@ class YoloExtractor(Extractor):
         return self.sample_jpg()
 
 if __name__ == "__main__":
-    features = YoloExtractor().extract_sample_input()
+    extractor = YoloExtractor()
+    input = extractor.sample_input()
+    extractor.extract(input)
