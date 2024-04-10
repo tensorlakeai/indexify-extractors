@@ -1,7 +1,7 @@
 /ve*
-.DS_Store
+*.DS_Store
 .ipynb_checkpoints
-__pycache__
+*__pycache__
 dist
 *.pt
 *.pth
