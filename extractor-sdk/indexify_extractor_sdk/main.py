@@ -84,7 +84,7 @@ def join_server(
     ),
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
-    ] = 2,
+    ] = 1,
 ):
     print_version()
     if not extractor:
