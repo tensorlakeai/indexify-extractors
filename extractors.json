@@ -19,6 +19,7 @@
   {"type": "image", "module_name": "groundingdino.grounding_dino:GroundingDinoExtractor"},
   {"type": "invoices", "module_name": "donut_cord.base_cord_v2:DonutBaseV2"},
   {"type": "invoices", "module_name": "donut_invoice.donut_base_invoice:SimpleInvoiceParserExtractor"},
+  {"type": "pdf", "module_name": "pdf-extractor.pdf_extractor:PDFExtractor"},
   {"type": "pdf", "module_name": "layoutlm_document_qa.layoutlm_document_qa:LayoutLMDocumentQA"},
   {"type": "pdf", "module_name": "ocrmypdf.ocr_my_pdf:OCRMyPDFExtractor"},
   {"type": "pdf", "module_name": "unstructuredio.unstructured_pdf:UnstructuredIOExtractor"},
