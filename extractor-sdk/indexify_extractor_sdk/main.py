@@ -59,8 +59,8 @@ def run_local(
         None,
         help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
     ),
-    text: Optional[str] = typer.Argument(None, help="Text to extract from"),
-    file: Optional[str] = typer.Argument(None, help="File to extract from"),
+    text: Optional[str] = typer.Option(None, help="Text to extract from"),
+    file: Optional[str] = typer.Option(None, help="File to extract from"),
 ):
     indexify_extractor.local(extractor, text, file)
 
