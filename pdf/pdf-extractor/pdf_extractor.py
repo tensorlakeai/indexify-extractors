@@ -1,8 +1,3 @@
-import os
-current_file_path = os.path.abspath(__file__)
-current_directory = os.path.dirname(current_file_path)
-print(" --- TEST SCRIPT --- ", current_directory)
-
 from typing import List, Union
 import io
 import json
