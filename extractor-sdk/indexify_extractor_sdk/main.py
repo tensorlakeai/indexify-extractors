@@ -86,6 +86,8 @@ def join_server(
         int, typer.Option(help="number of worker processes for extraction")
     ] = 1,
 ):
+    extractor_directory = os.path.join(os.path.expanduser("~"), ".indexify-extractors", os.path.basename(extractor.split(".")[0]))
+    sys.path.append(extractor_directory)
     print_version()
     if not extractor:
         extractor = os.environ.get("EXTRACTOR_PATH")
