@@ -10,6 +10,7 @@
   {"type": "embedding", "module_name": "openai-embedding.openai_embedding:OpenAIEmbeddingExtractor"},
   {"type": "embedding", "module_name": "scibert.scibert_uncased:SciBERTExtractor"},
   {"type": "audio", "module_name": "whisper-asr.whisper_extractor:WhisperExtractor"},
+  {"type": "audio", "module_name": "whisper-mlx.whisper_extractor:WhisperExtractor"},
   {"type": "audio", "module_name": "whisper-diarization.whisper_diarization:WhisperDiarizationExtractor"},
   {"type": "video", "module_name": "audio-extractor.audio_extractor:AudioExtractor"},
   {"type": "video", "module_name": "face-extractor.face_extractor:FaceExtractor"},
