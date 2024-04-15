@@ -18,6 +18,7 @@
   {"type": "html", "module_name": "wikipedia.wikipedia:WikipediaExtractor"},
   {"type": "image", "module_name": "yolo.yolo_extractor:YoloExtractor"},
   {"type": "image", "module_name": "groundingdino.grounding_dino:GroundingDinoExtractor"},
+  {"type": "image", "module_name": "moondream.moondream_extractor:MoondreamExtractor"},
   {"type": "invoices", "module_name": "donut_cord.base_cord_v2:DonutBaseV2"},
   {"type": "invoices", "module_name": "donut_invoice.donut_base_invoice:SimpleInvoiceParserExtractor"},
   {"type": "pdf", "module_name": "pdf-extractor.pdf_extractor:PDFExtractor"},
