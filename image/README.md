@@ -16,4 +16,5 @@ indexify-extractor join-server <extractor-module-name>
 |---------------|---------------------------|---------------------------------------|
 | yolo          | hub://image/yolo          | yolo_extractor:YoloExtractor          |
 | groundingdino | hub://image/groundingdino | grounding_dino:GroundingDinoExtractor |
+| moondream     | hub://image/moondream     | moondream:MoondreamExtractor          |
 |               |                           |                                       |
