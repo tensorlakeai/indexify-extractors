@@ -1,35 +1,63 @@
+from typing import List, Union
+from indexify_extractor_sdk import Content, Extractor, Feature
+import requests
+import tempfile
 import cv2
 from ultralytics import YOLO
 
-# Load the YOLOv8 model
-model = YOLO('yolov8n.pt')
+class TrackExtractor(Extractor):
+    name = "tensorlake/tracking"
+    description = "A YOLO based object tracker for video."
+    system_dependencies = ["ffmpeg", "libsm6", "libxext6"]
+    input_mime_types = ["video", "video/mp4"]
 
-# Open the video file
-video_path = "path/to/video.mp4"
-cap = cv2.VideoCapture(video_path)
+    def __init__(self):
+        super().__init__()
+        self.model = YOLO('yolov8n.pt')
 
-# Loop through the video frames
-while cap.isOpened():
-    # Read a frame from the video
-    success, frame = cap.read()
+    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
+        features = []
+        frame = 0
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
+            self.filename = tmpfile.name
+            tmpfile.write(content.data)
+            tmpfile.flush()
 
-    if success:
-        # Run YOLOv8 tracking on the frame, persisting tracks between frames
-        results = model.track(frame, persist=True)
+        # Open the video file
+        cap = cv2.VideoCapture(self.filename)
 
-        # Visualize the results on the frame
-        annotated_frame = results[0].plot()
+        # Loop through the video frames
+        while cap.isOpened():
+            # Read a frame from the video
+            success, frame = cap.read()
 
-        # Display the annotated frame
-        cv2.imshow("YOLOv8 Tracking", annotated_frame)
+            if success:
+                # Run YOLOv8 tracking on the frame, persisting tracks between frames
+                results = self.model.track(frame, persist=True)
 
-        # Break the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-    else:
-        # Break the loop if the end of the video is reached
-        break
+                for r in results:
+                    boxes = r.boxes
+                    for box in boxes:
+                        b = box.xyxy[0]
+                        c = box.cls
+                        name = self.model.names[int(c)]
+                        feature = Feature.metadata({"frame": frame, "bounding_box": b.tolist(), "object_name": name})
+                        features.append(feature)
+            frame += 1
 
-# Release the video capture object and close the display window
-cap.release()
-cv2.destroyAllWindows()
+        return features
+
+    def sample_input(self) -> Content:
+        return self.sample_mp4()
+
+if __name__ == "__main__":
+    filename = "sample.mp4"
+    with requests.get("https://extractor-files.diptanu-6d5.workers.dev/sample.mp4", stream=True) as r:
+        with open(filename, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    f = open(filename, "rb")
+    video_data = Content(content_type="video/mp4", data=f.read())
+    extractor = TrackExtractor()
+    results = extractor.extract(video_data)
+    print(results)
