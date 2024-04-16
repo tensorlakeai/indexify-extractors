@@ -2,10 +2,12 @@ from typing import List, Union
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel
 from transformers import pipeline
-from utils.chunk_module import divide_text_into_chunks
+from utils.chunk_module import IndexifyTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownTextSplitter, LatexTextSplitter
 
 class InputParams(BaseModel):
     max_length: int = 130
+    chunk_method: str = "indexify" # recursive, markdown, latex
 
 class SummaryExtractor(Extractor):
     name = "tensorlake/llm-summary"
@@ -24,7 +26,22 @@ class SummaryExtractor(Extractor):
         article = content.data.decode("utf-8")
 
         max_length = getattr(params, 'max_length', len(article)//4)
-        article_chunks = divide_text_into_chunks(article)
+        chunk_method = getattr(params, 'chunk_method', 'indexify')
+        if chunk_method == "recursive":
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=20)
+            docs = text_splitter.create_documents([article])
+            article_chunks = [doc.page_content for doc in docs]
+        elif chunk_method == "markdown":
+            text_splitter = MarkdownTextSplitter(chunk_size=512, chunk_overlap=20)
+            docs = text_splitter.create_documents([article])
+            article_chunks = [doc.page_content for doc in docs]
+        elif chunk_method == "latex":
+            text_splitter = LatexTextSplitter(chunk_size=512, chunk_overlap=20)
+            docs = text_splitter.create_documents([article])
+            article_chunks = [doc.page_content for doc in docs]
+        else:
+            text_splitter = IndexifyTextSplitter(chunk_size=512)
+            article_chunks = text_splitter.create_documents([article])
         num_chunks = len(article_chunks)
 
         for item in article_chunks:
