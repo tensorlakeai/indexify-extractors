@@ -47,6 +47,27 @@ jobs:
           body: ${{ github.event.inputs.release_message }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-publish-rust:
+    name: Build and Publish Rust Bindings
+    runs-on: ubuntu-latest
+    needs:
+      - create-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+          profile: minimal
+      - name: Install maturin
+        run: python3 -m pip install maturin --user
+      - name: Build Wheels
+        run: cd text/llm-summary/utils/rust_splitter && maturin build --release --strip --manylinux 1
+      - name: Upload Wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: text/llm-summary/utils/rust_splitter/target/wheels
           
   publish-extractor-sdk-to-pypi:
     name: Publish Extractor SDK
