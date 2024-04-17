@@ -26,5 +26,6 @@
   {"type": "pdf", "module_name": "ocrmypdf.ocr_my_pdf:OCRMyPDFExtractor"},
   {"type": "pdf", "module_name": "unstructuredio.unstructured_pdf:UnstructuredIOExtractor"},
   {"type": "text", "module_name": "chunking.chunk_extractor:ChunkExtractor"},
+  {"type": "text", "module_name": "summarization.summary_extractor:SummaryExtractor"},
   {"type": "text", "module_name": "text-lid.language_extractor:LanguageExtractor"}
 ]
