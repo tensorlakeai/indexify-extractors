@@ -55,7 +55,7 @@ class SummaryExtractor(Extractor):
             )
             res = self.summarizer(
                 prompt,
-                max_new_tokens=(max_length//num_chunks)*1.5,
+                max_new_tokens=(max_length//num_chunks)*2,
                 return_full_text=False
             )
             summary = res[0]["generated_text"]

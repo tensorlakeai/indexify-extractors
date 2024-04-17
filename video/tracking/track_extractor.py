@@ -17,7 +17,7 @@ class TrackExtractor(Extractor):
 
     def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         features = []
-        frame = 0
+        frame_count = 0
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
             self.filename = tmpfile.name
             tmpfile.write(content.data)
@@ -40,10 +40,11 @@ class TrackExtractor(Extractor):
                     for box in boxes:
                         b = box.xyxy[0]
                         c = box.cls
+                        id = box.id.int().tolist()
                         name = self.model.names[int(c)]
-                        feature = Feature.metadata({"frame": frame, "bounding_box": b.tolist(), "object_name": name})
+                        feature = Feature.metadata({"frame": frame_count, "track_id": id, "bounding_box": b.tolist(), "object_name": name})
                         features.append(feature)
-            frame += 1
+            frame_count += 1
 
         return features
 
