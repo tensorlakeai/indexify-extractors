@@ -29,6 +29,7 @@ websockets = "^12.0"
 genson = "^1.2.2"
 rich = "^13.7.1"
 fsspec = "^2024.2.0"
+indexify_text_splitter = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 syrupy = "^4.0.0"

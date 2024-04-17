@@ -2,8 +2,8 @@ from typing import List, Union
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel
 from transformers import pipeline
-from utils.chunk_module import IndexifyTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownTextSplitter, LatexTextSplitter
+import indexify_text_splitter
 
 class InputParams(BaseModel):
     max_length: int = 130
@@ -27,6 +27,7 @@ class SummaryExtractor(Extractor):
 
         max_length = getattr(params, 'max_length', len(article)//4)
         chunk_method = getattr(params, 'chunk_method', 'indexify')
+
         if chunk_method == "recursive":
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=20)
             docs = text_splitter.create_documents([article])
@@ -40,8 +41,8 @@ class SummaryExtractor(Extractor):
             docs = text_splitter.create_documents([article])
             article_chunks = [doc.page_content for doc in docs]
         else:
-            text_splitter = IndexifyTextSplitter(chunk_size=512)
-            article_chunks = text_splitter.create_documents([article])
+            article_chunks = indexify_text_splitter.create_documents([article], 512)
+        
         num_chunks = len(article_chunks)
 
         for item in article_chunks:
