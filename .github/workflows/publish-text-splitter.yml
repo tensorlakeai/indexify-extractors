@@ -48,13 +48,13 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
 
   windows:
     runs-on: ${{ matrix.platform.runner }}
@@ -77,13 +77,13 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-windows-${{ matrix.platform.target }}
           path: dist
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
 
   macos:
     runs-on: ${{ matrix.platform.runner }}
@@ -105,13 +105,13 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-macos-${{ matrix.platform.target }}
           path: dist
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
 
   emscripten:
     runs-on: ${{ matrix.platform.runner }}
@@ -133,9 +133,11 @@ jobs:
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: emsdk-cache
+          working-directory: ./text_splitters
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          working-directory: ./text_splitters
       - run: pip install pyodide-build
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -144,13 +146,13 @@ jobs:
           args: --release --out dist -i ${{ env.PYTHON_VERSION }}
           sccache: 'true'
           rust-toolchain: nightly
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wasm-wheels
           path: dist
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
 
   sdist:
     runs-on: ubuntu-latest
@@ -167,7 +169,7 @@ jobs:
         with:
           name: wheels-sdist
           path: dist
-        working-directory: ./text_splitters
+          working-directory: ./text_splitters
 
   release:
     name: Release
