@@ -29,7 +29,10 @@ class YoloExtractor(Extractor):
                 b = box.xyxy[0]
                 c = box.cls
                 name = self.model.names[int(c)]
-                feature = Feature.metadata({"bounding_box": b.tolist(), "object_name": name})
+                feature = Feature.metadata(
+                    value={"bounding_box": b.tolist(), "object_name": name},
+                    comment={"bounding_box": "Bounding box coordinates in the format [x1, y1, x2, y2]"}
+                )
                 features.append(feature)
 
         return features
