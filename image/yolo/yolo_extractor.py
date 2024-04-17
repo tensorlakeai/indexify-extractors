@@ -13,8 +13,8 @@ class YoloExtractor(Extractor):
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
-        self._download_file("https://extractor-files.diptanu-6d5.workers.dev/yolov9c.pt","yolov9c.pt")
-        self.model = YOLO("yolov9c.pt")
+        self._download_file("https://extractor-files.diptanu-6d5.workers.dev/yolov9e.pt","yolov9e.pt")
+        self.model = YOLO("yolov9e.pt")
 
     def extract(self, content: Content, params=None) -> List[Union[Feature, Content]]:
         image_array = np.frombuffer(content.data, dtype=np.uint8)
