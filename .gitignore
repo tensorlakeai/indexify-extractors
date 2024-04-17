@@ -10,4 +10,4 @@ dist
 *sample.mp4
 *sample.mp3
 *sample.pdf
-text/llm-summary/utils/rust_splitter/target
+indexify_text_splitter/target
