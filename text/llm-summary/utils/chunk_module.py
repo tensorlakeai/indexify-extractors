@@ -1,6 +1,7 @@
 import re
+from langchain.docstore.document import Document
 
-class IndexifyTextSplitter:
+class FastRecursiveTextSplitter:
     def __init__(self, chunk_size=512):
         self.chunk_size = chunk_size
 
@@ -8,7 +9,8 @@ class IndexifyTextSplitter:
         chunks = []
         for text in texts:
             chunks.extend(self._divide_text_into_chunks(text))
-        return chunks
+        converted_list = [Document(page_content=item) for item in chunks]
+        return converted_list
 
     def _divide_text_into_chunks(self, text):
         # Remove leading/trailing whitespace and split the text into words
