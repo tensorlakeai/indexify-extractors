@@ -1,7 +1,0 @@
-[build-system]
-requires = ["maturin>=1.0,<2.0"]
-build-backend = "maturin"
-
-[tool.maturin]
-name = "indexify_text_splitter"
-requires-dist = ["pyo3"]

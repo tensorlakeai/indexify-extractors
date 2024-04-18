@@ -1,41 +1,18 @@
 use pyo3::prelude::*;
+
+use pyo3::prelude::*;
 use regex::Regex;
 
 #[pyclass]
-struct Document {
-    #[pyo3(get, set)]
-    page_content: String,
-}
-
-#[pymethods]
-impl Document {
-    #[new]
-    fn new(page_content: String) -> Self {
-        Document { page_content }
-    }
-}
-
-#[pyclass]
-struct FastRecursiveTextSplitter {
+struct _FastRecursiveTextSplitter {
     chunk_size: usize,
 }
 
 #[pymethods]
-impl FastRecursiveTextSplitter {
+impl _FastRecursiveTextSplitter {
     #[new]
     fn new(chunk_size: usize) -> Self {
-        FastRecursiveTextSplitter { chunk_size }
-    }
-
-    fn create_documents(&self, texts: Vec<String>) -> PyResult<Vec<Document>> {
-        let mut documents = Vec::new();
-        for text in texts {
-            let chunks = self.divide_text_into_chunks(&text);
-            for chunk in chunks {
-                documents.push(Document::new(chunk));
-            }
-        }
-        Ok(documents)
+        _FastRecursiveTextSplitter { chunk_size }
     }
 
     fn split_texts(&self, texts: Vec<String>) -> PyResult<Vec<String>> {
@@ -86,7 +63,7 @@ impl FastRecursiveTextSplitter {
 }
 
 #[pymodule]
-fn indexify_text_splitter(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_class::<FastRecursiveTextSplitter>()?;
+fn indexify_text_splitters(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_class::<_FastRecursiveTextSplitter>()?;
     Ok(())
 }
