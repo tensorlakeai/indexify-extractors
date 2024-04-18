@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-macos-${{ matrix.platform.target }}
-          path: dist
+          path: /text_splitters/dist
 
   emscripten:
     runs-on: ${{ matrix.platform.runner }}
@@ -165,7 +165,6 @@ jobs:
         with:
           name: wheels-sdist
           path: dist
-
   release:
     name: Release
     runs-on: ubuntu-latest
