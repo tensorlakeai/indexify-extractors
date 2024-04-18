@@ -36,6 +36,7 @@ class Feature(BaseModel):
     feature_type: Literal["embedding", "metadata"]
     name: str
     value: Json
+    comment: Optional[Json]
 
     @classmethod
     def embedding(cls, values: List[float], name: str = "embedding", distance="cosine"):
@@ -47,8 +48,10 @@ class Feature(BaseModel):
         )
 
     @classmethod
-    def metadata(cls, value: Json, name: str = "metadata"):
-        return cls(feature_type="metadata", name=name, value=json.dumps(value))
+    def metadata(cls, value: Json, comment: Json = None, name: str = "metadata"):
+        value = json.dumps(value)
+        comment = json.dumps(comment) if comment is not None else None
+        return cls(feature_type="metadata", name=name, value=value, comment=comment)
 
     def get_schema(self) -> dict:
         if self.feature_type == "embedding":
@@ -64,6 +67,10 @@ class Feature(BaseModel):
             print(metadata_schema)
             for k, v in metadata_schema["properties"].items():
                 schema[k] = {"type": v["type"]}
+
+                if self.comment is not None and k in self.comment:
+                    schema[k]["comment"] = self.comment[k]
+            
             return schema
 
 
