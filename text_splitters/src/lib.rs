@@ -38,6 +38,14 @@ impl FastRecursiveTextSplitter {
         Ok(documents)
     }
 
+    fn split_texts(&self, texts: Vec<String>) -> PyResult<Vec<String>> {
+        let mut chunks = Vec::new();
+        for text in texts {
+            chunks.extend(self.divide_text_into_chunks(&text));
+        }
+        Ok(chunks)
+    }
+
     fn divide_text_into_chunks(&self, text: &str) -> Vec<String> {
         let mut chunks = Vec::new();
         let re = Regex::new(r"[.!?]$").unwrap();
