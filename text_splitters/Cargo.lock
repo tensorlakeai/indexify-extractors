@@ -905,7 +905,7 @@ dependencies = [
 
 [[package]]
 name = "indexify_text_splitter"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "maturin",
  "pyo3",
