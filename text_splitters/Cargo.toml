@@ -1,6 +1,6 @@
 [package]
 name = "indexify_text_splitter"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A text splitter module for Python, implemented in Rust using PyO3."
 
