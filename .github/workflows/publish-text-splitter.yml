@@ -54,7 +54,6 @@ jobs:
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
-          working-directory: ./text_splitters
 
   windows:
     runs-on: ${{ matrix.platform.runner }}
@@ -83,7 +82,6 @@ jobs:
         with:
           name: wheels-windows-${{ matrix.platform.target }}
           path: dist
-          working-directory: ./text_splitters
 
   macos:
     runs-on: ${{ matrix.platform.runner }}
@@ -111,7 +109,6 @@ jobs:
         with:
           name: wheels-macos-${{ matrix.platform.target }}
           path: dist
-          working-directory: ./text_splitters
 
   emscripten:
     runs-on: ${{ matrix.platform.runner }}
@@ -152,7 +149,6 @@ jobs:
         with:
           name: wasm-wheels
           path: dist
-          working-directory: ./text_splitters
 
   sdist:
     runs-on: ubuntu-latest
@@ -169,7 +165,6 @@ jobs:
         with:
           name: wheels-sdist
           path: dist
-          working-directory: ./text_splitters
 
   release:
     name: Release
