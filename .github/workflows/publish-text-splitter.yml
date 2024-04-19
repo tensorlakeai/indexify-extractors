@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install musl-tools
-        run: apt install musl-tools
+        run: sudo apt install musl-tools -y
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -135,7 +135,7 @@ jobs:
           working-directory: ./text_splitters
       - run: pip install pyodide-build
       - name: Install musl-tools
-        run: apt install musl-tools
+        run: sudo apt install musl-tools -y
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
