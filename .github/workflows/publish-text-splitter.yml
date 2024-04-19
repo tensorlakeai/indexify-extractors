@@ -46,7 +46,6 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
           manylinux: auto
           working-directory: ./text_splitters
       - name: Upload wheels
@@ -75,7 +74,6 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
           working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -102,7 +100,6 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
           working-directory: ./text_splitters
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -129,7 +126,6 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v12
         with:
           version: ${{ env.EMSCRIPTEN_VERSION }}
-          actions-cache-folder: emsdk-cache
           working-directory: ./text_splitters
       - uses: actions/setup-python@v5
         with:
@@ -141,7 +137,6 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist -i ${{ env.PYTHON_VERSION }}
-          sccache: 'true'
           rust-toolchain: nightly
           working-directory: ./text_splitters
       - name: Upload wheels
