@@ -1,3 +1,9 @@
+[tool.poetry]
+name = "indexify-text-splitters"
+version = "0.0.2"
+description = "Fast text splitters for langchain and indexify"
+authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
+
 [build-system]
 requires = ["maturin>=1.5,<2.0"]
 build-backend = "maturin"

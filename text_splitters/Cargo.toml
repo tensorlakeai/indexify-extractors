@@ -10,5 +10,6 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
+maturin = "1.5.1"
 pyo3 = "0.21.2"
 regex = "1.5"
