@@ -8,7 +8,8 @@ from openai import OpenAI
 class InputParams(BaseModel):
     schema_bytes: bytes 
     model: str = "gpt-3.5-turbo"
-    system_messages: List[Json] = []
+    system_message: str | None
+    instructions: str | None
 
 
 # this is for testing purposes.
@@ -33,8 +34,9 @@ class Instructor(Extractor):
         cls = pickle.loads(params.schema_bytes)
         text = content.data.decode("utf-8")
         client = instructor.from_openai(OpenAI())
-        messages = [{"role": "user", "content": text}]
-        messages.extend(params.system_messages)
+        messages = [{"role": "user", "content": f"{params.instructions}: {text}"}]
+        if params.system_message:
+            messages.append({"role": "system", "content": params.system_message})
         model  = client.chat.completions.create(model=params.model,response_model=cls, messages=messages)
         return Feature.metadata(value=model.model_dump(), name="model")
     
