@@ -29,13 +29,7 @@ jobs:
           - runner: ubuntu-latest
             target: x86
           - runner: ubuntu-latest
-            target: aarch64
-          - runner: ubuntu-latest
             target: armv7
-          - runner: ubuntu-latest
-            target: s390x
-          - runner: ubuntu-latest
-            target: ppc64le
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -107,46 +101,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-macos-${{ matrix.platform.target }}
-          path: text_splitters/dist
-
-  emscripten:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
-          - runner: ubuntu-latest
-            target: wasm32-unknown-emscripten
-    steps:
-      - uses: actions/checkout@v4
-      - run: pip install pyodide-build
-      - name: Get Emscripten and Python version info
-        shell: bash
-        run: |
-          echo EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version) >> $GITHUB_ENV
-          echo PYTHON_VERSION=$(pyodide config get python_version | cut -d '.' -f 1-2) >> $GITHUB_ENV
-          pip uninstall -y pyodide-build
-      - uses: mymindstorm/setup-emsdk@v12
-        with:
-          version: ${{ env.EMSCRIPTEN_VERSION }}
-          working-directory: ./text_splitters
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          working-directory: ./text_splitters
-      - run: pip install pyodide-build
-      - run: rustup update
-      - run: sudo apt install musl-tools -y
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist -i ${{ env.PYTHON_VERSION }}
-          rust-toolchain: nightly
-          working-directory: ./text_splitters
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wasm-wheels
           path: text_splitters/dist
 
   sdist:
