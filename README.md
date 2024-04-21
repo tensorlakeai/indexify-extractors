@@ -21,13 +21,33 @@ Install the Indexify Extractor SDK
 pip install indexify-extractor-sdk
 ```
 
+List Available extractors 
+```bash
+indexify-extractor list
+```
+
 Pick any extractor you are interested in running. For example, if you want to run the MinLML6 Embedding Extractors -
 
 ```bash
 indexify-extractor download hub://embedding/minilm-l6
 ```
 
-To run an extractor locally -
+Embed the extractors directly into your application or notebook
+```python
+from indexify_extractor_sdk import load_extractor, Content
+extractor, config_cls = load_extractor("minilm-l6.minilm_l6:MiniLML6Extractor")
+content = Content.from_text("hello world")
+out = extractor.extract(content)
+```
+
+Extractors can be parameterized when they are called. The input parameters are Pydantic Models. Inspect the config class programatically or in the docs of the corresponding extractor -
+```python
+ex, config = load_extractor("chunking.chunk_extractor:ChunkExtractor")
+config.schema()
+#{'properties': {'overlap': {'default': 0, 'title': 'Overlap', 'type': 'integer'}, 'chunk_size': {'default': 100, 'title': 'Chunk Size', 'type': 'integer'}, 'text_splitter': {'default': 'recursive', 'enum': ['char', 'recursive', 'markdown', 'html'], 'title': 'Text Splitter', 'type': 'string'}, 'headers_to_split_on': {'default': [], 'items': {'type': 'string'}, 'title': 'Headers To Split On', 'type': 'array'}}, 'title': 'ChunkExtractionInputParams', 'type': 'object'}
+```
+
+To run an extractor locally on your terminal -
 ```
 indexify-extractor local minilm_l6:MiniLML6Extractor --text "hello world"
 ```
