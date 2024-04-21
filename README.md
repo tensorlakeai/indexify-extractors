@@ -3,7 +3,6 @@
 ## Overview
 
 Extractors are modules that give Indexify data processing capabilities such as metadata or embedding extraction from document, videos and audio. This repository hosts a collection of extractors for Indexify.
-These extractors complement the core functionalities of Indexify, enabling seamless integration and enhanced data processing capabilities.
 
 For the main Indexify project, visit: [Indexify Main Repository](https://github.com/diptanu/indexify).
 
