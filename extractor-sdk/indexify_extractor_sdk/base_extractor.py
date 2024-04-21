@@ -64,7 +64,6 @@ class Feature(BaseModel):
             schema_builder.add_object(self.value)
             metadata_schema = schema_builder.to_schema()
             schema = {}
-            print(metadata_schema)
             for k, v in metadata_schema["properties"].items():
                 schema[k] = {"type": v["type"]}
 
@@ -222,6 +221,11 @@ class Extractor(ABC):
         f = open(file_name, "rb")
         return Content(content_type="text/html", data=f.read(), features=features)
 
+
+def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
+    module_name, class_name = name.split(":")
+    wrapper = ExtractorWrapper(module_name, class_name)
+    return (wrapper._instance, wrapper._param_cls)
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):

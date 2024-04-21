@@ -12,12 +12,6 @@ from typing_extensions import Annotated
 
 cpu_count = multiprocessing.cpu_count()
 
-sys.path.append(".")
-
-extractors_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
-if os.path.exists(extractors_path):
-    sys.path.append(extractors_path)
-
 typer_app = typer.Typer(
     help="indexify-extractor - CLI for running and packaging indexify extractors"
 )

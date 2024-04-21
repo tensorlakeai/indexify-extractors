@@ -43,7 +43,7 @@ class Instructor(Extractor):
         return [Feature.metadata(value=model.model_dump(), name="model")]
     
     def sample_input(self) -> Tuple[Content, BaseModel]:
-        data = base64.b64encode(pickle.dumps(UserInfo))
+        data = base64.b64encode(pickle.dumps(UserInfo)).decode("utf-8")
         params = InputParams(schema_bytes=data)
         return (self.sample_text(), params.model_dump_json())
     
