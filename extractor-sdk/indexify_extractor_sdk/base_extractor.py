@@ -36,7 +36,7 @@ class Feature(BaseModel):
     feature_type: Literal["embedding", "metadata"]
     name: str
     value: Json
-    comment: Optional[Json]
+    comment: Optional[Json] = None
 
     @classmethod
     def embedding(cls, values: List[float], name: str = "embedding", distance="cosine"):
@@ -45,6 +45,7 @@ class Feature(BaseModel):
             feature_type="embedding",
             name=name,
             value=embedding.model_dump_json(),
+            comment=None
         )
 
     @classmethod
