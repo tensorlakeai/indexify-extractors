@@ -4,7 +4,7 @@ import json
 from importlib import import_module
 from typing import get_type_hints, Literal, Union, Dict
 
-from pydantic import BaseModel, Json
+from pydantic import BaseModel, Json, Field
 from genson import SchemaBuilder
 import requests
 import os
@@ -36,7 +36,7 @@ class Feature(BaseModel):
     feature_type: Literal["embedding", "metadata"]
     name: str
     value: Json
-    comment: Optional[Json]
+    comment: Optional[Json] = Field(default=None)
 
     @classmethod
     def embedding(cls, values: List[float], name: str = "embedding", distance="cosine"):
@@ -45,13 +45,14 @@ class Feature(BaseModel):
             feature_type="embedding",
             name=name,
             value=embedding.model_dump_json(),
+            comment=None
         )
 
     @classmethod
     def metadata(cls, value: Json, comment: Json = None, name: str = "metadata"):
         value = json.dumps(value)
         comment = json.dumps(comment) if comment is not None else None
-        return cls(feature_type="metadata", name=name, value=value, comment=comment)
+        return cls(feature_type="metadata", name=name, value=value)
 
     def get_schema(self) -> dict:
         if self.feature_type == "embedding":
