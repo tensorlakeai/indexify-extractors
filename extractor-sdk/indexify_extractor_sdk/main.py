@@ -110,6 +110,7 @@ def package(
     verbose: bool = typer.Option(False, "--verbose", help="Run in verbose mode."),
     dev: bool = typer.Option(False, "--dev", help="Run in development mode."),
     gpu: bool = typer.Option(False, "--gpu", help="Use GPU acceleration."),
+    tofile: str = typer.Option(None, "--to-file", help="Write Dockerfile to a specific file"),
 ):
     """
     Packages an extractor into a Docker image, including Dockerfile generation and tarball creation.
@@ -123,6 +124,7 @@ def package(
         verbose=verbose,
         dev=dev,
         gpu=gpu,
+        tofile=tofile
     )
     packager.package()
 

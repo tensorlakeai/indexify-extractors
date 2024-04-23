@@ -1,6 +1,7 @@
 name: Publish Extractor
 
 on: 
+  pull_request:
   workflow_dispatch:
     inputs:
       extractor_path:
@@ -21,7 +22,7 @@ jobs:
           MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
           FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
           pip install -r requirements.txt
-          indexify-extractor package ${FILE_NAME}:${MODULE_CLASS}
+          indexify-extractor package --to-file extractor.dockerfile ${FILE_NAME}:${MODULE_CLASS}
       - name: Extract package name
         id: extract_name
         run: |
@@ -37,4 +38,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Push
-        run: docker push ${{ steps.extract_name.outputs.package_name }}
+        run: docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t ${{ steps.extract_name.outputs.package_name }}:latest -f extractor.dockerfile;
+        # run: docker push 
+        
