@@ -47,7 +47,7 @@ config.schema()
 #{'properties': {'overlap': {'default': 0, 'title': 'Overlap', 'type': 'integer'}, 'chunk_size': {'default': 100, 'title': 'Chunk Size', 'type': 'integer'}, 'text_splitter': {'default': 'recursive', 'enum': ['char', 'recursive', 'markdown', 'html'], 'title': 'Text Splitter', 'type': 'string'}, 'headers_to_split_on': {'default': [], 'items': {'type': 'string'}, 'title': 'Headers To Split On', 'type': 'array'}}, 'title': 'ChunkExtractionInputParams', 'type': 'object'}
 ```
 
-##### Extract Locally on shell -
+#### Extract Locally on shell -
 ```bash
 indexify-extractor local minilm_l6:MiniLML6Extractor --text "hello world"
 ```

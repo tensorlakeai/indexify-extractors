@@ -4,7 +4,7 @@ from transformers import AutoModel, AutoTokenizer
 from indexify_extractor_sdk.embedding.base_embedding import BaseEmbeddingExtractor
 
 class BGEBase(BaseEmbeddingExtractor):
-    name = "BAAI/bge-base-en"
+    name = "tensorlake/bge-base-en"
     description = "BGE Base English Model for Sentence Embeddings"
     system_dependencies = []
 
@@ -12,7 +12,7 @@ class BGEBase(BaseEmbeddingExtractor):
         super(BGEBase, self).__init__(max_context_length=512)
         self.max_context_length = 512  # TO-CHECK Explicitly set max_context_length as an instance attribute
         self._tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-base-en')
-        self._model = AutoModel.from_pretrained('BAAI/bge-base-en')
+        self._model = AutoModel.from_pretrained('BAAI/bge-base-en', torchscript=True)
         self._model.eval()
 
     def extract_embeddings(self, texts: List[str]) -> List[List[float]]:
