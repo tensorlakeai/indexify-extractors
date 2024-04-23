@@ -18,6 +18,7 @@ jobs:
       - run: pip install ./extractor-sdk
       - name: Package Extractor
         run: |
+          echo Publishing Extractor: ${{ github.event.inputs.extractor_path }}
           DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           cd $DIRECTORY
           MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
