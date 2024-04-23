@@ -7,6 +7,7 @@ on:
       extractor_path:
         type: string
         description: "Path to extractor, ex: embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
+        default: embedding/minilm-l6/minilm_l6:MiniLML6Extractor
         required: true
 
 jobs:
