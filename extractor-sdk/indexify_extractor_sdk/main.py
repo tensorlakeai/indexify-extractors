@@ -79,6 +79,7 @@ def join_server(
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
     ] = 1,
+    config_path: Optional[str] = typer.Option(None, help="Path to the TLS configuration file")
 ):
     print_version()
     if not extractor:
@@ -90,6 +91,7 @@ def join_server(
     sys.path.append(extractor_directory)
     
     print("workers ", workers)
+    print("config path provided ", config_path)
 
     indexify_extractor.join(
         extractor=extractor,
@@ -98,6 +100,7 @@ def join_server(
         ingestion_addr=ingestion_addr,
         listen_port=listen_port,
         advertise_addr=advertise_addr,
+        config_path=config_path
     )
 
 

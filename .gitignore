@@ -11,3 +11,4 @@ dist
 *sample.mp3
 *sample.pdf
 text_splitters/target
+.dev-tls

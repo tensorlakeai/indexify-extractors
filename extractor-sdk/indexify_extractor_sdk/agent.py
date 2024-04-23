@@ -1,3 +1,5 @@
+import ssl
+import yaml
 import asyncio
 from . import coordinator_service_pb2
 from .coordinator_service_pb2_grpc import CoordinatorServiceStub
@@ -85,9 +87,10 @@ async def process_task_outcome(
     task: coordinator_service_pb2.Task,
     url,
     _executor_id,
+    ssl_context,
     frame_size=CONTENT_FRAME_SIZE,
 ):
-    async with websockets.connect(url, ping_interval=5, ping_timeout=30) as ws:
+    async with websockets.connect(url, ssl=ssl_context, ping_interval=5, ping_timeout=30) as ws:
         # start new extracted content ingest
         await ws.send(begin_message(task_outcome, task, _executor_id).model_dump_json())
 
@@ -126,7 +129,24 @@ class ExtractorAgent:
         listen_port: int,
         advertise_addr: Optional[str],
         ingestion_addr: str = "localhost:8900",
+        config_path: Optional[str] = None,
     ):
+        if config_path:
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+            if config.get('use_tls', False):
+                print("Running the extractor with TLS enabled")
+                tls_config = config['tls_config']
+                self._ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=tls_config['ca_bundle_path'])
+                self._ssl_context.load_cert_chain(certfile=tls_config['cert_path'], keyfile=tls_config['key_path'])
+                self._protocol = "wss"
+            else:
+                self._ssl_context = None
+                self._protocol = "ws"
+        else:
+            self._ssl_context = None
+            self._protocol = "ws"
+
         self._task_store: TaskStore = TaskStore()
         self._executor_id = executor_id
         self._extractor = extractor
@@ -163,7 +183,7 @@ class ExtractorAgent:
             await asyncio.sleep(5)
             await self.launch_tasks()
             # We should copy only the keys and not the values
-            url = f"ws://{self._ingestion_addr}/write_content"
+            url = f"{self._protocol}://{self._ingestion_addr}/write_content"
             for task_outcome in self._task_store.task_outcomes():
                 print(
                     f"reporting outcome of task {task_outcome.task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}, num_features: {len(task_outcome.features)}"
@@ -173,7 +193,7 @@ class ExtractorAgent:
                 )
                 try:
                     await process_task_outcome(
-                        task_outcome, task, url, self._executor_id
+                        task_outcome, task, url, self._executor_id, self._ssl_context
                     )
                 except Exception as e:
                     print(
