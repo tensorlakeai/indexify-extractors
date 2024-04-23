@@ -18,20 +18,20 @@ jobs:
       - run: pip install ./extractor-sdk
       - name: Package Extractor
         run: |
-          echo Publishing Extractor: ${{ github.event.inputs.extractor_path }}
-          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
+          echo Publishing Extractor: embedding/minilm-l6/minilm_l6:MiniLML6Extractor
+          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
           cd $DIRECTORY
-          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
-          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
+          MODULE_CLASS=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f2)
+          FILE_NAME=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | awk -F'[:/]' '{print $(NF-1)}')
           pip install -r requirements.txt
           indexify-extractor package --to-file extractor.dockerfile ${FILE_NAME}:${MODULE_CLASS}
       - name: Extract package name
         id: extract_name
         run: |
-          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
+          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
           cd $DIRECTORY
-          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
-          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
+          MODULE_CLASS=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f2)
+          FILE_NAME=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | awk -F'[:/]' '{print $(NF-1)}')
           output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
           echo "::set-output name=package_name::$output"
       - name: Login to Docker Hub
