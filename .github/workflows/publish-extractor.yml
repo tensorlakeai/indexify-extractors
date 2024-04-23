@@ -42,6 +42,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Push
-        run: docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t ${{ steps.extract_name.outputs.package_name }}:latest -f extractor.dockerfile;
+        run: |
+          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
+          cd $DIRECTORY
+          ls
+          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t ${{ steps.extract_name.outputs.package_name }}:latest -f extractor.dockerfile;
         # run: docker push 
         
