@@ -1,13 +1,11 @@
 name: Publish Extractor
 
 on: 
-  pull_request:
   workflow_dispatch:
     inputs:
       extractor_path:
         type: string
         description: "Path to extractor, ex: embedding/minilm-l6/minilm_l6:MiniLML6Extractor"
-        default: embedding/minilm-l6/minilm_l6:MiniLML6Extractor
         required: true
 
 jobs:
@@ -18,20 +16,20 @@ jobs:
       - run: pip install ./extractor-sdk
       - name: Package Extractor
         run: |
-          echo Publishing Extractor: embedding/minilm-l6/minilm_l6:MiniLML6Extractor
-          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
+          echo Publishing Extractor: ${{ github.event.inputs.extractor_path }}
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           cd $DIRECTORY
-          MODULE_CLASS=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f2)
-          FILE_NAME=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | awk -F'[:/]' '{print $(NF-1)}')
+          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
           pip install -r requirements.txt
           indexify-extractor package --to-file extractor.dockerfile ${FILE_NAME}:${MODULE_CLASS}
       - name: Extract package name
         id: extract_name
         run: |
-          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           cd $DIRECTORY
-          MODULE_CLASS=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f2)
-          FILE_NAME=$(echo embedding/minilm-l6/minilm_l6:MiniLML6Extractor | awk -F'[:/]' '{print $(NF-1)}')
+          MODULE_CLASS=$(echo ${{ github.event.inputs.extractor_path }} | cut -d':' -f2)
+          FILE_NAME=$(echo ${{ github.event.inputs.extractor_path }} | awk -F'[:/]' '{print $(NF-1)}')
           output=$(python -c "from ${FILE_NAME} import ${MODULE_CLASS} as extractorclass; print(extractorclass.name)")
           echo "::set-output name=package_name::$output"
       - name: Set up Docker Buildx
@@ -43,9 +41,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Push
         run: |
-          DIRECTORY=$(dirname embedding/minilm-l6/minilm_l6:MiniLML6Extractor | cut -d':' -f1)
+          DIRECTORY=$(dirname ${{ github.event.inputs.extractor_path }} | cut -d':' -f1)
           cd $DIRECTORY
-          ls
           docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t ${{ steps.extract_name.outputs.package_name }}:latest -f extractor.dockerfile;
-        # run: docker push 
         
