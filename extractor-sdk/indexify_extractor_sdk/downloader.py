@@ -65,7 +65,7 @@ def install_dependencies(directory_path):
         subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
         pip_path = os.path.join(venv_path, 'bin', 'pip')
 
-        subprocess.check_call([pip_path, 'install', '--no-deps', '-r', requirements_path])
+        subprocess.check_call([pip_path, 'install', '-r', requirements_path])
         subprocess.check_call([pip_path, 'install', 'indexify-extractor-sdk'])
 
     # print instructions for next steps
