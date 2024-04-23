@@ -39,6 +39,7 @@ class ExtractorPackager:
         verbose: bool = False,
         dev: bool = False,
         gpu: bool = False,
+        tofile: bool = False,
     ):
         self.logger = logging.getLogger(__name__)
         self.config = {
@@ -47,6 +48,7 @@ class ExtractorPackager:
             "verbose": verbose,
             "dev": dev,
             "gpu": gpu,
+            "tofile": tofile,
         }
         self.logger.debug(f"Config: {self.config}")
 
@@ -131,7 +133,13 @@ class ExtractorPackager:
         except Exception as e:
             self.logger.error(f"Failed to generate Dockerfile: {e}")
             raise
-
+        if self.config.get("tofile"):
+            dockerfile_name = self.config.get('tofile')
+            print(f"Saving dockerfile to {dockerfile_name}")
+            f = open(dockerfile_name, 'w')
+            f.write(dockerfile_content)
+            f.close()
+            return
         try:
             compressed_tar_stream = io.BytesIO(
                 self._generate_compressed_tarball(dockerfile_content)
