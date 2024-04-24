@@ -75,7 +75,7 @@ class WhisperExtractor(Extractor):
         text = result['text']
         return [Content.from_text(text)]
     
-    def extract_batch(self, content_list: List[Content], params: type[BaseModel] = None) -> List[List[Feature | Content]]:
+    def extract_batch(self, content_list: List[Content], params: List[type[BaseModel]] = None) -> List[List[Feature | Content]]:
         out = []
         with self._accelerator.split_between_processes(content_list) as content_list:
             data = [content.data for content in content_list]

@@ -237,28 +237,30 @@ class ExtractorWrapper:
         extract_batch = getattr(self._instance, "extract_batch", None)
         self._has_batch_extract = True if callable(extract_batch) else False
 
+    def _param_from_json(self, param: Json) -> BaseModel:
+        param_dict = json.loads(param) if param is not None else {}
+        return self._param_cls.model_validate(param_dict) if self._param_cls is not None else None
+
     def extract_batch(
-        self, content_list: Dict[str, Content], params: Json
+        self, content_list: Dict[str, Content], params: Dict[str, Json]
     ) -> Dict[str, List[Union[Feature, Content]]]:
-        params_dict = json.loads(params) if params is not None else {}
-        param_instance = (
-            self._param_cls.model_validate(params_dict)
-            if self._param_cls is not None
-            else None
-        )
         if self._has_batch_extract:
-            keys = []
-            values = []
-            for k, v in content_list.items():
-                keys.append(k)
-                values.append(v)
-            result = self._instance.extract_batch(values, param_instance)
+            task_ids = []
+            task_contents = []
+            params = []
+            for task_id, content in content_list.items():
+                param_instance = self._param_from_json(params.get(task_id, None))
+                params.append(param_instance)
+                task_ids.append(task_id)
+                task_contents.append(content)
+            result = self._instance.extract_batch(task_contents, params)
             out: Dict[str, List[Union[Feature, Content]]] = {}
             for i, extractor_out in enumerate(result):
-                out[keys[i]] = extractor_out
+                out[task_ids[i]] = extractor_out
             return out
         out = {}
         for task_id, content in content_list.items():
+            param_instance = self._param_from_json(params.get(task_id, None))
             out[task_id] = self._instance.extract(content, param_instance)
         return out
 
@@ -274,7 +276,7 @@ class ExtractorWrapper:
                 else None
             )
         outputs: Dict[str, List[Union[Feature, Content]]] = self.extract_batch(
-            {"task_id": s_input}, input_params
+            {"task_id": s_input}, {"task_id": input_params},
         )
         embedding_schemas = {}
         metadata_schemas = {}

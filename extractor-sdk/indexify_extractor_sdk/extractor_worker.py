@@ -27,8 +27,8 @@ def create_executor(extractor_module: ExtractorModule, workers: int):
     )
 
 
-def _extract_content(content_list: Dict[str, Content], params: Json) -> List[Content]:
-    return extractor_wrapper.extract_batch(content_list, params)
+def _extract_content(task_content_map: Dict[str, Content], task_params_map: Dict[str, Json]) -> List[Content]:
+    return extractor_wrapper.extract_batch(task_content_map, task_params_map)
 
 
 def _describe():

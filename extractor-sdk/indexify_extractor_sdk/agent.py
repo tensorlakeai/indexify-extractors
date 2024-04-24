@@ -204,11 +204,12 @@ class ExtractorAgent:
         if len(tasks_to_launch) == 0:
             return
         print("launching tasks : ", ",".join(tasks_to_launch.keys()))
-        content_list = {}
         content_urls = {}
         for _, task in tasks_to_launch.items():
             content_urls[task.id] = task.content_metadata.storage_url
         content_bytes = await download_content(content_urls)
+        content_list = {}
+        task_params_map = {}
         for task_id, bytes in content_bytes.items():
             if isinstance(bytes, Exception):
                 print(f"failed to download content{bytes} for task {task_id}")
@@ -219,16 +220,18 @@ class ExtractorAgent:
                 continue
             c = create_content(bytes, tasks_to_launch[task_id])
             content_list[task_id] = c
+            task_params_map[task_id] = tasks_to_launch[task_id].input_params
         if len(content_list) == 0:
             return
         try:
             print(f"launching tasks {len(content_list)}")
+            print(f"launching task {task.id} {task.input_params}")
             outputs: Dict[str, Union[List[Feature], List[Content]]] = (
                 await extract_content(
                     loop=asyncio.get_running_loop(),
                     executor=self._executor,
                     content_list=content_list,
-                    params=task.input_params,
+                    params=task_params_map,
                 )
             )
         except Exception as e:
