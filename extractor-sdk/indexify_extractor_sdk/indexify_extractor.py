@@ -7,7 +7,7 @@ import nanoid
 import json
 from .extractor_worker import ExtractorModule, create_executor, describe
 from .agent import ExtractorAgent
-
+import os
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
     if text and file:
@@ -41,6 +41,7 @@ def join(
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     advertise_addr: Optional[str] = None,
+    config_path: Optional[str] = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
     module, cls = split_validate_extractor(extractor)
@@ -77,7 +78,8 @@ def join(
         coordinator_addr=coordinator_addr,
         listen_port=listen_port,
         ingestion_addr=ingestion_addr,
-        advertise_addr=advertise_addr
+        advertise_addr=advertise_addr,
+        config_path=config_path
     )
     try:
         asyncio.get_event_loop().run_until_complete(server.run())

@@ -1,0 +1,6 @@
+use_tls: false
+# Define absolute paths
+tls_config:
+  cert_path: "/Users/zaidhumayun/Desktop/Development.nosync/Rust/indexify-extractors/.dev-tls/client.crt"
+  key_path: "/Users/zaidhumayun/Desktop/Development.nosync/Rust/indexify-extractors/.dev-tls/client.key"
+  ca_bundle_path: "/Users/zaidhumayun/Desktop/Development.nosync/Rust/indexify-extractors/.dev-tls/ca.crt"
