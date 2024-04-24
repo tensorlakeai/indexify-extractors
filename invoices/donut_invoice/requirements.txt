@@ -1,0 +1,8 @@
+transformers
+torch
+torchvision
+Pillow
+pytesseract
+sentencepiece
+pdf2image
+pydantic

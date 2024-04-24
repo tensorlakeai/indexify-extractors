@@ -9,7 +9,6 @@ from transformers import DonutProcessor, VisionEncoderDecoderModel
 from indexify_extractor_sdk import (
     Extractor,
     Feature,
-    ExtractorSchema,
     Content,
 )
 
@@ -21,6 +20,9 @@ class SimpleInvoiceParserInputParams(BaseModel):
 
 # SimpleInvoiceParserExtractor definition
 class SimpleInvoiceParserExtractor(Extractor):
+    name = "tensorlake/donut-simple-invoice-parser"
+    description = "Simple Invoice Parser using Donut for Images and PDF"
+    system_dependencies = ["poppler-utils"]
     input_mimes = ["application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
@@ -75,24 +77,24 @@ class SimpleInvoiceParserExtractor(Extractor):
     def extract(
         self, content: Content, params: SimpleInvoiceParserInputParams
     ) -> List[Content]:
-        if is_pdf(content.data):
+        if content.data[:4] == b'%PDF':
             image = self._convert_pdf_to_image(content.data)
         else:
             image = self._convert_image_data_to_image(content.data)
 
         data = self._process_document(image)[0]
+        print(data)
         return [
                 Content.from_text(
                     text="",
-                    feature=Feature.metadata(
+                    features=[Feature.metadata(
                         value=data, name="invoice_simple_donut"
-                    ),
+                    )],
                 )
             ]
-
-# Function to determine if the content is a PDF
-def is_pdf(data):
-    return data[:4] == b'%PDF'
+    
+    def sample_input(self) -> Content:
+        return self.sample_invoice_pdf()
 
 # Testing block
 if __name__ == "__main__":
