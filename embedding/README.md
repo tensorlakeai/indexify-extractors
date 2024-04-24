@@ -24,4 +24,4 @@ indexify-extractor join-server <extractor-module-name>
 | mpnet    | hub://embedding/mpnet            | mpnet_base_v2:MPNetV2                             |
 | openai   | hub://embedding/openai-embedding | openai_embedding:OpenAIEmbeddingExtractor         |
 | scibert  | hub://embedding/scibert          | scibert_uncased:SciBERTExtractor                  |
-|          |                                  |                                                   |
+| arctic   | hub://embedding/arctic           | arctic:ArcticExtractor                            |

@@ -14,3 +14,22 @@ Content(content_type="application/pdf", data=f.read())
 ```
 [Content(content_type='text/plain', data=b'I love playing football.', features=[Feature(feature_type='metadata', name='text', value={'page': 1}, comment=None)], labels={})]
 ```
+
+##### code:
+```python
+!indexify-extractor download hub://pdf/pdf-extractor
+!indexify-extractor join-server pdf-extractor.pdf_extractor:PDFExtractor
+
+from indexify import IndexifyClient
+client = IndexifyClient()
+
+client.add_extraction_policy(extractor='tensorlake/pdf-extractor', name="pdf-extraction")
+
+import requests
+req = requests.get("https://arxiv.org/pdf/2310.16944.pdf")
+
+with open('2310.16944.pdf','wb') as f:
+    f.write(req.content)
+
+client.upload_file(path="2310.16944.pdf")
+```
