@@ -54,10 +54,6 @@ class ExtractedFeatures(BaseModel):
     features: List[ApiFeature]
 
 
-class ExtractedContent(BaseModel):
-    content_list: List[ApiContent]
-
-
 class FinishExtractedContentIngest(BaseModel):
     num_extracted_content: int
 
@@ -68,10 +64,6 @@ class BeginMultipartContent(BaseModel):
 
 class ApiBeginExtractedContentIngest(BaseModel):
     BeginExtractedContentIngest: BeginExtractedContentIngest
-
-
-class ApiExtractedContent(BaseModel):
-    ExtractedContent: ExtractedContent
 
 
 class ApiFinishExtractedContentIngest(BaseModel):
