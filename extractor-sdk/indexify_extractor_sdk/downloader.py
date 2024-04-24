@@ -89,20 +89,23 @@ def create_extractor_db():
         AND name='{table_name}'
     """)
 
-    if not cur.fetchone():
-        # Create the table
-        # ID is the full extractor name: minilm-l6.minilm_l6:MiniLML6Extractor
-        cur.execute(f"""
-            CREATE TABLE {table_name} (
-                id TEXT NOT NULL PRIMARY KEY,
-                name TEXT NOT NULL,
-                description TEXT,
-                input_params TEXT,
-                input_mime_types TEXT,
-                metadata_schemas TEXT,
-                embedding_schemas TEXT
-            )
-        """)
+    # If the table exists, return
+    if  cur.fetchone():
+        return
+
+    # Create the table
+    # ID is the full extractor name: minilm-l6.minilm_l6:MiniLML6Extractor
+    cur.execute(f"""
+        CREATE TABLE {table_name} (
+            id TEXT NOT NULL PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            input_params TEXT,
+            input_mime_types TEXT,
+            metadata_schemas TEXT,
+            embedding_schemas TEXT
+        )
+    """)
 
     conn.commit()
     conn.close()
@@ -127,6 +130,22 @@ def save_extractor_description(id: str, description: ExtractorDescription):
     conn = sqlite3.connect("/tmp/indexify-extractors.db")
     cur = conn.cursor()
 
+    # Check if the extractor already exists
+    cur.execute(f"""
+        SELECT id 
+        FROM extractors 
+        WHERE id='{id}'
+    """)
+
+    if cur.fetchone():
+        # delete the existing extractor record.
+        # This is to ensure that the database is always
+        # up-to-date with the latest extractor info.
+        cur.execute(f"""
+            DELETE FROM extractors
+            WHERE id='{id}'
+        """)
+
     input_params: str = description.input_params if description.input_params else None
 
     # Convert the lists to JSON strings
@@ -134,6 +153,7 @@ def save_extractor_description(id: str, description: ExtractorDescription):
     embedding_schemas = serialize_embedding_schemas(description.embedding_schemas)
     metadata_schemas = json.dumps(description.metadata_schemas)
 
+    # Insert the extractor info into the database
     cur.execute(f"""
         INSERT INTO extractors (
             id, name, description, input_params, input_mime_types, metadata_schemas, embedding_schemas
