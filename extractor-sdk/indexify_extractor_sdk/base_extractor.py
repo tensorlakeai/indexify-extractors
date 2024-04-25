@@ -242,14 +242,14 @@ class ExtractorWrapper:
         return self._param_cls.model_validate(param_dict) if self._param_cls is not None else None
 
     def extract_batch(
-        self, content_list: Dict[str, Content], params: Dict[str, Json]
+        self, content_list: Dict[str, Content], input_params: Dict[str, Json]
     ) -> Dict[str, List[Union[Feature, Content]]]:
         if self._has_batch_extract:
             task_ids = []
             task_contents = []
             params = []
             for task_id, content in content_list.items():
-                param_instance = self._param_from_json(params.get(task_id, None))
+                param_instance = self._param_from_json(input_params.get(task_id, None))
                 params.append(param_instance)
                 task_ids.append(task_id)
                 task_contents.append(content)
@@ -260,7 +260,7 @@ class ExtractorWrapper:
             return out
         out = {}
         for task_id, content in content_list.items():
-            param_instance = self._param_from_json(params.get(task_id, None))
+            param_instance = self._param_from_json(input_params.get(task_id, None))
             out[task_id] = self._instance.extract(content, param_instance)
         return out
 

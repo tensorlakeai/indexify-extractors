@@ -2,7 +2,6 @@ from typing import List, Union, Dict
 from .base_extractor import Content, ExtractorWrapper, Feature
 from pydantic import Json, BaseModel
 import concurrent
-import asyncio
 
 
 class ExtractorModule(BaseModel):
@@ -38,7 +37,7 @@ def _describe():
 async def extract_content(
     loop, executor, content_list: Dict[str, Content], params: Json
 ) -> Dict[str, List[Union[Feature, Content]]]:
-    return await loop.run_in_executor(executor, _extract_content, content_list, params)
+    return await loop.run_in_executor(executor, _extract_content, content_list, {"dummy_task_id": params})
 
 
 async def describe(loop, executor):
