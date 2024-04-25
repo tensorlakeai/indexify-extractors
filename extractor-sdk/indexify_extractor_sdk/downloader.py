@@ -190,7 +190,6 @@ def download_extractor(extractor_path):
     )
 
     fs.get(extractor_path, directory_path, recursive=True)
-    install_dependencies(directory_path)
 
     # Store the extractor info in the database
 
@@ -203,3 +202,4 @@ def download_extractor(extractor_path):
         print(f"Error saving extractor description: {e}")
         raise e
 
+    install_dependencies(directory_path)
