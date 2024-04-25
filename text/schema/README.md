@@ -17,5 +17,5 @@ results = extractor.extract(data, params=input_params)
 
 ##### output:
 ```
-[Content(content_type='text/plain', data=b'{\n    "Invoice No.": "20240501-336593",\n    "Date": "4/19/2024",\n    "Account Number": "922000203826",\n    "Owner": "John Doe",\n    "Property": "200 Park Avenue, Manhattan",\n    "Address": "200 Park Avenue Manhattan, New York 10166",\n    "Registration Key": "FLOWR2U",\n    "Last Month Balance": "$653.03",\n    "Current Amount Due": "$653.03",\n    "Due Date": "5/1/2024"\n}', features=[Feature(feature_type='metadata', name='text', value={'model': 'gpt-3.5-turbo-0125', 'completion_tokens': 99, 'prompt_tokens': 564}, comment=None)], labels={})]
+[Content(content_type='text/plain', data=b'{\n    "Invoice No.": "20240501-336593",\n    "Date": "4/19/2024",\n    "Account Number": "922000203826",\n    "Owner": "John Doe",\n    "Address": "200 Park Avenue Manhattan, New York 10166",\n    "Last Month Balance": "$653.03",\n    "Current Amount Due": "$653.03",\n    "Registration Key": "FLOWR2U",\n    "Due Date": "5/1/2024"\n}', features=[Feature(feature_type='metadata', name='text', value={'model': 'gpt-3.5-turbo-0125', 'completion_tokens': 99, 'prompt_tokens': 564}, comment=None)], labels={})]
 ```
