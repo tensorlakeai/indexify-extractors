@@ -197,6 +197,7 @@ def download_extractor(extractor_path):
         save_extractor_description(extractor_full_name, description)
     except Exception as e:
         print(f"Error saving extractor description: {e}")
+        raise e
 
     fs.get(extractor_path, directory_path, recursive=True)
     install_dependencies(directory_path)
