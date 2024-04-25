@@ -98,6 +98,7 @@ def create_extractor_db():
 
     # If the table exists, return
     if  cur.fetchone():
+        conn.close()
         return
 
     # Create the table
