@@ -19,7 +19,7 @@ class SummaryExtractor(Extractor):
         super().__init__()
         self.summarizer = pipeline("text-generation", model="h2oai/h2o-danube2-1.8b-chat", device_map="auto")
 
-    def extract(self, content: Content, params = InputParams) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params: InputParams) -> List[Union[Feature, Content]]:
         contents = []
         full_summary = ""
 

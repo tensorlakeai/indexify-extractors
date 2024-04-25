@@ -20,7 +20,7 @@ class SummaryExtractor(Extractor):
         super().__init__()
         self.summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-    def extract(self, content: Content, params = InputParams) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params: InputParams) -> List[Union[Feature, Content]]:
         contents = []
         full_summary = ""
 
