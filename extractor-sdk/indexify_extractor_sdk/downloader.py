@@ -188,17 +188,17 @@ def download_extractor(extractor_path):
         os.path.expanduser("~"), ".indexify-extractors", base_extractor_path
     )
 
+    fs.get(extractor_path, directory_path, recursive=True)
+    install_dependencies(directory_path)
+
     # Store the extractor info in the database
 
     extractor_full_name = get_extractor_full_name(base_extractor_path)
+    description = get_extractor_description(extractor_full_name)
 
     try:
-        description = get_extractor_description(extractor_full_name)
         save_extractor_description(extractor_full_name, description)
     except Exception as e:
         print(f"Error saving extractor description: {e}")
         raise e
-
-    fs.get(extractor_path, directory_path, recursive=True)
-    install_dependencies(directory_path)
 
