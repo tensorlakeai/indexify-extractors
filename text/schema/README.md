@@ -1,6 +1,6 @@
-# LLM Extractor
+# Schema Extractor
 
-This is a LLM based Extractor that supports multiple LLMs. By default it uses OpenAI and works on the Content of previous extractor as data for schema extraction, however we can manually overwrite schema and data.
+This is a LLM based Schema Extractor that supports multiple LLMs. By default it uses OpenAI and works on the Content of previous extractor as data for schema extraction, however we can manually overwrite schema and data.
 
 ### Example:
 ##### input:

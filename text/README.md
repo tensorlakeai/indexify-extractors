@@ -17,3 +17,5 @@ indexify-extractor join-server <extractor-module-name>
 | summarization        | hub://text/summarization       | summary_extractor:SummaryExtractor       |
 | llm-summary          | hub://text/llm-summary         | summary_extractor:SummaryExtractor       |
 | chunking             | hub://text/chunking            | chunk_extractor:ChunkExtractor           |
+| llm                  | hub://text/llm                 | llm_extractor:LLMExtractor           |
+| schema               | hub://text/schema              | schema_extractor:SchemaExtractor           |
