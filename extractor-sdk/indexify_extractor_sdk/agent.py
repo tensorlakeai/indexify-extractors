@@ -30,6 +30,7 @@ from .server import http_server, ServerRouter, get_server_advertise_addr
 import concurrent
 import websockets
 from .task_store import TaskStore, CompletedTask
+from websockets.exceptions import ConnectionClosed
 
 CONTENT_FRAME_SIZE = 1024 * 1024
 
@@ -78,41 +79,79 @@ async def send_extracted_content(ws, content: ApiContent, id: int, frame_size):
     )
 
 
+class TaskReportError(Exception):
+    """Exception raised for errors in the task reporting process."""
+
+    def __init__(self, task_id, message="Failed to report task"):
+        self.task_id = task_id
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f"{self.message}"
+
+
 async def process_task_outcome(
-    task_outcome,
+    task_outcome: CompletedTask,
     task: coordinator_service_pb2.Task,
     url,
     _executor_id,
     ssl_context,
     frame_size=CONTENT_FRAME_SIZE,
 ):
-    async with websockets.connect(url, ssl=ssl_context, ping_interval=5, ping_timeout=30) as ws:
-        # start new extracted content ingest
-        await ws.send(begin_message(task_outcome, task, _executor_id).model_dump_json())
+    try:
+        async with websockets.connect(url, ssl=ssl_context, ping_interval=5, ping_timeout=30) as ws:
+            # start new extracted content ingest
+            await ws.send(
+                begin_message(task_outcome, task, _executor_id).model_dump_json()
+            )
 
-        # send all contents one at a time
-        for i, content in enumerate(task_outcome.new_content):
-            await send_extracted_content(ws, content, id=i + 1, frame_size=frame_size)
+            num_extracted_content = 0
+            if task_outcome.task_outcome == "Success":
+                num_extracted_content = len(task_outcome.new_content)
+                # send all contents one at a time
+                for i, content in enumerate(task_outcome.new_content):
+                    await send_extracted_content(
+                        ws, content, id=i + 1, frame_size=frame_size
+                    )
 
-        # send all features one at a time
-        for feature in task_outcome.features:
-            extracted_features = ApiExtractedFeatures(
-                ExtractedFeatures=ExtractedFeatures(
-                    content_id=task.content_metadata.id, features=[feature]
+                # send all features one at a time
+                for feature in task_outcome.features:
+                    extracted_features = ApiExtractedFeatures(
+                        ExtractedFeatures=ExtractedFeatures(
+                            content_id=task.content_metadata.id, features=[feature]
+                        )
+                    )
+                    await ws.send(extracted_features.model_dump_json())
+                print(
+                    f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
+                )
+
+            # finish extracted content ingest
+            finish_msg = ApiFinishExtractedContentIngest(
+                FinishExtractedContentIngest=FinishExtractedContentIngest(
+                    num_extracted_content=num_extracted_content
                 )
             )
-            await ws.send(extracted_features.model_dump_json())
-        print(
-            f"finished message {FinishExtractedContentIngest(num_extracted_content=len(task_outcome.new_content)).model_dump_json()}"
-        )
 
-        # finish extracted content ingest
-        finish_msg = ApiFinishExtractedContentIngest(
-            FinishExtractedContentIngest=FinishExtractedContentIngest(
-                num_extracted_content=len(task_outcome.new_content)
+            await ws.send(finish_msg.model_dump_json())
+
+            response = await ws.recv()
+            response_data = json.loads(response)
+            print(f"response: {response_data}")
+            if "Error" in response_data:
+                raise TaskReportError(task_outcome.task_id, response_data["Error"])
+
+    except ConnectionClosed as e:
+        if not e.rcvd is None:
+            # the connection was closed by the server with an error message
+            raise TaskReportError(
+                task_outcome.task_id,
+                f"Connection closed with code {e.code} reason {e.reason}",
             )
-        )
-        await ws.send(finish_msg.model_dump_json())
+        else:
+            # otherwise abnormal close, retry
+            raise e
 
 
 class ExtractorAgent:
@@ -191,9 +230,14 @@ class ExtractorAgent:
                     await process_task_outcome(
                         task_outcome, task, url, self._executor_id, self._ssl_context
                     )
+                except TaskReportError as e:
+                    print(f"failed to report task {e.task_id}, exception: {e}")
+                    self._task_store.report_failed(task_id=e.task_id)
+                    continue
                 except Exception as e:
+                    # the connection was dropped in the middle of the reporting process, retry
                     print(
-                        f"failed to report task {task_outcome.task_outcome}, exception: {e}"
+                        f"failed to report task {task_outcome.task_id}, exception: {e}, retrying"
                     )
                     continue
 

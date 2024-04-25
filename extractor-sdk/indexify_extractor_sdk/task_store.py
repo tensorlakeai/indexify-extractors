@@ -51,6 +51,17 @@ class TaskStore:
         self._tasks.pop(task_id)
         self._finished.pop(task_id)
 
+    def report_failed(self, task_id: str):
+        if self._finished[task_id].task_outcome != "Failed":
+            # An error occurred while reporting the task, mark it as failed
+            # and try reporting again.
+            self._finished[task_id].task_outcome = "Failed"
+        else:
+            # If a task is already marked as failed, remove it from the queue.
+            # The only possible error at this point is task not present at
+            # the coordinator.
+            self._tasks.pop(task_id)
+
     def num_pending_tasks(self) -> int:
         return len(self._tasks) + len(self._running_tasks)
 
