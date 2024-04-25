@@ -75,9 +75,16 @@ def install_dependencies(directory_path):
     # print instructions for next steps
     print_instructions(directory_path)
 
+def get_db_path():
+    """Returns the path the extractors database file."""
+    base_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
+    db_path = os.path.join(base_path, "extractors.db")
+    return db_path
+
 def create_extractor_db():
     # Connect to the database
-    conn = sqlite3.connect("/tmp/indexify-extractors.db")
+    path = get_db_path()
+    conn = sqlite3.connect(path)
     cur = conn.cursor()
 
     # Check if the table exists
@@ -127,7 +134,8 @@ def serialize_embedding_schemas(embedding_schemas) -> str:
     return json.dumps(schemas)
 
 def save_extractor_description(id: str, description: ExtractorDescription):
-    conn = sqlite3.connect("/tmp/indexify-extractors.db")
+    db_path = get_db_path()
+    conn = sqlite3.connect(db_path)
     cur = conn.cursor()
 
     # Check if the extractor already exists
