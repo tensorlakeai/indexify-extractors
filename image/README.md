@@ -1,4 +1,4 @@
-# PDF Extractors
+# Image Extractors
 
 To begin utilizing these extractors install the indexify-extractor CLI.
 
