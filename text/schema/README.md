@@ -2,6 +2,8 @@
 
 This is a LLM based Schema Extractor that supports multiple LLMs. It accepts a user provided JSON Schema and extracts information from text passed into it to the schema. The extractor uses OpenAI by default, we will extend this to use other LLMs as well.
 
+This is insprired by Instructor from @jxnlco. We support instructor too by pickling the user provided pydantic model into the Instructor extractor. This extractor doesn't depend on pickling and only uses JSON schema which is easier to work with in distributed production deployments. 
+
 ### Example:
 ##### input:
 ```
