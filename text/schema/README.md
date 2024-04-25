@@ -1,6 +1,6 @@
 # Schema Extractor
 
-This is a LLM based Schema Extractor that supports multiple LLMs. By default it uses OpenAI and works on the Content of previous extractor as data for schema extraction, however we can manually overwrite schema and data.
+This is a LLM based Schema Extractor that supports multiple LLMs. It accepts a user provided JSON Schema and extracts information from text passed into it to the schema. The extractor uses OpenAI by default, we will extend this to use other LLMs as well.
 
 ### Example:
 ##### input:
