@@ -159,6 +159,7 @@ class ExtractorAgent:
         ingestion_addr: str = "localhost:8900",
         config_path: Optional[str] = None,
     ):
+        self._use_tls = False
         if config_path:
             with open(config_path, 'r') as f:
                 config = yaml.safe_load(f)
