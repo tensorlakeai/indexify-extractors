@@ -39,15 +39,8 @@ class ApiContent(BaseModel):
 
 class BeginExtractedContentIngest(BaseModel):
     task_id: str
-    namespace: str
-    output_to_index_table_mapping: Dict[str, str]
-    parent_content_id: str
     executor_id: str
     task_outcome: str
-    extraction_policy: str
-    extractor: str
-    index_tables: List[str]
-    
 
 class ExtractedFeatures(BaseModel):
     content_id: str
