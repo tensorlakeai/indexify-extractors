@@ -162,13 +162,16 @@ class ExtractorAgent:
         if config_path:
             with open(config_path, 'r') as f:
                 config = yaml.safe_load(f)
+                self._config = config
             if config.get('use_tls', False):
                 print("Running the extractor with TLS enabled")
+                self._use_tls = True
                 tls_config = config['tls_config']
                 self._ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=tls_config['ca_bundle_path'])
                 self._ssl_context.load_cert_chain(certfile=tls_config['cert_path'], keyfile=tls_config['key_path'])
                 self._protocol = "wss"
             else:
+                self._use_tls = False
                 self._ssl_context = None
                 self._protocol = "ws"
         else:
@@ -196,7 +199,19 @@ class ExtractorAgent:
     async def register(self):
         # This needs to be here because every time we register we need to create a new channel
         # because the old one might have been closed after hb was broken or we could never connect
-        self._channel = grpc.aio.insecure_channel(self._coordinator_addr)
+        if self._use_tls:
+            # Load the certificate and key files
+            with open(self._config['tls_config']['cert_path'], 'rb') as f:
+                cert = f.read()
+            with open(self._config['tls_config']['key_path'], 'rb') as f:
+                key = f.read()
+            with open(self._config['tls_config']['ca_bundle_path'], 'rb') as f:
+                ca_cert = f.read()
+            credentials = grpc.ssl_channel_credentials(root_certificates=ca_cert, private_key=key, certificate_chain=cert)
+            self._channel = grpc.aio.secure_channel(self._coordinator_addr, credentials=credentials)
+        else:
+            self._channel = grpc.aio.insecure_channel(self._coordinator_addr)
+
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(self._channel)
         req = coordinator_service_pb2.RegisterExecutorRequest(
             executor_id=self._executor_id,
@@ -319,7 +334,7 @@ class ExtractorAgent:
                 await self.register()
                 self._has_registered = True
             except Exception as e:
-                print(f"failed to register{e}")
+                print(f"failed to register: {e}")
                 await asyncio.sleep(5)
                 continue
             hb_ticker = self.ticker()
