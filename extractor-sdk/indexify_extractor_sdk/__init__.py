@@ -5,8 +5,9 @@ import sys
 sys.path.append(".")
 
 extractors_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
-if os.path.exists(extractors_path):
-    sys.path.append(extractors_path)
+if not os.path.exists(extractors_path):
+    os.mkdir(extractors_path)
+sys.path.append(extractors_path)
 
 
 
