@@ -3,6 +3,8 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 from transformers import pipeline
 from openai import OpenAI
+import google.generativeai as genai
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class SchemaExtractorConfig(BaseModel):
     service: str = Field(default='openai')
@@ -46,6 +48,26 @@ class SchemaExtractor(Extractor):
             )
             response_content = response.choices[0].message.content
             feature = Feature.metadata(value={"model": response.model, "completion_tokens": response.usage.completion_tokens, "prompt_tokens": response.usage.prompt_tokens}, name="text")
+        
+        if service == "gemini":
+            if key != None:
+                genai.configure(api_key=key)
+            generation_config = {"temperature": 1, "top_p": 0.95, "top_k": 0, "max_output_tokens": 8192}
+            model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest", generation_config=generation_config)
+            convo = model.start_chat(history=[])
+            convo.send_message(additional_messages + str(schema) + " " + data)
+            response_content = convo.last.text
+            feature = Feature.metadata(value={"model": convo.model.model_name}, name="text")
+        
+        if '/' in service:
+            model = AutoModelForCausalLM.from_pretrained(service, device_map="cuda", torch_dtype="auto", trust_remote_code=True)
+            tokenizer = AutoTokenizer.from_pretrained(service)
+            messages = [{"role": "system", "content": additional_messages + str(schema)}, {"role": "user", "content": data}]
+            pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
+            generation_args = {"max_new_tokens": 500, "return_full_text": False, "temperature": 0.0, "do_sample": False}
+            output = pipe(messages, **generation_args)
+            response_content = output[0]['generated_text']
+            feature = Feature.metadata(value={"model": service}, name="text")
         
         contents.append(Content.from_text(response_content, features=[feature]))
         
