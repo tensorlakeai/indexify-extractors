@@ -14,7 +14,7 @@ class ClipEmbeddingExtractor(Extractor):
     def __init__(self):
         super(ClipEmbeddingExtractor, self).__init__()
         self._device = "cuda" if torch.cuda.is_available() else "cpu"
-        self._model, self._preprocess = clip.load("ViT-B/32", device=self._device)
+        self._model, self._preprocess = clip.load("ViT-B/32", device=self._device, jit=True)
 
     def extract(self, content: Content, params = None) -> Union[List[Feature], List[Content]]:
         if "image" in content.content_type:
