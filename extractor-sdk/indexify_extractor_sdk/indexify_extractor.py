@@ -20,7 +20,7 @@ def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None
         content = Content.from_file(file)
     module, cls = extractor.split(":")
     wrapper = ExtractorWrapper(module, cls)
-    result = wrapper.extract_batch({"task_id": content}, params="{}")
+    result = wrapper.extract_batch({"task_id": content}, input_params={"task_id": "{}"})
     print(result)
 
 
