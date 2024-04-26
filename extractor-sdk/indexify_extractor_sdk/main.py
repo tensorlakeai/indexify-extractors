@@ -138,6 +138,10 @@ def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
 
     download_extractor(extractor_path)
 
+@typer_app.command(name="version", help="Print the version of the SDK and the CLI")
+def _version():
+    print_version()
+
 
 @typer_app.command(help="List all the available extractors")
 def list(
