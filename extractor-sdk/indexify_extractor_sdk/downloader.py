@@ -78,6 +78,10 @@ def install_dependencies(directory_path):
 def get_db_path():
     """Returns the path the extractors database file."""
     base_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
+
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+
     db_path = os.path.join(base_path, "extractors.db")
     return db_path
 
@@ -190,6 +194,7 @@ def download_extractor(extractor_path):
     )
 
     fs.get(extractor_path, directory_path, recursive=True)
+    install_dependencies(directory_path)
 
     # Store the extractor info in the database
 
@@ -201,5 +206,3 @@ def download_extractor(extractor_path):
     except Exception as e:
         print(f"Error saving extractor description: {e}")
         raise e
-
-    install_dependencies(directory_path)
