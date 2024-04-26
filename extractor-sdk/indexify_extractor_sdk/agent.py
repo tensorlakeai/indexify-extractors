@@ -34,19 +34,12 @@ from websockets.exceptions import ConnectionClosed
 
 CONTENT_FRAME_SIZE = 1024 * 1024
 
-
 def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id):
     return ApiBeginExtractedContentIngest(
         BeginExtractedContentIngest=BeginExtractedContentIngest(
             task_id=task_outcome.task_id,
-            namespace=task.namespace,
-            output_to_index_table_mapping=task.output_index_mapping,
-            parent_content_id=task.content_metadata.id,
             executor_id=_executor_id,
             task_outcome=task_outcome.task_outcome,
-            extraction_policy=task.extraction_policy_id,
-            extractor=task.extractor,
-            index_tables=task.index_tables,
         )
     )
 
