@@ -198,6 +198,15 @@ def download_extractor(extractor_path):
 
     # Store the extractor info in the database
 
+    # Add the extractor path in the PYTHONPATH
+    sys.path.append(directory_path)
+    all_subdirs = [d for d in os.listdir(directory_path) ]
+    for dir in all_subdirs:
+        extractor_path = os.path.join(directory_path, dir)
+        if os.path.isdir(extractor_path)  and extractor_path not in sys.path:
+            print(f"Adding extractor dir: {extractor_path} to PYTHONPATH")
+            sys.path.append(extractor_path)
+
     extractor_full_name = get_extractor_full_name(base_extractor_path)
     description = get_extractor_description(extractor_full_name)
 

@@ -7,6 +7,7 @@ sys.path.append(".")
 extractors_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
 if not os.path.exists(extractors_path):
     os.mkdir(extractors_path)
+sys.path.append(extractors_path)
 all_subdirs = [d for d in os.listdir(extractors_path) ]
 for dir in all_subdirs:
     print(f"Adding extractor dir: {dir} to PYTHONPATH")
