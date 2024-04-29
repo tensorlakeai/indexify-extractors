@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 from transformers import pipeline
@@ -8,9 +8,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class SchemaExtractorConfig(BaseModel):
     service: str = Field(default='openai')
-    key: str = Field(default=None)
+    key: Optional[str] = Field(default=None)
     schema: dict = Field(default={'properties': {'name': {'title': 'Name', 'type': 'string'}}, 'required': ['name'], 'title': 'User', 'type': 'object'})
-    data: str = Field(default=None)
+    data: Optional[str] = Field(default=None)
     additional_messages: str = Field(default='Extract information in JSON according to this schema and return only the output. ')
 
 class SchemaExtractor(Extractor):
