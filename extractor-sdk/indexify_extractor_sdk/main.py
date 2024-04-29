@@ -6,6 +6,7 @@ import logging
 import os
 from .list_extractors import list_extractors
 import sys
+from .downloader import get_db_path
 
 import multiprocessing
 from typing_extensions import Annotated
@@ -59,13 +60,8 @@ def run_local(
     indexify_extractor.local(extractor, text, file)
 
 
-@typer_app.command(help="Joins the extractor to the coordinator server")
+@typer_app.command(help="Joins the executor to the coordinator server")
 def join_server(
-    # optional, default to $EXTRACTOR_PATH if not provided. If $EXTRACTOR_PATH is not set, it will raise an error.
-    extractor: str = typer.Argument(
-        None,
-        help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
-    ),
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     listen_port: int = typer.Option(
@@ -82,19 +78,17 @@ def join_server(
     config_path: Optional[str] = typer.Option(None, help="Path to the TLS configuration file")
 ):
     print_version()
-    if not extractor:
-        extractor = os.environ.get("EXTRACTOR_PATH")
-        print(f"Using extractor path from $EXTRACTOR_PATH: {extractor}")
-        assert extractor, "Extractor path not provided and $EXTRACTOR_PATH not set."
-        
-    extractor_directory = os.path.join(os.path.expanduser("~"), ".indexify-extractors", os.path.basename(extractor.split(".")[0]))
-    sys.path.append(extractor_directory)
+
+    # Check if any extractors are downloaded.
+    path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
+    if not os.path.isdir(path):
+        print(path)
+        raise Exception("No extractors found. Download extractors using the downloader.")
     
     print("workers ", workers)
     print("config path provided ", config_path)
 
     indexify_extractor.join(
-        extractor=extractor,
         workers=workers,
         coordinator_addr=coordinator_addr,
         ingestion_addr=ingestion_addr,
