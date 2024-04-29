@@ -189,13 +189,11 @@ def download_extractor(extractor_path):
     extractor_path = extractor_path.removeprefix("hub://")
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
 
-    base_extractor_path = os.path.basename(extractor_path)
-    directory_path = os.path.join(
-        os.path.expanduser("~"), ".indexify-extractors", base_extractor_path
-    )
+    directory_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
 
     fs.get(extractor_path, directory_path, recursive=True)
-    install_dependencies(directory_path)
+    base_extractor_path = os.path.basename(extractor_path)
+    install_dependencies(os.path.join(directory_path, base_extractor_path))
 
     # Store the extractor info in the database
 
