@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 from transformers import pipeline
@@ -8,9 +8,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class LLMExtractorConfig(BaseModel):
     service: str = Field(default='openai')
-    key: str = Field(default=None)
+    key: Optional[str] = Field(default=None)
     prompt: str = Field(default='You are a helpful assistant.')
-    query: str = Field(default=None)
+    query: Optional[str] = Field(default=None)
 
 class LLMExtractor(Extractor):
     name = "tensorlake/llm"
