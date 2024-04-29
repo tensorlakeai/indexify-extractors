@@ -159,6 +159,7 @@ def save_extractor_description(id: str, description: ExtractorDescription):
             WHERE id='{id}'
         """)
 
+    sanitized_description = description.description.replace("'", "''")
     input_params: str = description.input_params if description.input_params else None
 
     # Convert the lists to JSON strings
@@ -171,7 +172,7 @@ def save_extractor_description(id: str, description: ExtractorDescription):
         INSERT INTO extractors (
             id, name, description, input_params, input_mime_types, metadata_schemas, embedding_schemas
         ) VALUES (
-            '{id}', '{description.name}', '{description.description}',
+            '{id}', '{description.name}', '{sanitized_description}',
             '{input_params}', '{mime_types}',
             '{metadata_schemas}', '{embedding_schemas}'
         )
