@@ -159,6 +159,7 @@ def save_extractor_description(id: str, description: ExtractorDescription):
             WHERE id='{id}'
         """)
 
+    sanitized_description = description.description.replace("'", "''")
     input_params: str = description.input_params if description.input_params else None
 
     # Convert the lists to JSON strings
@@ -171,7 +172,7 @@ def save_extractor_description(id: str, description: ExtractorDescription):
         INSERT INTO extractors (
             id, name, description, input_params, input_mime_types, metadata_schemas, embedding_schemas
         ) VALUES (
-            '{id}', '{description.name}', '{description.description}',
+            '{id}', '{description.name}', '{sanitized_description}',
             '{input_params}', '{mime_types}',
             '{metadata_schemas}', '{embedding_schemas}'
         )
@@ -188,13 +189,11 @@ def download_extractor(extractor_path):
     extractor_path = extractor_path.removeprefix("hub://")
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
 
-    base_extractor_path = os.path.basename(extractor_path)
-    directory_path = os.path.join(
-        os.path.expanduser("~"), ".indexify-extractors", base_extractor_path
-    )
+    directory_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
 
     fs.get(extractor_path, directory_path, recursive=True)
-    install_dependencies(directory_path)
+    base_extractor_path = os.path.basename(extractor_path)
+    install_dependencies(os.path.join(directory_path, base_extractor_path))
 
     # Store the extractor info in the database
 
