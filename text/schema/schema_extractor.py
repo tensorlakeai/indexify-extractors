@@ -8,9 +8,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class SchemaExtractorConfig(BaseModel):
     service: str = Field(default='openai')
-    key: str = Field(default="")
+    key: Optional[str] = Field(default=None)
     schema: dict = Field(default={'properties': {'name': {'title': 'Name', 'type': 'string'}}, 'required': ['name'], 'title': 'User', 'type': 'object'})
-    data: str = Field(default="")
+    data: Optional[str] = Field(default=None)
     additional_messages: str = Field(default='Extract information in JSON according to this schema and return only the output. ')
 
 class SchemaExtractor(Extractor):
@@ -31,11 +31,11 @@ class SchemaExtractor(Extractor):
         schema = params.schema
         data = params.data
         additional_messages = params.additional_messages
-        if data is "":
+        if data is None:
             data = text
 
         if service == "openai":
-            if key is "":
+            if key is None:
                 client = OpenAI()
             else:
                 client = OpenAI(api_key=key)
@@ -50,7 +50,7 @@ class SchemaExtractor(Extractor):
             feature = Feature.metadata(value={"model": response.model, "completion_tokens": response.usage.completion_tokens, "prompt_tokens": response.usage.prompt_tokens}, name="text")
         
         if service == "gemini":
-            if key != "":
+            if key != None:
                 genai.configure(api_key=key)
             generation_config = {"temperature": 1, "top_p": 0.95, "top_k": 0, "max_output_tokens": 8192}
             model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest", generation_config=generation_config)
