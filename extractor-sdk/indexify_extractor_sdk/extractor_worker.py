@@ -59,8 +59,8 @@ def _extract_content(
         # Get task IDs using the extractor
         task_ids = [
             task_id
-            for task_id, extractor_name in task_extractor_map.items()
-            if extractor_name == extractor_name
+            for task_id, task_extractor_name in task_extractor_map.items()
+            if extractor_name == task_extractor_name
         ]
 
         # Filter task contents and params using the task IDs
