@@ -2,28 +2,18 @@ import io
 import torch
 from PIL import Image
 from typing import List
-from pydantic import BaseModel
 from pdf2image import convert_from_bytes
 from transformers import DonutProcessor, VisionEncoderDecoderModel
+from indexify_extractor_sdk import Content, Extractor, Feature
 
-from indexify_extractor_sdk import (
-    Extractor,
-    Feature,
-    Content,
-)
-
-
-# SimpleInvoiceParserInputParams definition
-class SimpleInvoiceParserInputParams(BaseModel):
-    # No input except the file itself
-    ...
-
-# DonutBaseV2 definition
 class DonutBaseV2(Extractor):
-    input_mimes = ["application/pdf", "image/jpeg", "image/png"]
+    name = "tensorlake/donutcord"
+    description = "An extractor that let's you do Document Parsing."
+    system_dependencies = []
+    input_mime_types = ["application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
-        super().__init__()
+        super(DonutBaseV2, self).__init__()
         self.processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base-finetuned-cord-v2")
         self.model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-finetuned-cord-v2")
 
@@ -67,25 +57,17 @@ class DonutBaseV2(Extractor):
         sequence = sequence.split("<s_cord-v2>", 1)[-1].strip()
         return self.processor.token2json(sequence), image
 
-    def extract(
-        self, content: Content, params: SimpleInvoiceParserInputParams
-    ) -> List[Content]:
+    def extract(self, content: Content, params = None) -> List[Content]:
         if is_pdf(content.data):
             image = self._convert_pdf_to_image(content.data)
         else:
             image = self._convert_image_data_to_image(content.data)
 
         data = self._process_document(image)[0]
-        return [
-                Content.from_text(
-                    text="",
-                    feature=Feature.metadata(
-                        value=data, name="invoice_simple_donut"
-                    ),
-                )
-            ]
-
-        return out
+        return [Content.from_text("", features=[Feature.metadata(value=data, name="invoice_simple_donut")])]
+    
+    def sample_input(self) -> Content:
+        return self.sample_invoice_pdf()
 
 # Function to determine if the content is a PDF
 def is_pdf(data):
@@ -100,12 +82,12 @@ if __name__ == "__main__":
 
     with open(pdf_file_path, "rb") as file:
         pdf_data = file.read()
-        pdf_content = Content(data=pdf_data)
-        pdf_results = extractor.extract([pdf_content], SimpleInvoiceParserInputParams())
+        pdf_content = Content(content_type="application/pdf", data=pdf_data)
+        pdf_results = extractor.extract(pdf_content)
         print("PDF Extraction Results:", pdf_results)
 
     with open(image_file_path, "rb") as file:
         image_data = file.read()
-        image_content = Content(data=image_data)
-        image_results = extractor.extract([image_content], SimpleInvoiceParserInputParams())
+        image_content = Content(content_type="image/jpeg", data=image_data)
+        image_results = extractor.extract([image_content])
         print("Image Extraction Results:", image_results)
