@@ -32,7 +32,7 @@ Find the name of the extractor you want.
 indexify-extractor download hub://embedding/minilm-l6
 ```
 
-#### Use them independently 
+#### Load and Run in Notebook or Python Applications 
 ```python
 from indexify_extractor_sdk import load_extractor, Content
 extractor, config_cls = load_extractor("minilm-l6.minilm_l6:MiniLML6Extractor")
@@ -49,10 +49,10 @@ config.schema()
 
 #### Extract Locally on shell -
 ```bash
-indexify-extractor local minilm_l6:MiniLML6Extractor --text "hello world"
+indexify-extractor run-local minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
 ```
 
-#### Run with Indexify Server
+#### Run Extractors as a Service for Continous Extraction and Indexing with Indexify Server
 To run the extractor with Indexify's control plane such that it can continuously extract from content -
 ```bash
 indexify-extractor join-server minilm_l6:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
@@ -62,12 +62,12 @@ The `coordinator-addr` and `ingestion-addr` above are the default addresses expo
 ## Build a new Extractor
 If want to build a new extractor to give Indexify new data processing capabilities you can write a new extractor by cloning this repository - https://tensorlakeai/indexify-extractor-template
 
-### Clone the template
+#### Clone the template
 ```shell
 git clone https://github.com/tensorlakeai/indexify-extractor-template.git
 ``` 
 
-### Implement the extractor interface 
+#### Implement the extractor interface 
 ```python
 class MyExtractor(Extractor):
     input_mime_types = ["text/plain", "application/pdf", "image/jpeg"]
@@ -99,19 +99,30 @@ class MyExtractor(Extractor):
 
 Once you have developed the extractor you can test the extractor locally by running the `indexify-extractor local` command as described above.
 
-### Deploy the extractor
+#### Test and Deploy the extractor
+First test your extractor 
+```python
+ex, config = load_extractor("my_extractor:MyExtractor")
+config.schema()
+ex.extract(Content(...), config(...)# or ignore if you don't have config)
+```
+Run the extractor on shell
+```bash
+indexify-extractor run-local my_extractor:MyExtractor --text "hello world" // or --file /path to file
+```
+
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
 ```
 indexify-extractor join-server my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 
-### Package the Extractor 
+#### Package the Extractor 
 Once you build a new extractor, and have tested it and it's time to deploy this in production, you can build a container with the extractor -
 ```bash
 indexify-extractor package my_extractor:MyExtractor
 ```
 
-### Running Your packaged extractor
+#### Running Your packaged extractor
 To run your packaged extractor image you can run the following command
 ```bash
 docker run ExtractorImageName indexify-extractor join-server --coordinator-addr=host.docker.internal:8950 --ingestion-addr=host.docker.internal:8900

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "indexify-extractor-sdk"
-version = "0.0.49"
+version = "0.0.57"
 description = "Indexify Extractor SDK to build new extractors for extraction from unstructured data"
 authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
 readme = "README.md"
@@ -10,7 +10,7 @@ indexify-extractor = "indexify_extractor_sdk.main:typer_app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-typer = {extras = ["all"], version = "^0.9.0"}
+typer = { extras = ["all"], version = "^0.9.0" }
 pydantic = "^2.6.1"
 fastapi = "^0.109.2"
 nanoid = "^2.0.0"

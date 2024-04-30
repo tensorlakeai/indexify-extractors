@@ -1,6 +1,6 @@
 # LLM Extractor
 
-This is a LLM based Extractor that supports multiple LLMs. By default it uses OpenAI and works on the Content of previous extractor as message, however we can manually overwrite prompt and message.
+This is a LLM based Extractor that supports multiple LLMs. The extractor uses OpenAI by default, with ability to use other LLMs as well and works on the Content of previous extractor as message, however we can manually overwrite prompt and message. We support Gemini 1.5 Pro which has 1 million token context window that can process vast amounts of information in one go — including 11 hours of audio transcript, codebases with over 30,000 lines of code or over 700,000 words. We also support using any open source LLM from Hugging Face if you want to run locally.
 
 ### Example:
 ##### input:
