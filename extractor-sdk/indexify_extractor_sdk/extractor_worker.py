@@ -55,6 +55,7 @@ def _extract_content(
 ) -> Dict[str, Union[List[Feature], List[Content]]]:
     result = {}
 
+    # Iterate over available extractors
     for extractor_name, extractor_wrapper in extractor_wrapper_map.items():
         # Get task IDs using the extractor
         task_ids = [
@@ -62,6 +63,10 @@ def _extract_content(
             for task_id, task_extractor_name in task_extractor_map.items()
             if extractor_name == task_extractor_name
         ]
+
+        # Skip if no tasks are using the extractor
+        if len(task_ids) == 0:
+            continue
 
         # Filter task contents and params using the task IDs
         task_contents = {}
