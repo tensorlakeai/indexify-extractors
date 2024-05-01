@@ -5,6 +5,7 @@ import concurrent
 from .downloader import get_db_path
 import sqlite3
 import os
+import sys
 
 
 class ExtractorModule(BaseModel):
@@ -20,8 +21,34 @@ def create_extractor_wrapper_map(ids: List[str] = []):
 
     conn = sqlite3.connect(get_db_path())
     cur = conn.cursor()
-    cur.execute("SELECT id, name FROM extractors")
-    records = cur.fetchall()
+    records = []
+
+    # When running the extractor worker as Docker container,
+    # the database does not exist because the downloader is not run.
+    # So just use the ExtractorWrapper from the provided IDs.
+    try:
+        cur.execute("SELECT id, name FROM extractors")
+        records = cur.fetchall()
+    except sqlite3.OperationalError:
+        conn.close()
+
+        print("adding extractor from environment")
+        extractor = os.environ.get("EXTRACTOR_PATH")
+
+        extractor_directory = os.path.join(
+            os.path.expanduser("~"),
+            ".indexify-extractors",
+            os.path.basename(extractor.split(".")[0])
+        )
+
+        sys.path.append(extractor_directory)
+
+        module, cls = extractor.split(":")
+        extractor_wrapper = ExtractorWrapper(module, cls)
+        description = extractor_wrapper.describe()
+        name = description.name
+
+        records = [(extractor, name)]
 
     # Return error if no extractors are found
     if len(records) == 0:

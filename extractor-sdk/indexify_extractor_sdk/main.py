@@ -84,9 +84,6 @@ def join_server(
 ):
     print_version()
 
-    if not extractor:
-        print("joining all extractors")
-
     # Check if any extractors are downloaded.
     path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
     if not os.path.isdir(path):
