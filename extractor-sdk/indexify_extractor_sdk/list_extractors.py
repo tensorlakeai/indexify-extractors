@@ -29,7 +29,6 @@ def list_extractors(extractor_type: Optional[str] = None):
     table.add_column("Name", style="cyan")
     table.add_column("Type", style="magenta")
     table.add_column("Download Link", style="orange3")
-    table.add_column("Run Command", style="green")
 
     for extractor in extractor_data:
         if extractor_type and extractor_type != extractor.get("type"):
@@ -41,7 +40,6 @@ def list_extractors(extractor_type: Optional[str] = None):
             module_name.split(".")[0],
             extractor.get("type"),
             f"hub://{extractor.get('type')}/{name}",
-            f"indexify-extractor join-server {module_name}",
         )
 
     console = Console()

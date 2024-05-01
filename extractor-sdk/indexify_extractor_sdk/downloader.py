@@ -47,7 +47,7 @@ def print_instructions(directory_path):
     if not os.environ.get("VIRTUAL_ENV"):
         message += f"source {venv_path}/bin/activate\n"
 
-    message += f"indexify-extractor join-server {os.path.basename(directory_path)}.{find_extractor_subclasses(directory_path)}[/]"
+    message += f"indexify-extractor join-server[/]"
     console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
     
     
