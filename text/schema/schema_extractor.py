@@ -2,12 +2,14 @@ from typing import List, Union, Optional
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 from transformers import pipeline
+import os
 from openai import OpenAI
 import google.generativeai as genai
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class SchemaExtractorConfig(BaseModel):
     service: str = Field(default='openai')
+    oai_model: Optional[str] = Field(default='gpt-3.5-turbo')
     key: Optional[str] = Field(default=None)
     schema: dict = Field(default={'properties': {'name': {'title': 'Name', 'type': 'string'}}, 'required': ['name'], 'title': 'User', 'type': 'object'})
     data: Optional[str] = Field(default=None)
@@ -27,6 +29,7 @@ class SchemaExtractor(Extractor):
         text = content.data.decode("utf-8")
 
         service = params.service
+        oai_model = params.oai_model
         key = params.key
         schema = params.schema
         data = params.data
@@ -35,19 +38,23 @@ class SchemaExtractor(Extractor):
             data = text
 
         if service == "openai":
-            if key is None:
-                client = OpenAI()
+            if ('OPENAI_API_KEY' not in os.environ) and (key is None):
+                response_content = "The OPENAI_API_KEY environment variable is not present."
+                feature = Feature.metadata(value={"model": oai_model}, name="text")
             else:
-                client = OpenAI(api_key=key)
-            response = client.chat.completions.create(
-                model="gpt-4-turbo",
-                messages=[
-                    {"role": "system", "content": additional_messages + str(schema)},
-                    {"role": "user", "content": data}
-                ]
-            )
-            response_content = response.choices[0].message.content
-            feature = Feature.metadata(value={"model": response.model, "completion_tokens": response.usage.completion_tokens, "prompt_tokens": response.usage.prompt_tokens}, name="text")
+                if ('OPENAI_API_KEY' in os.environ) and (key is None):
+                    client = OpenAI()
+                else:
+                    client = OpenAI(api_key=key)
+                response = client.chat.completions.create(
+                    model=oai_model,
+                    messages=[
+                        {"role": "system", "content": additional_messages + str(schema)},
+                        {"role": "user", "content": data}
+                    ]
+                )
+                response_content = response.choices[0].message.content
+                feature = Feature.metadata(value={"model": response.model, "completion_tokens": response.usage.completion_tokens, "prompt_tokens": response.usage.prompt_tokens}, name="text")
         
         if service == "gemini":
             if key != None:
