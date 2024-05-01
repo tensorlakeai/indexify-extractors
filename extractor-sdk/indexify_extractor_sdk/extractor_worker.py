@@ -6,6 +6,7 @@ from .downloader import get_db_path
 import sqlite3
 import os
 import sys
+import json
 
 
 class ExtractorModule(BaseModel):
@@ -108,7 +109,7 @@ def _extract_content(
         inner = task_params_map["dummy_task_id"]
         for task_id in task_ids:
             params[task_id] = inner[task_id]
-        task_params = {"dummy_task_id": params}
+        task_params = {"dummy_task_id": json.dumps(params)}
 
         # Extract content using the right extractor
         extracted = extractor_wrapper.extract_batch(task_contents, task_params)
