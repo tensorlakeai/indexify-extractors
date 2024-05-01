@@ -132,6 +132,9 @@ def get_extractor_full_name(directory: str):
     name = find_extractor_subclasses(path)
     return f"{directory}.{name}"
 
+def sanitize_db_value(value: str) -> str:
+    return value.replace("'", "''")
+
 def serialize_embedding_schemas(embedding_schemas) -> str:
     schemas = {}
     for name, embedding_schema in embedding_schemas.items():
@@ -174,7 +177,8 @@ def save_extractor_description(id: str, description: ExtractorDescription):
         ) VALUES (
             '{id}', '{description.name}', '{sanitized_description}',
             '{input_params}', '{mime_types}',
-            '{metadata_schemas}', '{embedding_schemas}'
+            '{sanitize_db_value(metadata_schemas)}',
+            '{sanitize_db_value(embedding_schemas)}'
         )
     """)
 
