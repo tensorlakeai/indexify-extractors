@@ -42,10 +42,15 @@ def join(
     ingestion_addr: str = "localhost:8900",
     advertise_addr: Optional[str] = None,
     config_path: Optional[str] = None,
+    extractor: str = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
 
-    executor = create_executor(workers=workers)
+    extractors = []
+    if extractor:
+        extractors.append(extractor)
+
+    executor = create_executor(workers=workers, extractor_ids=extractors)
     asyncio.set_event_loop(asyncio.new_event_loop())
     descriptions: List[ExtractorDescription] = asyncio.get_event_loop().run_until_complete(
         describe(asyncio.get_event_loop(), executor)

@@ -62,6 +62,11 @@ def run_local(
 
 @typer_app.command(help="Joins the executor to the coordinator server")
 def join_server(
+    # optional, default to joining all extractor.
+    extractor: str = typer.Argument(
+        None,
+        help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
+    ),
     coordinator_addr: str = "localhost:8950",
     ingestion_addr: str = "localhost:8900",
     listen_port: int = typer.Option(
@@ -79,6 +84,9 @@ def join_server(
 ):
     print_version()
 
+    if not extractor:
+        print("joining all extractors")
+
     # Check if any extractors are downloaded.
     path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
     if not os.path.isdir(path):
@@ -94,7 +102,8 @@ def join_server(
         ingestion_addr=ingestion_addr,
         listen_port=listen_port,
         advertise_addr=advertise_addr,
-        config_path=config_path
+        config_path=config_path,
+        extractor=extractor,
     )
 
 

@@ -14,7 +14,7 @@ class ExtractorModule(BaseModel):
 # str here is ExtractorDescription.name
 extractor_wrapper_map: Dict[str, ExtractorWrapper] = {}
 
-def create_extractor_wrapper_map():
+def create_extractor_wrapper_map(ids: List[str] = []):
     global extractor_wrapper_map
     print("creating extractor wrappers")
 
@@ -32,6 +32,9 @@ def create_extractor_wrapper_map():
         )
 
     for row in records:
+        if len(ids) > 0 and row[0] not in ids:
+            continue
+
         print(f"adding extractor: {row[1]}")
         module, cls = row[0].split(":")
         extractor_wrapper = ExtractorWrapper(module, cls)
@@ -40,11 +43,12 @@ def create_extractor_wrapper_map():
     conn.close()
 
 
-def create_executor(workers: int):
+def create_executor(workers: int, extractor_ids: List[str] = []):
     print("creating executor")
     return concurrent.futures.ProcessPoolExecutor(
         initializer=create_extractor_wrapper_map,
         max_workers=workers,
+        initargs=(extractor_ids,)
     )
 
 
