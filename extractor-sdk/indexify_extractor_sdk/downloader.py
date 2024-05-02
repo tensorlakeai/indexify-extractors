@@ -144,22 +144,21 @@ def save_extractor_description(id: str, description: ExtractorDescription):
     cur = conn.cursor()
 
     # Check if the extractor already exists
-    cur.execute(f"""
+    cur.execute("""
         SELECT id 
         FROM extractors 
-        WHERE id='{id}'
-    """)
+        WHERE id=?
+    """, [id])
 
     if cur.fetchone():
         # delete the existing extractor record.
         # This is to ensure that the database is always
         # up-to-date with the latest extractor info.
-        cur.execute(f"""
+        cur.execute("""
             DELETE FROM extractors
-            WHERE id='{id}'
-        """)
+            WHERE id=?
+        """, [id])
 
-    sanitized_description = description.description.replace("'", "''")
     input_params: str = description.input_params if description.input_params else None
 
     # Convert the lists to JSON strings
@@ -168,15 +167,13 @@ def save_extractor_description(id: str, description: ExtractorDescription):
     metadata_schemas = json.dumps(description.metadata_schemas)
 
     # Insert the extractor info into the database
-    cur.execute(f"""
+    cur.execute("""
         INSERT INTO extractors (
             id, name, description, input_params, input_mime_types, metadata_schemas, embedding_schemas
         ) VALUES (
-            '{id}', '{description.name}', '{sanitized_description}',
-            '{input_params}', '{mime_types}',
-            '{metadata_schemas}', '{embedding_schemas}'
+            ?, ?, ?, ?, ?, ?, ?
         )
-    """)
+    """, [id, description.name, description.description, input_params, mime_types, metadata_schemas, embedding_schemas])
 
     conn.commit()
     conn.close()
