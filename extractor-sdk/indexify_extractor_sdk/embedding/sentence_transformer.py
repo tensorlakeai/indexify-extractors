@@ -23,7 +23,8 @@ class SentenceTransformersEmbedding:
         self._tokenizer = AutoTokenizer.from_pretrained(
             f"sentence-transformers/{model_name}"
         )
-        self._model = AutoModel.from_pretrained(f"sentence-transformers/{model_name}")
+        self._model = AutoModel.from_pretrained(f"sentence-transformers/{model_name}", torchscript=True)
+        self._model.eval()
 
     def embed_ctx(self, inputs: List[str]) -> List[List[float]]:
         result = self._embed(inputs)
