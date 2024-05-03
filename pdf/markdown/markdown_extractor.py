@@ -1,13 +1,14 @@
 from typing import List, Union
 import io
+from marker.convert import convert_single_pdf
+from marker.models import load_all_models
 import json
 from indexify_extractor_sdk import Content, Extractor, Feature
-from pypdf import PdfReader
 
-class PDFExtractor(Extractor):
-    name = "tensorlake/pdf-extractor"
-    description = "PDF Extractor for Texts, Images & Tables"
-    system_dependencies = ["poppler-utils"]
+class MarkdownExtractor(Extractor):
+    name = "tensorlake/markdown-extractor"
+    description = "Markdown Extractor for PDFs"
+    system_dependencies = []
     input_mime_types = ["application/pdf"]
 
     def __init__(self):
@@ -15,24 +16,12 @@ class PDFExtractor(Extractor):
 
     def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         contents = []
-
-        reader = PdfReader(io.BytesIO(content.data))
-        for i in range(len(reader.pages)):
-            page = reader.pages[i]
-            page_text = page.extract_text()
-            feature = Feature.metadata(value={"page": i+1}, name="text")
-            contents.append(Content.from_text(page_text, features=[feature]))
-
-            for img in page.images:
-                feature = Feature.metadata({"page": i+1}, name="image")
-                contents.append(Content(content_type="image/png", data=img.data, features=[feature]))
-
-        tables = get_tables(content.data)
-
-        for page, content in tables.items():
-            feature = Feature.metadata({"page": int(page)}, name="table")
-            contents.append(Content(content_type="application/json", data=json.dumps(content), features=[feature]))
+        model_lst = load_all_models()
+        full_text, out_meta = convert_single_pdf(io.BytesIO(content.data), model_lst, max_pages=None, parallel_factor=1)
         
+        feature = Feature.metadata(value=out_meta, name="text")
+        contents.append(Content.from_text(full_text, features=[feature]))
+
         return contents
 
     def sample_input(self) -> Content:
@@ -41,6 +30,6 @@ class PDFExtractor(Extractor):
 if __name__ == "__main__":
     f = open("2310.16944.pdf", "rb")
     pdf_data = Content(content_type="application/pdf", data=f.read())
-    extractor = PDFExtractor()
+    extractor = MarkdownExtractor()
     results = extractor.extract(pdf_data)
     print(results)
