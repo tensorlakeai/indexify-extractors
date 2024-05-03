@@ -56,7 +56,7 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         cur.execute(f"SELECT * FROM extractors WHERE id = '{id}'")
         record = cur.fetchone()
         if record is None:
-            raise ValueError(f"Extractor {id} not found in the database.")
+            raise ValueError(f"Extractor <{id}> not found locally.")
 
         load_extractor_description(record)
         extractor_wrapper = create_extractor_wrapper(record[0])

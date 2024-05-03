@@ -42,7 +42,7 @@ def join(
     ingestion_addr: str = "localhost:8900",
     advertise_addr: Optional[str] = None,
     config_path: Optional[str] = None,
-    extractor: str = None,
+    extractor: Optional[str] = None,
 ):
     print(f"joining {coordinator_addr} and sending extracted content to {ingestion_addr}")
     executor = create_executor(workers=workers, extractor_id=extractor)
