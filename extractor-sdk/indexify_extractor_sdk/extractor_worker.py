@@ -1,5 +1,5 @@
 from typing import List, Union, Dict, Optional
-from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription
+from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription, EmbeddingSchema
 from pydantic import Json, BaseModel
 import concurrent
 from .downloader import get_db_path
@@ -53,13 +53,13 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
     # the extractor ID is passed as an environment variable.
     # If there is ID or EXTRACTOR_PATH, load the extractor singularly.
     if id:
-        cur.execute(f"SELECT id, name FROM extractors WHERE id = '{id}'")
+        cur.execute(f"SELECT * FROM extractors WHERE id = '{id}'")
         record = cur.fetchone()
         if record is None:
             raise ValueError(f"Extractor {id} not found in the database.")
 
+        load_extractor_description(record)
         extractor_wrapper = create_extractor_wrapper(record[0])
-        load_extractor_description(extractor_wrapper)
         extractor_wrapper_map[record[1]] = extractor_wrapper
     elif os.environ.get("EXTRACTOR_PATH"):
         print("adding extractor from environment")
@@ -74,26 +74,49 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         # This has to be done first to import the extractor module correctly
         sys.path.append(extractor_directory)
 
+        # TODO: Optimize this to load description from the database.
         extractor_wrapper = create_extractor_wrapper(extractor)
-        description = load_extractor_description(extractor_wrapper)
+        description = extractor_wrapper.describe()
         name = description.name
+        extractor_descriptions.append(description)
         extractor_wrapper_map[name] = extractor_wrapper
     else:
-        cur.execute("SELECT id, name FROM extractors")
+        cur.execute("SELECT * FROM extractors")
         records = cur.fetchall()
         for record in records:
             # This only loads the description of the extractor to be reported
             # to the coordinator. The actual extractor will be loaded when needed.
             print(f"reporting available extractor: {record[1]}")
-            extractor_wrapper = create_extractor_wrapper(record[0])
-            load_extractor_description(extractor_wrapper)
+            load_extractor_description(record)
 
     conn.close()
 
 
-def load_extractor_description(extractor_wrapper: ExtractorWrapper) -> ExtractorDescription:
-    global extractor_descriptions
-    description = extractor_wrapper.describe()
+def load_extractor_description(record) -> ExtractorDescription:
+    """Load the description of an extractor from SQLite database record."""
+
+    # Rebuild the embedding schemas.
+    _embedding_schemas =  json.loads(record[6])
+    embedding_schemas = {}
+    for name, schema in _embedding_schemas.items():
+        schema = json.loads(schema)
+        embedding_schemas[name] = EmbeddingSchema(
+            dim=schema["dim"],
+            distance=schema["distance"],
+        )
+
+    description = ExtractorDescription(
+        name=record[1],
+        version="",
+        description=record[2],
+        python_dependencies=[],
+        system_dependencies=[],
+        input_params=record[3],
+        input_mime_types=json.loads(record[4]),
+        metadata_schemas=json.loads(record[5]),
+        embedding_schemas=embedding_schemas
+    )
+
     extractor_descriptions.append(description)
     return description
 

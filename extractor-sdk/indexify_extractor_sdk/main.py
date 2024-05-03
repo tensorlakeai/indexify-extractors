@@ -60,7 +60,7 @@ def run_local(
     indexify_extractor.local(extractor, text, file)
 
 
-@typer_app.command(help="Joins the executor to the coordinator server")
+@typer_app.command(help="Joins the extractors to the coordinator server")
 def join_server(
     # optional, default to joining all extractor.
     extractor: str = typer.Argument(
