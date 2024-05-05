@@ -1,5 +1,5 @@
 ocrmypdf
 libmagic
 tesseract
-tesseract-lang
 fitz
+marker-pdf
