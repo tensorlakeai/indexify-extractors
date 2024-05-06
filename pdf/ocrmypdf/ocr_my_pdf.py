@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from indexify_extractor_sdk import Extractor, Content, Feature
 import tempfile
 import ocrmypdf
-from pypdf import PdfReader
+import fitz
 
 
 class OCRMyPDFConfig(BaseModel):
@@ -33,13 +33,13 @@ class OCRMyPDFExtractor(Extractor):
 
                 new_content = []
                 # extract text from each page
-                reader = PdfReader(outtmpfile.name)
-                for i, page in enumerate(reader.pages):
+                doc = fitz.open(outtmpfile.name)
+                for i, page in enumerate(doc):
                     new_content.append(
                         Content(
                             content_type="text/plain",
-                            data=bytes(page.extract_text(), "utf-8"),
-                            features=[Feature.metadata(value={"page": i})],
+                            data=bytes(page.get_text(), "utf-8"),
+                            features=[Feature.metadata(value={"page": i+1}, name="text")],
                         )
                     )
 
@@ -50,4 +50,9 @@ class OCRMyPDFExtractor(Extractor):
 
 
 if __name__ == "__main__":
-    OCRMyPDFExtractor().extract_sample_input()
+    f = open("sample.pdf", "rb")
+    pdf_data = Content(content_type="application/pdf", data=f.read())
+    input_params = OCRMyPDFConfig()
+    extractor = OCRMyPDFExtractor()
+    results = extractor.extract(pdf_data, params=input_params)
+    print(results)

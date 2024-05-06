@@ -1,9 +1,9 @@
 from typing import List, Union
-import io
 import json
 from indexify_extractor_sdk import Content, Extractor, Feature
 from utils.tt_module import get_tables
-from pypdf import PdfReader
+import fitz
+import tempfile
 
 class PDFExtractor(Extractor):
     name = "tensorlake/pdf-extractor"
@@ -16,17 +16,23 @@ class PDFExtractor(Extractor):
 
     def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         contents = []
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as inputtmpfile:
+            inputtmpfile.write(content.data)
+            inputtmpfile.flush()
 
-        reader = PdfReader(io.BytesIO(content.data))
-        for i in range(len(reader.pages)):
-            page = reader.pages[i]
-            page_text = page.extract_text()
-            feature = Feature.metadata(value={"page": i+1}, name="text")
-            contents.append(Content.from_text(page_text, features=[feature]))
+            doc = fitz.open(inputtmpfile.name)
+            for i in range(len(doc)):
+                page = doc[i]
+                page_text = page.get_text()
+                image_list = page.get_images()
+                feature = Feature.metadata(value={"page": i+1}, name="text")
+                contents.append(Content.from_text(page_text, features=[feature]))
 
-            for img in page.images:
-                feature = Feature.metadata({"page": i+1}, name="image")
-                contents.append(Content(content_type="image/png", data=img.data, features=[feature]))
+                for img in image_list:
+                    xref = img[0]
+                    pix = fitz.Pixmap(doc, xref)
+                    feature = Feature.metadata({"page": i+1}, name="image")
+                    contents.append(Content(content_type="image/png", data=pix.tobytes(), features=[feature]))
 
         tables = get_tables(content.data)
 
