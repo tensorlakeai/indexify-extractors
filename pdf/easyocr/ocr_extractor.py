@@ -2,7 +2,8 @@ from typing import List, Union
 import io
 from indexify_extractor_sdk import Content, Extractor, Feature
 from utils.ocr_module import get_text
-from pypdf import PdfReader
+import fitz
+import tempfile
 
 class OCRExtractor(Extractor):
     name = "tensorlake/easyocr"
@@ -22,17 +23,24 @@ class OCRExtractor(Extractor):
             image_text = get_text(content.data)
             contents.append(Content.from_text(image_text, features=[feature]))
         else:
-            reader = PdfReader(io.BytesIO(content.data))
-            for i in range(len(reader.pages)):
-                page = reader.pages[i]
-                page_text = page.extract_text()
-                feature = Feature.metadata(value={"page": i+1}, name="text")
-                if page_text:
-                    contents.append(Content.from_text(page_text, features=[feature]))
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as inputtmpfile:
+                inputtmpfile.write(content.data)
+                inputtmpfile.flush()
 
-                for img in page.images:
-                    image_text = get_text(img.data)
-                    contents.append(Content.from_text(image_text, features=[feature]))
+                doc = fitz.open(inputtmpfile.name)
+                for i in range(len(doc)):
+                    page = doc[i]
+                    page_text = page.get_text()
+                    image_list = page.get_images()
+                    feature = Feature.metadata(value={"page": i+1}, name="text")
+                    if page_text:
+                        contents.append(Content.from_text(page_text, features=[feature]))
+
+                    for img in image_list:
+                        xref = img[0]
+                        pix = fitz.Pixmap(doc, xref)
+                        image_text = get_text(pix.tobytes())
+                        contents.append(Content.from_text(image_text, features=[feature]))
         
         return contents
 

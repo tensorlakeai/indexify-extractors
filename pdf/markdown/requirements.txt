@@ -1,5 +1,4 @@
 ocrmypdf
-libmagic
 tesseract
-fitz
+PyMuPDF
 marker-pdf

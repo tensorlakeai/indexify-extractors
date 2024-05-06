@@ -1,5 +1,4 @@
 from typing import List, Union
-import io
 from marker.convert import convert_single_pdf
 from marker.models import load_all_models
 import tempfile
