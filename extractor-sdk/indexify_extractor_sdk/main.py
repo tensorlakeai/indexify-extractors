@@ -7,6 +7,7 @@ import os
 from .list_extractors import list_extractors
 import sys
 from .downloader import get_db_path
+from .base_extractor import EXTRACTORS_PATH
 
 import multiprocessing
 from typing_extensions import Annotated
@@ -85,11 +86,9 @@ def join_server(
     print_version()
 
     # Check if any extractors are downloaded.
-    path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
-    if not os.path.isdir(path):
-        print(path)
+    if not os.path.isdir(EXTRACTORS_PATH):
         raise Exception("No extractors found. Download extractors using the downloader.")
-    
+
     print("workers ", workers)
     print("config path provided ", config_path)
 
