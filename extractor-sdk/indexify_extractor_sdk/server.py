@@ -13,6 +13,7 @@ from fastapi import FastAPI, APIRouter
 
 
 class ExtractionRequest(BaseModel):
+    extractor_name: str
     content: ApiContent
     input_params: Optional[Json]
 
@@ -42,11 +43,15 @@ class ServerRouter:
         )
         task_id = "dummy_task_id"
         content_dict: Dict[str, Content] = {task_id: content}
-        input_params = (
-            json.dumps(request.input_params) if request.input_params else None
-        )
+        params_map = {task_id: request.input_params}
+        extractor_map = {task_id: request.extractor_name}
+
         extractor_out: Dict[str, List[Content]] = await extract_content(
-            loop, self._executor, content_dict, params=input_params
+            loop,
+            self._executor,
+            content_dict,
+            params=params_map,
+            extractors=extractor_map
         )
         api_content: List[ApiContent] = []
         api_features: List[ApiFeature] = []

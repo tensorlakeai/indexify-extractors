@@ -9,7 +9,7 @@ pip install indexify-extractor-sdk
 ## Download and Run
 ```bash
 indexify-extractor download <download-link>
-indexify-extractor join-server <extractor-module-name>
+indexify-extractor join-server
 ```
 
 | Name           | Download link                | Extractor Module Name                           |

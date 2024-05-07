@@ -47,7 +47,7 @@ def print_instructions(directory_path):
     if not os.environ.get("VIRTUAL_ENV"):
         message += f"source {venv_path}/bin/activate\n"
 
-    message += f"indexify-extractor join-server {os.path.basename(directory_path)}.{find_extractor_subclasses(directory_path)}[/]"
+    message += f"indexify-extractor join-server[/]"
     console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
     
     
@@ -131,6 +131,9 @@ def get_extractor_full_name(directory: str):
     path = os.path.join(os.path.expanduser("~"), ".indexify-extractors", directory)
     name = find_extractor_subclasses(path)
     return f"{directory}.{name}"
+
+def sanitize_db_value(value: str) -> str:
+    return value.replace("'", "''")
 
 def serialize_embedding_schemas(embedding_schemas) -> str:
     schemas = {}

@@ -182,14 +182,14 @@ class Content(_message.Message):
     def __init__(self, mime: _Optional[str] = ..., data: _Optional[bytes] = ..., features: _Optional[_Iterable[_Union[Feature, _Mapping]]] = ...) -> None: ...
 
 class RegisterExecutorRequest(_message.Message):
-    __slots__ = ("executor_id", "addr", "extractor")
+    __slots__ = ("executor_id", "addr", "extractors")
     EXECUTOR_ID_FIELD_NUMBER: _ClassVar[int]
     ADDR_FIELD_NUMBER: _ClassVar[int]
-    EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTORS_FIELD_NUMBER: _ClassVar[int]
     executor_id: str
     addr: str
-    extractor: Extractor
-    def __init__(self, executor_id: _Optional[str] = ..., addr: _Optional[str] = ..., extractor: _Optional[_Union[Extractor, _Mapping]] = ...) -> None: ...
+    extractors: _containers.RepeatedCompositeFieldContainer[Extractor]
+    def __init__(self, executor_id: _Optional[str] = ..., addr: _Optional[str] = ..., extractors: _Optional[_Iterable[_Union[Extractor, _Mapping]]] = ...) -> None: ...
 
 class RegisterExecutorResponse(_message.Message):
     __slots__ = ("executor_id",)

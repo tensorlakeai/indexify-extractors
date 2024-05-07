@@ -55,7 +55,7 @@ indexify-extractor run-local minilm_l6:MiniLML6Extractor --text "hello world" //
 #### Run Extractors as a Service for Continous Extraction and Indexing with Indexify Server
 To run the extractor with Indexify's control plane such that it can continuously extract from content -
 ```bash
-indexify-extractor join-server minilm_l6:MiniLML6Extractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
+indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 The `coordinator-addr` and `ingestion-addr` above are the default addresses exposed by the Indexify server to get extraction instructions and to upload extracted data, they can be configured in the server configuration.
 
@@ -113,7 +113,7 @@ indexify-extractor run-local my_extractor:MyExtractor --text "hello world" // or
 
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
 ```
-indexify-extractor join-server my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
+indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-addr localhost:8900
 ```
 
 #### Package the Extractor 

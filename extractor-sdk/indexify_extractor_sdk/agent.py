@@ -151,7 +151,7 @@ class ExtractorAgent:
     def __init__(
         self,
         executor_id: str,
-        extractor: coordinator_service_pb2.Extractor,
+        extractors: List[coordinator_service_pb2.Extractor],
         coordinator_addr: str,
         executor: concurrent.futures.ProcessPoolExecutor,
         listen_port: int,
@@ -181,7 +181,7 @@ class ExtractorAgent:
 
         self._task_store: TaskStore = TaskStore()
         self._executor_id = executor_id
-        self._extractor = extractor
+        self._extractors = extractors
         self._has_registered = False
         self._coordinator_addr = coordinator_addr
         self._ingestion_addr = ingestion_addr
@@ -217,7 +217,7 @@ class ExtractorAgent:
         req = coordinator_service_pb2.RegisterExecutorRequest(
             executor_id=self._executor_id,
             addr=self._advertise_addr,
-            extractor=self._extractor,
+            extractors=self._extractors,
         )
         return await self._stub.RegisterExecutor(req)
 
@@ -263,6 +263,7 @@ class ExtractorAgent:
         content_bytes = await download_content(content_urls)
         content_list = {}
         task_params_map = {}
+        task_extractor_map = {}
         for task_id, bytes in content_bytes.items():
             if isinstance(bytes, Exception):
                 print(f"failed to download content{bytes} for task {task_id}")
@@ -274,6 +275,7 @@ class ExtractorAgent:
             c = create_content(bytes, tasks_to_launch[task_id])
             content_list[task_id] = c
             task_params_map[task_id] = tasks_to_launch[task_id].input_params
+            task_extractor_map[task_id] = tasks_to_launch[task_id].extractor
         if len(content_list) == 0:
             return
         try:
@@ -285,6 +287,7 @@ class ExtractorAgent:
                     executor=self._executor,
                     content_list=content_list,
                     params=task_params_map,
+                    extractors=task_extractor_map,
                 )
             )
         except Exception as e:

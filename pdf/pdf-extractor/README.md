@@ -18,7 +18,7 @@ Content(content_type="application/pdf", data=f.read())
 ##### code:
 ```python
 !indexify-extractor download hub://pdf/pdf-extractor
-!indexify-extractor join-server pdf-extractor.pdf_extractor:PDFExtractor
+!indexify-extractor join-server
 
 from indexify import IndexifyClient
 client = IndexifyClient()

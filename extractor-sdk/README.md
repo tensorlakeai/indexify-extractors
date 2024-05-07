@@ -57,6 +57,6 @@ indexify-extractor local my_extractor.py:MyExtractor --text "hello"
 
 Once you are ready to deploy the new extractor and ready to build pipelines with it. Package the extractor and deploy as many copies you want, and point it to the indexify server. Indexify server has two addresses, one for sending your extractor the extraction task, and another endpoint for your extractor to write the extracted content.
 ```
-indexify-extractor join-server my_extractor.py:MyExtractor --coordinator-addr localhost:8950 --ingestion-addr:8900
+indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-addr:8900
 ```
 
