@@ -6,9 +6,11 @@ from .coordinator_service_pb2_grpc import CoordinatorServiceStub
 import grpc
 import json
 from typing import List, Dict, Union, Optional
+from .base_extractor import ExtractorDescription
 from .base_extractor import Content, Feature, Embedding
 from .content_downloader import download_content, create_content
-from .extractor_worker import extract_content
+from .extractor_worker import extract_content, create_executor, describe
+from concurrent.futures.process import BrokenProcessPool
 from .ingestion_api_models import (
     ApiContent,
     ApiFeature,
@@ -154,11 +156,15 @@ class ExtractorAgent:
         extractors: List[coordinator_service_pb2.Extractor],
         coordinator_addr: str,
         executor: concurrent.futures.ProcessPoolExecutor,
+        num_workers,
+        extractor_arg,
         listen_port: int,
         advertise_addr: Optional[str],
         ingestion_addr: str = "localhost:8900",
         config_path: Optional[str] = None,
     ):
+        self.num_workers = num_workers
+        self.extractor_arg = extractor_arg
         self._use_tls = False
         if config_path:
             with open(config_path, 'r') as f:
@@ -290,6 +296,13 @@ class ExtractorAgent:
                     extractors=task_extractor_map,
                 )
             )
+        except BrokenProcessPool as bp:
+            print(f"failed to execute tasks {bp}, retrying")
+            self._executor.shutdown(wait=True, cancel_futures=True)
+            self._executor = create_executor(workers=self.num_workers, extractor_id=self.extractor_arg)
+            for task_id in content_list.keys():
+                self._task_store.retriable_failure(task_id)
+            return
         except Exception as e:
             task_ids = ",".join(content_list.keys())
             print(f"failed to execute tasks {task_ids} {e}")
