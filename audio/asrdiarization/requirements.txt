@@ -1,0 +1,8 @@
+accelerate==0.27.2
+torch==2.2.1
+pyannote-audio==3.1.1
+transformers==4.38.2
+numpy==1.26.4
+torchaudio==2.2.1
+pydantic==2.6.3
+pydantic-settings==2.2.1
