@@ -8,7 +8,7 @@ import subprocess
 from rich.console import Console
 from rich.panel import Panel
 from .extractor_worker import ExtractorWrapper
-from .base_extractor import ExtractorDescription
+from .base_extractor import ExtractorDescription, EXTRACTORS_PATH
 
 console = Console()
 
@@ -77,12 +77,7 @@ def install_dependencies(directory_path):
 
 def get_db_path():
     """Returns the path the extractors database file."""
-    base_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
-
-    if not os.path.exists(base_path):
-        os.makedirs(base_path)
-
-    db_path = os.path.join(base_path, "extractors.db")
+    db_path = os.path.join(EXTRACTORS_PATH, "extractors.db")
     return db_path
 
 def create_extractor_db():
@@ -128,7 +123,7 @@ def get_extractor_description(name: str) -> ExtractorDescription:
     return wrapper.describe()
 
 def get_extractor_full_name(directory: str):
-    path = os.path.join(os.path.expanduser("~"), ".indexify-extractors", directory)
+    path = os.path.join(EXTRACTORS_PATH, directory)
     name = find_extractor_subclasses(path)
     return f"{directory}.{name}"
 
@@ -189,22 +184,11 @@ def download_extractor(extractor_path):
     extractor_path = extractor_path.removeprefix("hub://")
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
 
-    directory_path = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
-
-    fs.get(extractor_path, directory_path, recursive=True)
+    fs.get(extractor_path, EXTRACTORS_PATH, recursive=True)
     base_extractor_path = os.path.basename(extractor_path)
-    install_dependencies(os.path.join(directory_path, base_extractor_path))
+    install_dependencies(os.path.join(EXTRACTORS_PATH, base_extractor_path))
 
     # Store the extractor info in the database
-
-    # Add the extractor path in the PYTHONPATH
-    sys.path.append(directory_path)
-    all_subdirs = [d for d in os.listdir(directory_path) ]
-    for dir in all_subdirs:
-        extractor_path = os.path.join(directory_path, dir)
-        if os.path.isdir(extractor_path)  and extractor_path not in sys.path:
-            print(f"Adding extractor dir: {extractor_path} to PYTHONPATH")
-            sys.path.append(extractor_path)
 
     extractor_full_name = get_extractor_full_name(base_extractor_path)
     description = get_extractor_description(extractor_full_name)

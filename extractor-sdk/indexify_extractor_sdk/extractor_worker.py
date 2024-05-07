@@ -1,5 +1,5 @@
 from typing import List, Union, Dict, Optional
-from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription, EmbeddingSchema
+from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription, EmbeddingSchema, EXTRACTORS_PATH
 from pydantic import Json, BaseModel
 import concurrent
 from .downloader import get_db_path
@@ -64,15 +64,6 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
     elif os.environ.get("EXTRACTOR_PATH"):
         print("adding extractor from environment")
         extractor = os.environ.get("EXTRACTOR_PATH")
-
-        extractor_directory = os.path.join(
-            os.path.expanduser("~"),
-            ".indexify-extractors",
-            os.path.basename(extractor.split(".")[0])
-        )
-
-        # This has to be done first to import the extractor module correctly
-        sys.path.append(extractor_directory)
 
         # TODO: Optimize this to load description from the database.
         extractor_wrapper = create_extractor_wrapper(extractor)
