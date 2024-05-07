@@ -70,7 +70,7 @@ def install_dependencies(directory_path):
             subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
         except FileNotFoundError as err:
             if "virtualenv" in str(err):
-                print("command virtualenv not found, did you install it? Try 'pip install virtualenv'")
+                console.print("[bold #f04318]command virtualenv not found, did you install it? Try 'pip install virtualenv'[/]")
                 return
             else:
                 raise
