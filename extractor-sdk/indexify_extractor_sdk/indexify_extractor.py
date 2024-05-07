@@ -80,6 +80,8 @@ def join(
         extractors=extractors,
         executor=executor,
         coordinator_addr=coordinator_addr,
+        num_workers=workers,
+        extractor_arg=extractor,
         listen_port=listen_port,
         ingestion_addr=ingestion_addr,
         advertise_addr=advertise_addr,

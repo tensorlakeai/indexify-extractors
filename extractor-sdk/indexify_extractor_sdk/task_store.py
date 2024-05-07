@@ -18,6 +18,7 @@ class TaskStore:
         self._tasks: Dict[str, coordinator_service_pb2.Task] = {}
         self._running_tasks: Dict[str, coordinator_service_pb2.Task] = {}
         self._finished: Dict[str, CompletedTask] = {}
+        self._retries: Dict[str, int] = {}
 
     def get_task(self, id) -> coordinator_service_pb2.Task:
         return self._tasks[id]
@@ -43,9 +44,23 @@ class TaskStore:
         return out
 
     def complete(self, outcome: CompletedTask):
+        self._retries.pop(outcome.task_id, None)
         self._finished[outcome.task_id] = outcome
         if outcome.task_id in self._running_tasks:
             self._running_tasks.pop(outcome.task_id)
+
+    def retriable_failure(self, task_id: str):
+        self._running_tasks.pop(task_id)
+        if task_id not in self._retries:
+            self._retries[task_id] = 0
+        self._retries[task_id] += 1
+        if self._retries[task_id] > 3:
+            self._retries.pop(task_id)
+            self.complete(
+                completed_task=CompletedTask(
+                    task_id=task_id, task_outcome="Failed", new_content=[], features=[]
+                )
+            )
 
     def mark_reported(self, task_id: str):
         self._tasks.pop(task_id)
