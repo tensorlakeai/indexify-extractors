@@ -19,9 +19,8 @@ class OCRExtractor(Extractor):
 
         suffix = f'.{content.content_type.split("/")[-1]}'
         if not suffix.endswith(".pdf"):
-            feature = Feature.metadata(name="image")
             image_text = get_text(content.data)
-            contents.append(Content.from_text(image_text, features=[feature]))
+            contents.append(Content.from_text(image_text))
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as inputtmpfile:
                 inputtmpfile.write(content.data)
