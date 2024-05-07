@@ -66,7 +66,17 @@ def install_dependencies(directory_path):
         # create env and install requirements
         print("Creating virtual environment...")
         version_str = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
+        try:
+            subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
+        except FileNotFoundError as err:
+            if "virtualenv" in str(err):
+                print("command virtualenv not found, did you install it? Try 'pip install virtualenv'")
+                return
+            else:
+                raise
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=} while attempting to create virtual envirnment.")
+            raise
         pip_path = os.path.join(venv_path, 'bin', 'pip')
 
         subprocess.check_call([pip_path, 'install', '-r', requirements_path])
