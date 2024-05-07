@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Dict, List, Type, Optional
+from types import ModuleType
 import json
-from importlib import import_module
+from importlib import util
 from typing import get_type_hints, Literal, Union, Dict
-
 from pydantic import BaseModel, Json, Field
 from genson import SchemaBuilder
 import requests
 import os
+import sys
+
+EXTRACTORS_PATH = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
 
 
 class EmbeddingSchema(BaseModel):
@@ -230,12 +233,42 @@ def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
-        module = import_module(module_name)
+        module = self._load_extractor_module(module_name)
         cls = getattr(module, class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
         extract_batch = getattr(self._instance, "extract_batch", None)
         self._has_batch_extract = True if callable(extract_batch) else False
+    
+    def _load_extractor_module(self, module_name: str) -> ModuleType:
+        """Load the extractor module from the extractor directory.
+        This method ensures that there is no name collision between extractor
+        modules and Python packages.
+
+        Args:
+        - module_name: The name of the module, e.g. "extractors.my_extractor".
+        """
+
+        # Create the full file path for the module source.
+        dir, mod = module_name.split(".")
+        file = mod + ".py"
+        full_path = os.path.join(EXTRACTORS_PATH, dir, file)
+
+        # Ensure the module is in the Python path.
+        if EXTRACTORS_PATH not in sys.path:
+            sys.path.append(EXTRACTORS_PATH)
+
+        module_dir = os.path.join(EXTRACTORS_PATH, dir)
+        if module_dir not in sys.path:
+            sys.path.append(module_dir)
+
+        # Load the module from the file path.
+        spec = util.spec_from_file_location(module_name, full_path)
+        module = util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+
+        return module
 
     def _param_from_json(self, param: Json) -> BaseModel:
         param_dict = json.loads(param) if param is not None else {}
