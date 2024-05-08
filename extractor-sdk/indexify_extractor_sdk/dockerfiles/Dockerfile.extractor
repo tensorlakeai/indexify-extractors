@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-WORKDIR /indexify
+WORKDIR /.indexify-extractors
 
 RUN apt-get update -y && \
     apt-get -y install git lsb-release ca-certificates apt-transport-https
@@ -9,8 +9,8 @@ RUN update-ca-certificates
 
 # Add Tini
 ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /indexify/tini
-RUN chmod +x /indexify/tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini tini
+RUN chmod +x tini
 
 RUN apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
     apt-get install -y  {{ system_dependencies }} && \
@@ -22,25 +22,25 @@ ENV EXTRACTOR_PATH {{ extractor_path }}
 
 RUN python3.11 -m venv ve
 # Use the virtualenv, to make sure we're using the right Python version
-ENV PATH="/indexify/ve/bin:$PATH"
+ENV PATH="/.indexify-extractors/ve/bin:$PATH"
 
 RUN pip3 install --no-input --upgrade pip && \
     pip3 install --no-input wheel && \
     pip3 install --no-input {{ additional_pip_flags }} {{ python_dependencies }}
 
 {% if dev %}
-COPY indexify_extractor_sdk /indexify/indexify_extractor_sdk/indexify_extractor_sdk
+COPY indexify_extractor_sdk indexify_extractor_sdk/indexify_extractor_sdk
 
-COPY README.md /indexify/indexify_extractor_sdk/README.md
-COPY pyproject.toml /indexify/indexify_extractor_sdk/pyproject.toml
+COPY README.md indexify_extractor_sdk/README.md
+COPY pyproject.toml indexify_extractor_sdk/pyproject.toml
 
-RUN cd /indexify/indexify_extractor_sdk && pip3 install .
+RUN cd indexify_extractor_sdk && pip3 install .
 {% else %}
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
-# Copy over the extractor as {{module_name}}.py into /indexify/{{module_name}}.py
-COPY . /indexify/
+# Copy over the extractor as {{module_name}}.py into /indexify-extractors/{{module_name}}.py
+COPY . indexify-extractors/
 
 ENV TOKENIZERS_PARALLELISM=true
 

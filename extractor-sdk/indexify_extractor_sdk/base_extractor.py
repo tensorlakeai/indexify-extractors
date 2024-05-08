@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Tuple, Dict, List, Type, Optional
 from types import ModuleType
 import json
-from importlib import util
+from importlib import import_module
 from typing import get_type_hints, Literal, Union, Dict
 from pydantic import BaseModel, Json, Field
 from genson import SchemaBuilder
@@ -11,6 +11,8 @@ import os
 import sys
 
 EXTRACTORS_PATH = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
+EXTRACTORS_MODULE = "indexify-extractors"
+EXTRACTOR_MODULE_PATH = os.path.join(EXTRACTORS_PATH, EXTRACTORS_MODULE)
 
 
 class EmbeddingSchema(BaseModel):
@@ -249,24 +251,24 @@ class ExtractorWrapper:
         - module_name: The name of the module, e.g. "extractors.my_extractor".
         """
 
-        # Create the full file path for the module source.
-        dir, mod = module_name.split(".")
-        file = mod + ".py"
-        full_path = os.path.join(EXTRACTORS_PATH, dir, file)
-
         # Ensure the module is in the Python path.
         if EXTRACTORS_PATH not in sys.path:
             sys.path.append(EXTRACTORS_PATH)
 
-        module_dir = os.path.join(EXTRACTORS_PATH, dir)
+        if EXTRACTOR_MODULE_PATH not in sys.path:
+            sys.path.append(EXTRACTOR_MODULE_PATH)
+
+        try:
+            dir = module_name.split(".")[0]
+        except IndexError:
+            dir = module_name
+
+        module_dir = os.path.join(EXTRACTOR_MODULE_PATH, dir)
         if module_dir not in sys.path:
             sys.path.append(module_dir)
 
         # Load the module from the file path.
-        spec = util.spec_from_file_location(module_name, full_path)
-        module = util.module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+        module = import_module(f"{EXTRACTORS_MODULE}.{module_name}")
 
         return module
 

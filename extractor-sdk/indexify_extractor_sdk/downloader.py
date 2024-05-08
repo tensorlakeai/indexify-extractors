@@ -8,7 +8,7 @@ import subprocess
 from rich.console import Console
 from rich.panel import Panel
 from .extractor_worker import ExtractorWrapper
-from .base_extractor import ExtractorDescription, EXTRACTORS_PATH
+from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH
 
 console = Console()
 
@@ -133,7 +133,7 @@ def get_extractor_description(name: str) -> ExtractorDescription:
     return wrapper.describe()
 
 def get_extractor_full_name(directory: str):
-    path = os.path.join(EXTRACTORS_PATH, directory)
+    path = os.path.join(EXTRACTOR_MODULE_PATH, directory)
     name = find_extractor_subclasses(path)
     return f"{directory}.{name}"
 
@@ -194,9 +194,9 @@ def download_extractor(extractor_path):
     extractor_path = extractor_path.removeprefix("hub://")
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
 
-    fs.get(extractor_path, EXTRACTORS_PATH, recursive=True)
+    fs.get(extractor_path, EXTRACTOR_MODULE_PATH, recursive=True)
     base_extractor_path = os.path.basename(extractor_path)
-    install_dependencies(os.path.join(EXTRACTORS_PATH, base_extractor_path))
+    install_dependencies(os.path.join(EXTRACTOR_MODULE_PATH, base_extractor_path))
 
     # Store the extractor info in the database
 
