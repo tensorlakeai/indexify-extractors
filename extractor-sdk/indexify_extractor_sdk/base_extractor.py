@@ -235,42 +235,12 @@ def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
-        module = self._load_extractor_module(module_name)
+        module = import_module(f"{EXTRACTORS_MODULE}.{module_name}")
         cls = getattr(module, class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
         extract_batch = getattr(self._instance, "extract_batch", None)
         self._has_batch_extract = True if callable(extract_batch) else False
-    
-    def _load_extractor_module(self, module_name: str) -> ModuleType:
-        """Load the extractor module from the extractor directory.
-        This method ensures that there is no name collision between extractor
-        modules and Python packages.
-
-        Args:
-        - module_name: The name of the module, e.g. "extractors.my_extractor".
-        """
-
-        # Ensure the module is in the Python path.
-        if EXTRACTORS_PATH not in sys.path:
-            sys.path.append(EXTRACTORS_PATH)
-
-        if EXTRACTOR_MODULE_PATH not in sys.path:
-            sys.path.append(EXTRACTOR_MODULE_PATH)
-
-        try:
-            dir = module_name.split(".")[0]
-        except IndexError:
-            dir = module_name
-
-        module_dir = os.path.join(EXTRACTOR_MODULE_PATH, dir)
-        if module_dir not in sys.path:
-            sys.path.append(module_dir)
-
-        # Load the module from the file path.
-        module = import_module(f"{EXTRACTORS_MODULE}.{module_name}")
-
-        return module
 
     def _param_from_json(self, param: Json) -> BaseModel:
         param_dict = json.loads(param) if param is not None else {}
