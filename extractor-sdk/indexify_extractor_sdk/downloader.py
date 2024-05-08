@@ -8,7 +8,7 @@ import subprocess
 from rich.console import Console
 from rich.panel import Panel
 from .extractor_worker import ExtractorWrapper
-from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH
+from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH, EXTRACTORS_DB_PATH
 
 console = Console()
 
@@ -85,15 +85,10 @@ def install_dependencies(directory_path):
     # print instructions for next steps
     print_instructions(directory_path)
 
-def get_db_path():
-    """Returns the path the extractors database file."""
-    db_path = os.path.join(EXTRACTORS_PATH, "extractors.db")
-    return db_path
 
 def create_extractor_db():
     # Connect to the database
-    path = get_db_path()
-    conn = sqlite3.connect(path)
+    conn = sqlite3.connect(EXTRACTORS_DB_PATH)
     cur = conn.cursor()
 
     # Check if the table exists
@@ -147,8 +142,7 @@ def serialize_embedding_schemas(embedding_schemas) -> str:
     return json.dumps(schemas)
 
 def save_extractor_description(id: str, description: ExtractorDescription):
-    db_path = get_db_path()
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(EXTRACTORS_DB_PATH)
     cur = conn.cursor()
 
     # Check if the extractor already exists

@@ -6,7 +6,6 @@ import logging
 import os
 from .list_extractors import list_extractors
 import sys
-from .downloader import get_db_path
 from .base_extractor import EXTRACTORS_PATH
 
 import multiprocessing

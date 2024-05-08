@@ -1,8 +1,7 @@
 from typing import List, Union, Dict, Optional
-from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription, EmbeddingSchema, EXTRACTORS_PATH
+from .base_extractor import Content, ExtractorWrapper, Feature, ExtractorDescription, EmbeddingSchema, EXTRACTORS_PATH, EXTRACTORS_DB_PATH
 from pydantic import Json, BaseModel
 import concurrent
-from .downloader import get_db_path
 import sqlite3
 import os
 import sys
@@ -28,7 +27,7 @@ def load_extractors(name: str):
     if name in extractor_wrapper_map:
         return
 
-    conn = sqlite3.connect(get_db_path())
+    conn = sqlite3.connect(EXTRACTORS_DB_PATH)
     cur = conn.cursor()
     cur.execute("SELECT id FROM extractors WHERE name = ?", (name,))
     record = cur.fetchone()
@@ -46,7 +45,7 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
     global extractor_wrapper_map
     print("creating extractor wrappers")
 
-    conn = sqlite3.connect(get_db_path())
+    conn = sqlite3.connect(EXTRACTORS_DB_PATH)
     cur = conn.cursor()
 
     # When running the extractor as a Docker container,
