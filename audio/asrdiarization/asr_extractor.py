@@ -113,7 +113,7 @@ class ASRExtractor(Extractor):
             transcript = []
 
         feature = Feature.metadata(value={"chunks": asr_outputs["chunks"], "text": asr_outputs["text"]})
-        return [Content(content_type="image/png", data=transcript, features=[feature])]
+        return [Content.from_text(str(transcript), features=[feature])]
     
     def sample_input(self) -> Content:
         return self.sample_mp3()
