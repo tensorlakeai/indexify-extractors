@@ -26,6 +26,7 @@ class DockerfileTemplate:
 
     def configure(
         self,
+        workdir: str,
         extractor_path: "ExtractorPathWrapper",
         system_dependencies: List[str],
         python_dependencies: List[str],
@@ -33,6 +34,7 @@ class DockerfileTemplate:
         dev: bool = False,
     ) -> "DockerfileTemplate":
         self.configuration_params = {
+            "workdir": workdir,
             "extractor_path": extractor_path.format(),
             "module_name": extractor_path.module_name,
             "module_file_name": extractor_path.file_name(),

@@ -14,6 +14,7 @@ import docker
 import logging
 import importlib.resources as pkg_resources
 import pathlib
+from .base_extractor import EXTRACTORS_PATH
 
 
 class ExtractorPackager:
@@ -221,9 +222,11 @@ class ExtractorPackager:
             raise
 
     def _generate_dockerfile(self) -> str:
+        workdir = EXTRACTORS_PATH.split("/")[-1]
         return (
             DockerfileTemplate()
             .configure(
+                workdir=workdir,
                 extractor_path=self.extractor_path,
                 system_dependencies=" ".join(
                     self.extractor_description["system_dependencies"]
