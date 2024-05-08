@@ -26,6 +26,3 @@ def load_indexify_extractors(base_path):
                 print(f"Successfully loaded: {module_name}")
             except Exception as e:
                 print(f"Failed to load: {module_name}, due to {e}")
-
-# Example usage
-load_indexify_extractors()
