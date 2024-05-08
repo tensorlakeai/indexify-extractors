@@ -16,4 +16,4 @@ indexify-extractor join-server
 |---------------------|---------------------------------|-------------------------------------------------|
 | whisper-asr         | hub://audio/whisper-asr         | whisper_extractor:WhisperExtractor              |
 | whisper-diarization | hub://audio/whisper-diarization | whisper_diarization:WhisperDiarizationExtractor |
-|                     |                                 |                                                 |
+| asrdiarization      | hub://audio/asrdiarization      | asr_extractor:ASRExtractor                      |
