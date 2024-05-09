@@ -58,7 +58,8 @@ class TestLoadAllExtractors(unittest.TestCase):
         # Extractors to skip for testing
         skip_extractors = [
             "openai-embedding.openai_embedding:OpenAIEmbeddingExtractor",
-            "whisper-asr.whisper_extractor:WhisperExtractor"
+            "whisper-asr.whisper_extractor:WhisperExtractor",
+            "whisper-mlx.whisper_extractor:WhisperExtractor"
         ]
 
         extractors_json_path = os.path.join(ROOT, "extractors.json")
