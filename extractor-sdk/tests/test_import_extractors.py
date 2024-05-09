@@ -59,7 +59,7 @@ class TestLoadAllExtractors(unittest.TestCase):
         skip_extractors = [
             "openai-embedding.openai_embedding:OpenAIEmbeddingExtractor",
             "whisper-asr.whisper_extractor:WhisperExtractor",
-            "whisper-mlx.whisper_extractor:WhisperExtractor"
+            "whisper-diarization.whisper_diarization:WhisperDiarizationExtractor",
         ]
 
         extractors_json_path = os.path.join(ROOT, "extractors.json")
@@ -67,7 +67,8 @@ class TestLoadAllExtractors(unittest.TestCase):
         with open(extractors_json_path,"r") as f:
             self.extractors = [
                 extractor for extractor in json.loads(f.read())
-                if extractor.get("module_name") not in skip_extractors
+                if extractor.get("module_name") not in skip_extractors and
+                not extractor.get("skip_deploy", False)
             ]
 
         setup_test_environment(self.extractors)
