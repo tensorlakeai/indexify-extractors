@@ -83,8 +83,5 @@ jobs:
       - name: Test describe the extractor
         if: ${{ matrix.skip_deploy != true }}
         run: |
-          ls -la $EXTRACTORS_DIR
-          ls -la $EXTRACTORS_DIR/$EXTRACTOR_MODULE
-
           source ~/.venv/bin/activate
           indexify-extractor describe $EXTRACTOR_NAME
