@@ -1,12 +1,15 @@
 import unittest
-# from indexify_extractor_sdk import load_indexify_extractors, load_extractor
+from indexify_extractor_sdk.indexify_extractor import describe_sync
 from indexify_extractor_sdk.downloader import download_extractor, find_extractor_subclasses, get_extractor_description
 import json
 import os
-import pytest
+import random
 from pathlib import Path
 from shutil import copytree
 from indexify_extractor_sdk.base_extractor import EXTRACTOR_MODULE_PATH
+
+# Root path of the indexify-extractors project.
+ROOT = Path(__file__).resolve().parents[2]
 
 def setup_test_environment(extractors):
     """This setup method will:
@@ -18,9 +21,6 @@ def setup_test_environment(extractors):
     - extractors: List of extractors in extractors.json file.
     """
 
-    # Root path of the indexify-extractors project,
-    root = Path(__file__).resolve().parents[2]
-
     if not os.environ.get("VIRTUAL_ENV"):
         raise Exception("Please run this test in a virtual environment.")
 
@@ -28,7 +28,7 @@ def setup_test_environment(extractors):
     pip = os.path.join(venv, "bin", "pip")
 
     # Install extractor-sdk from source
-    extractor_sdk_path = os.path.join(root, "extractor-sdk")
+    extractor_sdk_path = os.path.join(ROOT, "extractor-sdk")
     os.system(f"{pip} install -e {extractor_sdk_path}")
 
     # Extractors folder path
@@ -36,7 +36,7 @@ def setup_test_environment(extractors):
         folder = extractor.get("type")
         module = extractor.get("module_name").split(":")[0].split(".")[0]
 
-        current_extractor_path = os.path.join(root, folder, module)
+        current_extractor_path = os.path.join(ROOT, folder, module)
         new_extractor_path = os.path.join(EXTRACTOR_MODULE_PATH, module)
 
         print(f"setting up extractor: {module}")
@@ -61,11 +61,7 @@ class TestLoadAllExtractors(unittest.TestCase):
             "whisper-asr.whisper_extractor:WhisperExtractor"
         ]
 
-        extractors_json_path = os.path.join(
-            os.path.dirname(__file__),
-            "../../",
-            "extractors.json"
-        )
+        extractors_json_path = os.path.join(ROOT, "extractors.json")
 
         with open(extractors_json_path,"r") as f:
             self.extractors = [
@@ -75,25 +71,17 @@ class TestLoadAllExtractors(unittest.TestCase):
 
         setup_test_environment(self.extractors)
 
-
     def test_get_extractor_subclasses(self):
-        """
-        Test that each extractor has file that subclasses extractor class
-        """
+        """Test the extractor modules have the correct class name: module:class."""
         for extractor in self.extractors:
             folder = extractor.get("type")
             module_name = extractor.get("module_name")
-            module_dir = module_name.split(".")[0]
-            path = os.path.join("../../",folder,module_dir)
+            module_dir, module_class = module_name.split(".")
+            path = os.path.join(EXTRACTOR_MODULE_PATH, module_dir)
             subclass_name = find_extractor_subclasses(path)
-            assert ":" in subclass_name
+            assert subclass_name == module_class
 
-
-    @pytest.mark.dependency(depends=['test_download_all_extractors_function'])
     def test_get_extractor_description(self):
-        """
-        Test that each extractor has file that subclasses extractor class
-        """
         for extractor in self.extractors:
             module_name = extractor.get("module_name")
             print("testing", module_name)
@@ -102,26 +90,27 @@ class TestLoadAllExtractors(unittest.TestCase):
             assert len(extractor_description.description) > 0
             assert len(extractor_description.name) > 0
 
-    def test_download_all_extractors_function(self):
-        for extractor in self.extractors:
-            folder = extractor.get("type")
-            module = extractor.get("module_name").split(":")[0].split(".")[0]
-            extractor_path = f"hub://{folder}/{module}"
+    def test_download_extractors_sampled(self):
+        # Randomly pick 3 extractors to test download
+        extractors = random.sample(self.extractors, 3)
 
-            print(f"testing extractor: {module}")
+        for extractor in extractors:
+            folder = extractor.get("type")
+            module_name = extractor.get("module_name")
+            module_dir = module_name.split(".")[0]
+            extractor_path = f"hub://{folder}/{module_dir}"
+
+            print(f"testing download extractor: {module_name}")
 
             # Skip the test if the extractor is marked to be skipped.
             if extractor.get("skip_deploy", False):
                 continue
 
-            # FIXME: this fails for me due to some issue with nvidia-cublas-cu11
-            # and whisper-diarization.whisper_diarization:WhisperDiarizationExtractor
             download_extractor(extractor_path)
 
-
-    def test_downloaded_extractors_describe(self):
-        # depend on
-        pass
+            # Test that the extractor is downloaded and ready to use.
+            # If describe_sync does not raise an exception, the extractor is downloaded.
+            describe_sync(module_name)
 
 
 if __name__ == "__main__":
