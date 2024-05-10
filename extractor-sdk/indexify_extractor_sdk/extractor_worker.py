@@ -72,6 +72,7 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         cur.execute("SELECT * FROM extractors")
         records = cur.fetchall()
         for record in records:
+            print(f"reporting available extractor: {record[1]}")
             # This only loads the description of the extractor to be reported
             # to the coordinator. The actual extractor will be loaded when needed.
             load_extractor_description(record)
