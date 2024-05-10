@@ -1,0 +1,87 @@
+name: Test SDK with Extractors
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - extractor-sdk/**
+  pull_request:
+    paths:
+      - extractor-sdk/**
+
+jobs:
+  set-extractors-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          include=`cat extractors.json`
+          include=`echo $include | tr -d '\r\n '`
+          include=`echo $include | sed 's/"/\"/g'`
+          echo "matrix={\"include\": $include}" >> $GITHUB_OUTPUT
+
+  test-extractor:
+    runs-on: ubuntu-latest
+    needs: set-extractors-matrix
+    strategy:
+      matrix: ${{ fromJSON(needs.set-extractors-matrix.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        if: ${{ matrix.skip_deploy != true }}
+        uses: actions/checkout@v4
+
+      - name: Set up variables
+        if: ${{ matrix.skip_deploy != true }}
+        run: |
+          extractor_name=${{ matrix.module_name }}
+          extractors_dir=~/.indexify-extractors/indexify-extractors
+          extractor_module=`echo $extractor_name | cut -d'.' -f1`
+
+          echo "EXTRACTOR_NAME=$extractor_name" >> $GITHUB_ENV
+          echo "EXTRACTORS_DIR=$extractors_dir" >> $GITHUB_ENV
+          echo "EXTRACTOR_MODULE=$extractor_module" >> $GITHUB_ENV
+
+      - name: Copy the extractor to extractors directory
+        if: ${{ matrix.skip_deploy != true }}
+        run: |
+          from_extractor_dir="${{ matrix.type }}/$EXTRACTOR_MODULE"
+          to_extractor_dir="$EXTRACTORS_DIR/$EXTRACTOR_MODULE"
+          mkdir -p $to_extractor_dir
+          cp -R $from_extractor_dir $EXTRACTORS_DIR
+
+      - name: Set up Python
+        if: ${{ matrix.skip_deploy != true }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install extractor SDK from source
+        if: ${{ matrix.skip_deploy != true }}
+        run: |
+          pip install --upgrade pip
+          python -m venv ~/.venv
+          source ~/.venv/bin/activate
+          pip install ./extractor-sdk
+
+      - name: Install the extractor dependencies
+        if: ${{ matrix.skip_deploy != true }}
+        run: |
+          source ~/.venv/bin/activate
+          pip install -r $EXTRACTORS_DIR/$EXTRACTOR_MODULE/requirements.txt
+
+      - name: Test describe the extractor
+        if: ${{ matrix.skip_deploy != true }}
+        run: |
+          source ~/.venv/bin/activate
+          indexify-extractor describe $EXTRACTOR_NAME
