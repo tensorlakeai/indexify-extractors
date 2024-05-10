@@ -44,7 +44,7 @@ jobs:
         if: ${{ matrix.skip_deploy != true }}
         run: |
           extractor_name=${{ matrix.module_name }}
-          extractors_dir=~/.indexify-extractors/indexify-extractors
+          extractors_dir=~/.indexify-extractors/indexify_extractors
           extractor_module=`echo $extractor_name | cut -d'.' -f1`
 
           echo "EXTRACTOR_NAME=$extractor_name" >> $GITHUB_ENV
@@ -57,6 +57,7 @@ jobs:
           from_extractor_dir="${{ matrix.type }}/$EXTRACTOR_MODULE"
           to_extractor_dir="$EXTRACTORS_DIR/$EXTRACTOR_MODULE"
           mkdir -p $to_extractor_dir
+          touch $EXTRACTORS_DIR/__init__.py
           cp -R $from_extractor_dir $EXTRACTORS_DIR
 
       - name: Set up Python
