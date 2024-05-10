@@ -37,14 +37,12 @@ def load_extractors(name: str):
     if record is None:
         raise ValueError(f"Extractor {name} not found in the database.")
 
-    print(f"loading extractor: {name}")
     extractor_wrapper = create_extractor_wrapper(record[0])
     extractor_wrapper_map[name] = extractor_wrapper
 
 
 def create_extractor_wrapper_map(id: Optional[str] = None):
     global extractor_wrapper_map
-    print("creating extractor wrappers")
 
     conn = sqlite3.connect(get_db_path())
     cur = conn.cursor()
@@ -62,7 +60,6 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         extractor_wrapper = create_extractor_wrapper(record[0])
         extractor_wrapper_map[record[1]] = extractor_wrapper
     elif os.environ.get("EXTRACTOR_PATH"):
-        print("adding extractor from environment")
         extractor = os.environ.get("EXTRACTOR_PATH")
 
         # TODO: Optimize this to load description from the database.
@@ -77,7 +74,6 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         for record in records:
             # This only loads the description of the extractor to be reported
             # to the coordinator. The actual extractor will be loaded when needed.
-            print(f"reporting available extractor: {record[1]}")
             load_extractor_description(record)
 
     conn.close()
@@ -119,7 +115,6 @@ def create_extractor_wrapper(extractor_id: str) -> ExtractorWrapper:
 
 
 def create_executor(workers: int, extractor_id: Optional[str] = None):
-    print("creating executor")
     return concurrent.futures.ProcessPoolExecutor(
         initializer=create_extractor_wrapper_map,
         max_workers=workers,
@@ -157,13 +152,11 @@ def _extract_content(
             task_contents[task_id] = task_content_map[task_id]
 
         params =  {}
-        inner = task_params_map["dummy_task_id"]
         for task_id in task_ids:
-            params[task_id] = inner[task_id]
-        task_params = {"dummy_task_id": json.dumps(params)}
+            params[task_id] = task_params_map[task_id]
 
         # Extract content using the right extractor
-        extracted = extractor_wrapper.extract_batch(task_contents, task_params)
+        extracted = extractor_wrapper.extract_batch(task_contents, params)
 
         # Add the extracted data to the result
         for task_id, extracted_data in extracted.items():
@@ -180,14 +173,14 @@ async def extract_content(
     loop, 
     executor, 
     content_list: Dict[str, Content], 
-    params: Json,
+    params: Dict[str, Json],
     extractors: Dict[str, str] # task ID -> extractor name
 ) -> Dict[str, List[Union[Feature, Content]]]:
     return await loop.run_in_executor(
         executor, 
         _extract_content, 
         content_list, 
-        {"dummy_task_id": params},
+        params,
         extractors
     )
 
