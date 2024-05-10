@@ -12,6 +12,7 @@ from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MOD
 
 console = Console()
 
+VENV_PATH = os.path.join(EXTRACTORS_PATH, "ve")
 
 class ClassVisitor(ast.NodeVisitor):
     def __init__(self):
@@ -39,51 +40,62 @@ def find_extractor_subclasses(root_dir):
                     print(f"Syntax error in {filename}: {e}")
 
 
-def print_instructions(directory_path):
-    venv_path = os.path.join(directory_path, "ve")
-
+def print_instructions(extractor: str):
     message = """To run extractor, run the following:\n[bold #4AA4F4]"""
 
     if not os.environ.get("VIRTUAL_ENV"):
-        message += f"source {venv_path}/bin/activate\n"
+        message += f"source {VENV_PATH}/bin/activate\n"
 
-    message += f"indexify-extractor join-server[/]"
+    message += f"indexify-extractor join-server {extractor}[/]"
     console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
-    
-    
+
+
+def create_new_venv():
+    print("Creating virtual environment...")
+
+    version = sys.version_info
+    version_str = f"{version.major}.{version.minor}.{version.micro}"
+
+    try:
+        subprocess.check_call(['virtualenv', '-p', f"python{version_str}", VENV_PATH])
+
+        # Load python from the virtual environment to sys.path
+        sys.path.append(os.path.join(
+            VENV_PATH,
+            "lib",
+            f"python{version.major}.{version.minor}",
+            "site-packages")
+        )
+    except FileNotFoundError as err:
+        if "virtualenv" in str(err):
+            console.print("[bold #f04318]command virtualenv not found, did you install it? Try 'pip install virtualenv'[/]")
+            return
+        else:
+            raise
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=} while attempting to create virtual envirnment.")
+        raise
+
+
 def install_dependencies(directory_path):
     console.print("[bold #4AA4F4]Installing dependencies...[/]")
-    venv_path = os.path.join(directory_path, "ve")
     requirements_path = os.path.join(directory_path, "requirements.txt")
-    
+
     if not os.path.exists(requirements_path):
             raise ValueError("Unable to find requirements.txt")
-        
+
     if os.environ.get("VIRTUAL_ENV"):
         # install requirements to current env
-        subprocess.check_call([os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip'), 'install', '-r', requirements_path])
-    else:
-        # create env and install requirements
-        print("Creating virtual environment...")
-        version_str = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        try:
-            subprocess.check_call(['virtualenv', '-p', f"python{version_str}", venv_path])
-        except FileNotFoundError as err:
-            if "virtualenv" in str(err):
-                console.print("[bold #f04318]command virtualenv not found, did you install it? Try 'pip install virtualenv'[/]")
-                return
-            else:
-                raise
-        except Exception as err:
-            print(f"Unexpected {err=}, {type(err)=} while attempting to create virtual envirnment.")
-            raise
-        pip_path = os.path.join(venv_path, 'bin', 'pip')
-
+        pip_path = os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip')
         subprocess.check_call([pip_path, 'install', '-r', requirements_path])
-        subprocess.check_call([pip_path, 'install', 'indexify-extractor-sdk'])
+    else:
+        create_new_venv()
 
-    # print instructions for next steps
-    print_instructions(directory_path)
+        # install requirements to new venv
+        pip_path = os.path.join(VENV_PATH, 'bin', 'pip')
+        subprocess.check_call([pip_path, 'install', '-r', requirements_path])
+        subprocess.check_call([pip_path, 'install', 'indexify-extractor-sdk']) 
+
 
 def get_db_path():
     """Returns the path the extractors database file."""
@@ -200,6 +212,8 @@ def download_extractor(extractor_path):
 
     # Store the extractor info in the database
 
+    print(sys.path)
+
     extractor_full_name = get_extractor_full_name(base_extractor_path)
     description = get_extractor_description(extractor_full_name)
 
@@ -208,3 +222,6 @@ def download_extractor(extractor_path):
     except Exception as e:
         print(f"Error saving extractor description: {e}")
         raise e
+
+    # Print instruction last to improve user experience.
+    print_instructions(extractor_full_name)
