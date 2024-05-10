@@ -84,7 +84,8 @@ class ImgExtractor(Extractor):
 
         # Decode back into text
         generated_texts = self.processor.batch_decode(generated_ids, skip_special_tokens=True)
-        generated_json = token2json(generated_texts[0], self.processor)
+        added_vocab = self.processor.tokenizer.get_added_vocab()
+        generated_json = token2json(generated_texts[0], added_vocab)
         return [Content.from_text(str(generated_json))]
     
     def sample_input(self) -> Content:

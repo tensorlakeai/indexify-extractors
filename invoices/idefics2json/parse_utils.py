@@ -1,13 +1,10 @@
 import re
 
 # let's turn that into JSON
-def token2json(tokens, processor, is_inner_value=False, added_vocab=None):
+def token2json(tokens, added_vocab, is_inner_value=False):
         """
         Convert a (generated) token sequence into an ordered JSON format.
         """
-        if added_vocab is None:
-            added_vocab = processor.tokenizer.get_added_vocab()
-
         output = {}
 
         while tokens:
