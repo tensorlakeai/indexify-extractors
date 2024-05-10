@@ -21,7 +21,7 @@
   {"type": "image", "module_name": "moondream.moondream_extractor:MoondreamExtractor"},
   {"type": "invoices", "module_name": "donut_cord.base_cord_v2:DonutBaseV2", "skip_deploy": true},
   {"type": "invoices", "module_name": "donut_invoice.donut_base_invoice:SimpleInvoiceParserExtractor"},
-  {"type": "invoices", "module_name": "idefics2.img_extractor:ImgExtractor"},
+  {"type": "invoices", "module_name": "idefics2json.img_extractor:ImgExtractor"},
   {"type": "pdf", "module_name": "pdf-extractor.pdf_extractor:PDFExtractor"},
   {"type": "pdf", "module_name": "layoutlm_document_qa.layoutlm_document_qa:LayoutLMDocumentQA"},
   {"type": "pdf", "module_name": "ocrmypdf.ocr_my_pdf:OCRMyPDFExtractor"},

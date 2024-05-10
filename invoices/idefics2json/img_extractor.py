@@ -26,7 +26,7 @@ class ImgExtractorConfig(BaseModel):
     instruction: Optional[str] = "Extract JSON."
 
 class ImgExtractor(Extractor):
-    name = "tensorlake/idefics2"
+    name = "tensorlake/idefics2json"
     description = "Finetuned Idefics2 for Image to JSON."
     system_dependencies = []
     input_mime_types = ["image/jpeg", "image/png"]
