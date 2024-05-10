@@ -1,6 +1,7 @@
 import logging
 import torch
 import base64
+import os
 
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pyannote.audio import Pipeline
@@ -14,12 +15,13 @@ from pydantic_settings import BaseSettings
 from typing import Optional, Literal, List, Union
 
 logger = logging.getLogger(__name__)
+token = os.getenv('HF_TOKEN')
 
 class ModelSettings(BaseSettings):
     asr_model: str = "openai/whisper-large-v3"
     assistant_model: Optional[str] = "distil-whisper/distil-large-v3"
     diarization_model: Optional[str] = "pyannote/speaker-diarization-3.1"
-    hf_token: Optional[str]
+    hf_token: Optional[str] = token
 
 model_settings = ModelSettings()
 
@@ -116,7 +118,10 @@ class ASRExtractor(Extractor):
         return [Content.from_text(str(transcript), features=[feature])]
     
     def sample_input(self) -> Content:
-        return self.sample_mp3()
+        filepath = "sample.mp3"
+        with open(filepath, 'rb') as f:
+            audio_encoded = base64.b64encode(f.read()).decode("utf-8")
+        return Content(content_type="audio/mpeg", data=audio_encoded)
 
 if __name__ == "__main__":
     filepath = "sample.mp3"
