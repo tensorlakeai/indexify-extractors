@@ -1,7 +1,7 @@
 import re
 
 # let's turn that into JSON
-def token2json(tokens, is_inner_value=False, added_vocab=None):
+def token2json(tokens, processor, is_inner_value=False, added_vocab=None):
         """
         Convert a (generated) token sequence into an ordered JSON format.
         """

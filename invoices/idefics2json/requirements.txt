@@ -1,6 +1,8 @@
 accelerate==0.27.2
 torch==2.2.1
-transformers==4.38.2
+transformers
 numpy==1.26.4
 pydantic==2.6.3
 pydantic-settings==2.2.1
+bitsandbytes
+peft
