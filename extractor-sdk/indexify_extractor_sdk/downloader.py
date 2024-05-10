@@ -60,6 +60,9 @@ def create_new_venv():
         subprocess.check_call(['virtualenv', '-p', f"python{version_str}", VENV_PATH])
 
         # Load python from the virtual environment to sys.path
+        # This is required since to get the extractor description,
+        # we need to import the extractor module which depends on
+        # the dependencies installed in the virtual environment.
         sys.path.append(os.path.join(
             VENV_PATH,
             "lib",
@@ -211,8 +214,6 @@ def download_extractor(extractor_path):
     install_dependencies(os.path.join(EXTRACTOR_MODULE_PATH, base_extractor_path))
 
     # Store the extractor info in the database
-
-    print(sys.path)
 
     extractor_full_name = get_extractor_full_name(base_extractor_path)
     description = get_extractor_description(extractor_full_name)
