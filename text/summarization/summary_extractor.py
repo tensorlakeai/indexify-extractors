@@ -2,7 +2,7 @@ from typing import List, Union
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel
 from transformers import pipeline
-from utils.chunk_module import FastRecursiveTextSplitter
+from .utils.chunk_module import FastRecursiveTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownTextSplitter, LatexTextSplitter
 
 class InputParams(BaseModel):
