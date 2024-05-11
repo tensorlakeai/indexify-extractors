@@ -22,9 +22,6 @@ class ModelSettings(BaseSettings):
 
 model_settings = ModelSettings()
 
-class ImgExtractorConfig(BaseModel):
-    instruction: Optional[str] = "Extract JSON."
-
 class ImgExtractor(Extractor):
     name = "tensorlake/idefics2json"
     description = "Finetuned Idefics2 for Image to JSON."
@@ -64,14 +61,14 @@ class ImgExtractor(Extractor):
         self.model.set_input_embeddings(input_embeddings_module)
         self.model.set_output_embeddings(output_embeddings_module)
 
-    def extract(self, content: Content, params: ImgExtractorConfig) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         image = Image.open(BytesIO(content.data))
         # prepare image and prompt for the model
         messages = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": params.instruction},
+                    {"type": "text", "text": "Extract JSON."},
                     {"type": "image"},
                 ]
             },
@@ -99,7 +96,6 @@ if __name__ == "__main__":
     with open(filepath, 'rb') as f:
         image_data = f.read()
     data = Content(content_type="image/jpg", data=image_data)
-    params = ImgExtractorConfig(instruction="Extract JSON.")
     extractor = ImgExtractor()
-    results = extractor.extract(data, params=params)
+    results = extractor.extract(data)
     print(results)
