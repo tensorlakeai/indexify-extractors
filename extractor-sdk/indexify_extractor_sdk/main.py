@@ -15,7 +15,7 @@ from typing_extensions import Annotated
 cpu_count = multiprocessing.cpu_count()
 
 typer_app = typer.Typer(
-    help="indexify-extractor - CLI for running and packaging indexify extractors"
+    help="indexify-extractor - CLI for running and packaging indexify extractors", pretty_exceptions_enable=False
 )
 
 
