@@ -31,6 +31,8 @@ class PDFExtractor(Extractor):
                 for img in image_list:
                     xref = img[0]
                     pix = fitz.Pixmap(doc, xref)
+                    if not pix.colorspace.name in (fitz.csGRAY.name, fitz.csRGB.name):
+                        pix = fitz.Pixmap(fitz.csRGB, pix)
                     feature = Feature.metadata({"page": i+1}, name="image")
                     contents.append(Content(content_type="image/png", data=pix.tobytes(), features=[feature]))
 
