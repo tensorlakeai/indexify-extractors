@@ -11,7 +11,7 @@
   {"type": "embedding", "module_name": "scibert.scibert_uncased:SciBERTExtractor"},
   {"type": "audio", "module_name": "whisper-asr.whisper_extractor:WhisperExtractor"},
   {"type": "audio", "module_name": "whisper-mlx.whisper_extractor:WhisperExtractor", "skip_deploy": true},
-  {"type": "audio", "module_name": "whisper-diarization.whisper_diarization:WhisperDiarizationExtractor"},
+  {"type": "audio", "module_name": "asrdiarization.asr_extractor:ASRExtractor"},
   {"type": "video", "module_name": "audio-extractor.audio_extractor:AudioExtractor"},
   {"type": "video", "module_name": "face-extractor.face_extractor:FaceExtractor", "skip_deploy": true},
   {"type": "video", "module_name": "keyframes.key_frame_extractor:KeyFrameExtractor"},
