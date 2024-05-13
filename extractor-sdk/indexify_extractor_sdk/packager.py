@@ -240,6 +240,7 @@ class ExtractorPackager:
                     else "--extra-index-url https://download.pytorch.org/whl/cpu"
                 ),
                 dev=self.config.get("dev", False),
+                gpu=self.config.get("gpu", False),
             )
             .render()
         )

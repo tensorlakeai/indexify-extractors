@@ -32,6 +32,7 @@ class DockerfileTemplate:
         python_dependencies: List[str],
         additional_pip_flags: str = "",
         dev: bool = False,
+        gpu: bool = False,
     ) -> "DockerfileTemplate":
         self.configuration_params = {
             "workdir": workdir,
@@ -43,6 +44,7 @@ class DockerfileTemplate:
             "python_dependencies": python_dependencies,
             "additional_pip_flags": additional_pip_flags,
             "dev": dev,
+            "gpu": gpu,
         }
         return self
 
