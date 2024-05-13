@@ -22,14 +22,14 @@ class ModelSettings(BaseSettings):
 
 model_settings = ModelSettings()
 
-class ImgExtractor(Extractor):
+class ReceiptExtractor(Extractor):
     name = "tensorlake/idefics2json"
     description = "Finetuned Idefics2 for Image to JSON."
     system_dependencies = []
     input_mime_types = ["image/jpeg", "image/png"]
 
     def __init__(self):
-        super(ImgExtractor, self).__init__()
+        super(ReceiptExtractor, self).__init__()
 
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         logger.info(f"Using device: {device.type}")
@@ -96,6 +96,6 @@ if __name__ == "__main__":
     with open(filepath, 'rb') as f:
         image_data = f.read()
     data = Content(content_type="image/jpg", data=image_data)
-    extractor = ImgExtractor()
+    extractor = ReceiptExtractor()
     results = extractor.extract(data)
     print(results)
