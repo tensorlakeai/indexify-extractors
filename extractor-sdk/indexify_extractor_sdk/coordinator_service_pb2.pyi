@@ -27,21 +27,29 @@ class GetContentMetadataResponse(_message.Message):
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
     def __init__(self, content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
+class GetContentTreeMetadataRequest(_message.Message):
+    __slots__ = ("content_id",)
+    CONTENT_ID_FIELD_NUMBER: _ClassVar[int]
+    content_id: str
+    def __init__(self, content_id: _Optional[str] = ...) -> None: ...
+
+class GetContentTreeMetadataResponse(_message.Message):
+    __slots__ = ("content_list",)
+    CONTENT_LIST_FIELD_NUMBER: _ClassVar[int]
+    content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
+    def __init__(self, content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
+
 class UpdateTaskRequest(_message.Message):
-    __slots__ = ("executor_id", "task_id", "outcome", "content_list", "content_id", "extraction_policy_name")
+    __slots__ = ("executor_id", "task_id", "outcome", "content_list")
     EXECUTOR_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     OUTCOME_FIELD_NUMBER: _ClassVar[int]
     CONTENT_LIST_FIELD_NUMBER: _ClassVar[int]
-    CONTENT_ID_FIELD_NUMBER: _ClassVar[int]
-    EXTRACTION_POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     executor_id: str
     task_id: str
     outcome: TaskOutcome
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
-    content_id: str
-    extraction_policy_name: str
-    def __init__(self, executor_id: _Optional[str] = ..., task_id: _Optional[str] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ..., content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ..., content_id: _Optional[str] = ..., extraction_policy_name: _Optional[str] = ...) -> None: ...
+    def __init__(self, executor_id: _Optional[str] = ..., task_id: _Optional[str] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ..., content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
 class ListStateChangesRequest(_message.Message):
     __slots__ = ()
@@ -123,31 +131,33 @@ class GetIndexResponse(_message.Message):
     index: Index
     def __init__(self, index: _Optional[_Union[Index, _Mapping]] = ...) -> None: ...
 
-class CreateIndexRequest(_message.Message):
-    __slots__ = ("index",)
-    INDEX_FIELD_NUMBER: _ClassVar[int]
-    index: Index
-    def __init__(self, index: _Optional[_Union[Index, _Mapping]] = ...) -> None: ...
+class UpdateIndexesStateRequest(_message.Message):
+    __slots__ = ("indexes",)
+    INDEXES_FIELD_NUMBER: _ClassVar[int]
+    indexes: _containers.RepeatedCompositeFieldContainer[Index]
+    def __init__(self, indexes: _Optional[_Iterable[_Union[Index, _Mapping]]] = ...) -> None: ...
 
-class CreateIndexResponse(_message.Message):
+class UpdateIndexesStateResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
 
 class Index(_message.Message):
-    __slots__ = ("name", "namespace", "table_name", "schema", "extraction_policy", "extractor")
+    __slots__ = ("name", "namespace", "table_name", "schema", "extraction_policy", "extractor", "graph_name")
     NAME_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     TABLE_NAME_FIELD_NUMBER: _ClassVar[int]
     SCHEMA_FIELD_NUMBER: _ClassVar[int]
     EXTRACTION_POLICY_FIELD_NUMBER: _ClassVar[int]
     EXTRACTOR_FIELD_NUMBER: _ClassVar[int]
+    GRAPH_NAME_FIELD_NUMBER: _ClassVar[int]
     name: str
     namespace: str
     table_name: str
     schema: str
     extraction_policy: str
     extractor: str
-    def __init__(self, name: _Optional[str] = ..., namespace: _Optional[str] = ..., table_name: _Optional[str] = ..., schema: _Optional[str] = ..., extraction_policy: _Optional[str] = ..., extractor: _Optional[str] = ...) -> None: ...
+    graph_name: str
+    def __init__(self, name: _Optional[str] = ..., namespace: _Optional[str] = ..., table_name: _Optional[str] = ..., schema: _Optional[str] = ..., extraction_policy: _Optional[str] = ..., extractor: _Optional[str] = ..., graph_name: _Optional[str] = ...) -> None: ...
 
 class Embedding(_message.Message):
     __slots__ = ("embedding",)
@@ -198,16 +208,40 @@ class RegisterExecutorResponse(_message.Message):
     def __init__(self, executor_id: _Optional[str] = ...) -> None: ...
 
 class RegisterIngestionServerRequest(_message.Message):
-    __slots__ = ("ingestion_server_id", "addr")
+    __slots__ = ("ingestion_server_id",)
     INGESTION_SERVER_ID_FIELD_NUMBER: _ClassVar[int]
-    ADDR_FIELD_NUMBER: _ClassVar[int]
     ingestion_server_id: str
-    addr: str
-    def __init__(self, ingestion_server_id: _Optional[str] = ..., addr: _Optional[str] = ...) -> None: ...
+    def __init__(self, ingestion_server_id: _Optional[str] = ...) -> None: ...
 
 class RegisterIngestionServerResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
+
+class RemoveIngestionServerRequest(_message.Message):
+    __slots__ = ("ingestion_server_id",)
+    INGESTION_SERVER_ID_FIELD_NUMBER: _ClassVar[int]
+    ingestion_server_id: str
+    def __init__(self, ingestion_server_id: _Optional[str] = ...) -> None: ...
+
+class RemoveIngestionServerResponse(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
+
+class CreateGCTasksRequest(_message.Message):
+    __slots__ = ("state_change",)
+    STATE_CHANGE_FIELD_NUMBER: _ClassVar[int]
+    state_change: StateChange
+    def __init__(self, state_change: _Optional[_Union[StateChange, _Mapping]] = ...) -> None: ...
+
+class CreateGCTasksResponse(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
+
+class CoordinatorCommand(_message.Message):
+    __slots__ = ("gc_task",)
+    GC_TASK_FIELD_NUMBER: _ClassVar[int]
+    gc_task: GCTask
+    def __init__(self, gc_task: _Optional[_Union[GCTask, _Mapping]] = ...) -> None: ...
 
 class GCTaskAcknowledgement(_message.Message):
     __slots__ = ("task_id", "completed", "ingestion_server_id")
@@ -250,7 +284,7 @@ class HeartbeatResponse(_message.Message):
     def __init__(self, executor_id: _Optional[str] = ..., tasks: _Optional[_Iterable[_Union[Task, _Mapping]]] = ...) -> None: ...
 
 class Task(_message.Message):
-    __slots__ = ("id", "extractor", "namespace", "content_metadata", "input_params", "extraction_policy_id", "output_index_mapping", "outcome", "index_tables")
+    __slots__ = ("id", "extractor", "namespace", "content_metadata", "input_params", "extraction_policy_id", "extraction_graph_name", "output_index_mapping", "outcome", "index_tables")
     class OutputIndexMappingEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -264,6 +298,7 @@ class Task(_message.Message):
     CONTENT_METADATA_FIELD_NUMBER: _ClassVar[int]
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
     EXTRACTION_POLICY_ID_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_GRAPH_NAME_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_INDEX_MAPPING_FIELD_NUMBER: _ClassVar[int]
     OUTCOME_FIELD_NUMBER: _ClassVar[int]
     INDEX_TABLES_FIELD_NUMBER: _ClassVar[int]
@@ -273,10 +308,11 @@ class Task(_message.Message):
     content_metadata: ContentMetadata
     input_params: str
     extraction_policy_id: str
+    extraction_graph_name: str
     output_index_mapping: _containers.ScalarMap[str, str]
     outcome: TaskOutcome
     index_tables: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, id: _Optional[str] = ..., extractor: _Optional[str] = ..., namespace: _Optional[str] = ..., content_metadata: _Optional[_Union[ContentMetadata, _Mapping]] = ..., input_params: _Optional[str] = ..., extraction_policy_id: _Optional[str] = ..., output_index_mapping: _Optional[_Mapping[str, str]] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ..., index_tables: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., extractor: _Optional[str] = ..., namespace: _Optional[str] = ..., content_metadata: _Optional[_Union[ContentMetadata, _Mapping]] = ..., input_params: _Optional[str] = ..., extraction_policy_id: _Optional[str] = ..., extraction_graph_name: _Optional[str] = ..., output_index_mapping: _Optional[_Mapping[str, str]] = ..., outcome: _Optional[_Union[TaskOutcome, str]] = ..., index_tables: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ListExtractorsRequest(_message.Message):
     __slots__ = ()
@@ -355,6 +391,18 @@ class ListContentResponse(_message.Message):
     content_list: _containers.RepeatedCompositeFieldContainer[ContentMetadata]
     def __init__(self, content_list: _Optional[_Iterable[_Union[ContentMetadata, _Mapping]]] = ...) -> None: ...
 
+class GetExtractionPolicyRequest(_message.Message):
+    __slots__ = ("extraction_policy_id",)
+    EXTRACTION_POLICY_ID_FIELD_NUMBER: _ClassVar[int]
+    extraction_policy_id: str
+    def __init__(self, extraction_policy_id: _Optional[str] = ...) -> None: ...
+
+class GetExtractionPolicyResponse(_message.Message):
+    __slots__ = ("policy",)
+    POLICY_FIELD_NUMBER: _ClassVar[int]
+    policy: ExtractionPolicy
+    def __init__(self, policy: _Optional[_Union[ExtractionPolicy, _Mapping]] = ...) -> None: ...
+
 class ListExtractionPoliciesRequest(_message.Message):
     __slots__ = ("namespace",)
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
@@ -368,12 +416,10 @@ class ListExtractionPoliciesResponse(_message.Message):
     def __init__(self, policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
 
 class CreateNamespaceRequest(_message.Message):
-    __slots__ = ("name", "policies")
+    __slots__ = ("name",)
     NAME_FIELD_NUMBER: _ClassVar[int]
-    POLICIES_FIELD_NUMBER: _ClassVar[int]
     name: str
-    policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
-    def __init__(self, name: _Optional[str] = ..., policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class CreateNamespaceResponse(_message.Message):
     __slots__ = ("name", "created_at")
@@ -393,9 +439,28 @@ class ListNamespaceResponse(_message.Message):
     namespaces: _containers.RepeatedCompositeFieldContainer[Namespace]
     def __init__(self, namespaces: _Optional[_Iterable[_Union[Namespace, _Mapping]]] = ...) -> None: ...
 
+class ExtractionGraph(_message.Message):
+    __slots__ = ("id", "namespace", "name", "extraction_policies")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_POLICIES_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    namespace: str
+    name: str
+    extraction_policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
+    def __init__(self, id: _Optional[str] = ..., namespace: _Optional[str] = ..., name: _Optional[str] = ..., extraction_policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
+
 class ExtractionPolicy(_message.Message):
-    __slots__ = ("id", "extractor", "name", "input_params", "filters", "content_source")
+    __slots__ = ("id", "extractor", "name", "input_params", "filters", "content_source", "graph_name", "output_table_mapping")
     class FiltersEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class OutputTableMappingEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -408,13 +473,17 @@ class ExtractionPolicy(_message.Message):
     INPUT_PARAMS_FIELD_NUMBER: _ClassVar[int]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
     CONTENT_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    GRAPH_NAME_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_TABLE_MAPPING_FIELD_NUMBER: _ClassVar[int]
     id: str
     extractor: str
     name: str
     input_params: str
     filters: _containers.ScalarMap[str, str]
     content_source: str
-    def __init__(self, id: _Optional[str] = ..., extractor: _Optional[str] = ..., name: _Optional[str] = ..., input_params: _Optional[str] = ..., filters: _Optional[_Mapping[str, str]] = ..., content_source: _Optional[str] = ...) -> None: ...
+    graph_name: str
+    output_table_mapping: _containers.ScalarMap[str, str]
+    def __init__(self, id: _Optional[str] = ..., extractor: _Optional[str] = ..., name: _Optional[str] = ..., input_params: _Optional[str] = ..., filters: _Optional[_Mapping[str, str]] = ..., content_source: _Optional[str] = ..., graph_name: _Optional[str] = ..., output_table_mapping: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ExtractionPolicyRequest(_message.Message):
     __slots__ = ("namespace", "extractor", "name", "input_params", "filters", "content_source", "created_at")
@@ -440,6 +509,51 @@ class ExtractionPolicyRequest(_message.Message):
     content_source: str
     created_at: int
     def __init__(self, namespace: _Optional[str] = ..., extractor: _Optional[str] = ..., name: _Optional[str] = ..., input_params: _Optional[str] = ..., filters: _Optional[_Mapping[str, str]] = ..., content_source: _Optional[str] = ..., created_at: _Optional[int] = ...) -> None: ...
+
+class CreateExtractionGraphRequest(_message.Message):
+    __slots__ = ("namespace", "name", "policies")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    POLICIES_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    name: str
+    policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicyRequest]
+    def __init__(self, namespace: _Optional[str] = ..., name: _Optional[str] = ..., policies: _Optional[_Iterable[_Union[ExtractionPolicyRequest, _Mapping]]] = ...) -> None: ...
+
+class CreateExtractionGraphResponse(_message.Message):
+    __slots__ = ("graph_id", "extractors", "policies", "extractor_output_table_mapping", "indexes")
+    class ExtractorsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: Extractor
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Extractor, _Mapping]] = ...) -> None: ...
+    class PoliciesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ExtractionPolicy
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ExtractionPolicy, _Mapping]] = ...) -> None: ...
+    class ExtractorOutputTableMappingEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    GRAPH_ID_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTORS_FIELD_NUMBER: _ClassVar[int]
+    POLICIES_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTOR_OUTPUT_TABLE_MAPPING_FIELD_NUMBER: _ClassVar[int]
+    INDEXES_FIELD_NUMBER: _ClassVar[int]
+    graph_id: str
+    extractors: _containers.MessageMap[str, Extractor]
+    policies: _containers.MessageMap[str, ExtractionPolicy]
+    extractor_output_table_mapping: _containers.ScalarMap[str, str]
+    indexes: _containers.RepeatedCompositeFieldContainer[Index]
+    def __init__(self, graph_id: _Optional[str] = ..., extractors: _Optional[_Mapping[str, Extractor]] = ..., policies: _Optional[_Mapping[str, ExtractionPolicy]] = ..., extractor_output_table_mapping: _Optional[_Mapping[str, str]] = ..., indexes: _Optional[_Iterable[_Union[Index, _Mapping]]] = ...) -> None: ...
 
 class ExtractionPolicyResponse(_message.Message):
     __slots__ = ("created_at", "extractor", "extraction_policy", "index_name_table_mapping", "output_index_name_mapping")
@@ -470,7 +584,7 @@ class ExtractionPolicyResponse(_message.Message):
     def __init__(self, created_at: _Optional[int] = ..., extractor: _Optional[_Union[Extractor, _Mapping]] = ..., extraction_policy: _Optional[_Union[ExtractionPolicy, _Mapping]] = ..., index_name_table_mapping: _Optional[_Mapping[str, str]] = ..., output_index_name_mapping: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ContentMetadata(_message.Message):
-    __slots__ = ("id", "file_name", "parent_id", "mime", "labels", "storage_url", "created_at", "namespace", "source", "size_bytes")
+    __slots__ = ("id", "file_name", "parent_id", "mime", "labels", "storage_url", "created_at", "namespace", "source", "size_bytes", "hash", "extraction_policy_ids", "root_content_id", "extraction_graph_names")
     class LabelsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -478,6 +592,13 @@ class ContentMetadata(_message.Message):
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class ExtractionPolicyIdsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     FILE_NAME_FIELD_NUMBER: _ClassVar[int]
     PARENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -488,6 +609,10 @@ class ContentMetadata(_message.Message):
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     SIZE_BYTES_FIELD_NUMBER: _ClassVar[int]
+    HASH_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_POLICY_IDS_FIELD_NUMBER: _ClassVar[int]
+    ROOT_CONTENT_ID_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_GRAPH_NAMES_FIELD_NUMBER: _ClassVar[int]
     id: str
     file_name: str
     parent_id: str
@@ -498,7 +623,11 @@ class ContentMetadata(_message.Message):
     namespace: str
     source: str
     size_bytes: int
-    def __init__(self, id: _Optional[str] = ..., file_name: _Optional[str] = ..., parent_id: _Optional[str] = ..., mime: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., storage_url: _Optional[str] = ..., created_at: _Optional[int] = ..., namespace: _Optional[str] = ..., source: _Optional[str] = ..., size_bytes: _Optional[int] = ...) -> None: ...
+    hash: str
+    extraction_policy_ids: _containers.ScalarMap[str, int]
+    root_content_id: str
+    extraction_graph_names: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[str] = ..., file_name: _Optional[str] = ..., parent_id: _Optional[str] = ..., mime: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., storage_url: _Optional[str] = ..., created_at: _Optional[int] = ..., namespace: _Optional[str] = ..., source: _Optional[str] = ..., size_bytes: _Optional[int] = ..., hash: _Optional[str] = ..., extraction_policy_ids: _Optional[_Mapping[str, int]] = ..., root_content_id: _Optional[str] = ..., extraction_graph_names: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class CreateContentRequest(_message.Message):
     __slots__ = ("content",)
@@ -525,20 +654,20 @@ class TombstoneContentResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Namespace(_message.Message):
-    __slots__ = ("name", "policies")
+    __slots__ = ("name", "extraction_graphs")
     NAME_FIELD_NUMBER: _ClassVar[int]
-    POLICIES_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_GRAPHS_FIELD_NUMBER: _ClassVar[int]
     name: str
-    policies: _containers.RepeatedCompositeFieldContainer[ExtractionPolicy]
-    def __init__(self, name: _Optional[str] = ..., policies: _Optional[_Iterable[_Union[ExtractionPolicy, _Mapping]]] = ...) -> None: ...
+    extraction_graphs: _containers.RepeatedCompositeFieldContainer[ExtractionGraph]
+    def __init__(self, name: _Optional[str] = ..., extraction_graphs: _Optional[_Iterable[_Union[ExtractionGraph, _Mapping]]] = ...) -> None: ...
 
 class GetSchemaRequest(_message.Message):
-    __slots__ = ("namespace", "content_source")
+    __slots__ = ("namespace", "extraction_graph_name")
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
-    CONTENT_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_GRAPH_NAME_FIELD_NUMBER: _ClassVar[int]
     namespace: str
-    content_source: str
-    def __init__(self, namespace: _Optional[str] = ..., content_source: _Optional[str] = ...) -> None: ...
+    extraction_graph_name: str
+    def __init__(self, namespace: _Optional[str] = ..., extraction_graph_name: _Optional[str] = ...) -> None: ...
 
 class GetSchemaResponse(_message.Message):
     __slots__ = ("schema",)
@@ -547,12 +676,16 @@ class GetSchemaResponse(_message.Message):
     def __init__(self, schema: _Optional[_Union[StructuredDataSchema, _Mapping]] = ...) -> None: ...
 
 class StructuredDataSchema(_message.Message):
-    __slots__ = ("columns", "content_source")
+    __slots__ = ("id", "extraction_graph_name", "namespace", "columns")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    EXTRACTION_GRAPH_NAME_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     COLUMNS_FIELD_NUMBER: _ClassVar[int]
-    CONTENT_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    extraction_graph_name: str
+    namespace: str
     columns: str
-    content_source: str
-    def __init__(self, columns: _Optional[str] = ..., content_source: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., extraction_graph_name: _Optional[str] = ..., namespace: _Optional[str] = ..., columns: _Optional[str] = ...) -> None: ...
 
 class GetAllSchemaRequest(_message.Message):
     __slots__ = ("namespace",)
@@ -720,3 +853,29 @@ class TaskAssignments(_message.Message):
     ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
     assignments: _containers.ScalarMap[str, str]
     def __init__(self, assignments: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class GetTaskRequest(_message.Message):
+    __slots__ = ("task_id",)
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    task_id: str
+    def __init__(self, task_id: _Optional[str] = ...) -> None: ...
+
+class GetTaskResponse(_message.Message):
+    __slots__ = ("task",)
+    TASK_FIELD_NUMBER: _ClassVar[int]
+    task: Task
+    def __init__(self, task: _Optional[_Union[Task, _Mapping]] = ...) -> None: ...
+
+class GetIngestionInfoRequest(_message.Message):
+    __slots__ = ("task_id",)
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    task_id: str
+    def __init__(self, task_id: _Optional[str] = ...) -> None: ...
+
+class GetIngestionInfoResponse(_message.Message):
+    __slots__ = ("task", "root_content")
+    TASK_FIELD_NUMBER: _ClassVar[int]
+    ROOT_CONTENT_FIELD_NUMBER: _ClassVar[int]
+    task: Task
+    root_content: ContentMetadata
+    def __init__(self, task: _Optional[_Union[Task, _Mapping]] = ..., root_content: _Optional[_Union[ContentMetadata, _Mapping]] = ...) -> None: ...
