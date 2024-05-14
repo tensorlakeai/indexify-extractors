@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-WORKDIR {{ workdir }}
+WORKDIR /root/{{ workdir }}
 
 RUN apt-get update -y && \
     apt-get -y install git lsb-release ca-certificates apt-transport-https
@@ -22,7 +22,7 @@ ENV EXTRACTOR_PATH {{ extractor_path }}
 
 RUN python3.11 -m venv ve
 # Use the virtualenv, to make sure we're using the right Python version
-ENV PATH="/.indexify-extractors/ve/bin:$PATH"
+ENV PATH /root/.indexify-extractors/ve/bin:$PATH
 
 RUN pip3 install --no-input --upgrade pip && \
     pip3 install --no-input wheel && \
@@ -39,8 +39,8 @@ RUN cd indexify_extractor_sdk && pip3 install .
 RUN pip3 install --no-input indexify_extractor_sdk {{ additional_pip_flags }}
 {% endif %}
 
-# Copy over the extractor as {{module_name}}.py into /indexify-extractors/{{module_name}}.py
-COPY . indexify-extractors/
+# Copy over the extractor as {{module_name}}.py into indexify_extractors/{{module_name}}.py
+COPY . indexify_extractors/
 
 ENV TOKENIZERS_PARALLELISM=true
 
