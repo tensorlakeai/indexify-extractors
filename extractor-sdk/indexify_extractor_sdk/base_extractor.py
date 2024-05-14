@@ -243,8 +243,19 @@ class ExtractorWrapper:
         self._has_batch_extract = True if callable(extract_batch) else False
 
     def _param_from_json(self, param: Json) -> BaseModel:
-        param_dict = json.loads(param) if param is not None else {}
-        return self._param_cls.model_validate(param_dict) if self._param_cls is not None else None
+        if self._param_cls is None:
+            return {}
+
+        param_dict = {}
+        if param is not None and param != "null":
+            param_dict = json.loads(param)
+
+        try:
+            return self._param_cls.model_validate(param_dict)
+        except Exception as e:
+            print(f"Error validating input params: {e}")
+
+        return {}
 
     def extract_batch(
         self, content_list: Dict[str, Content], input_params: Dict[str, Json]
