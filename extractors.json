@@ -26,7 +26,7 @@
   {"type": "pdf", "module_name": "layoutlm_document_qa.layoutlm_document_qa:LayoutLMDocumentQA"},
   {"type": "pdf", "module_name": "ocrmypdf.ocr_my_pdf:OCRMyPDFExtractor"},
   {"type": "pdf", "module_name": "unstructuredio.unstructured_pdf:UnstructuredIOExtractor"},
-  {"type": "pdf", "module_name": "markdown.markdown_extractor:MarkdownExtractor"},
+  {"type": "pdf", "module_name": "marker.markdown_extractor:MarkdownExtractor"},
   {"type": "text", "module_name": "chunking.chunk_extractor:ChunkExtractor"},
   {"type": "text", "module_name": "summarization.summary_extractor:SummaryExtractor"},
   {"type": "text", "module_name": "llm-summary.summary_extractor:SummaryExtractor"},

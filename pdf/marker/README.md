@@ -1,6 +1,6 @@
-# PDF to Markdown Extraction
+# PDF to Markdown Extraction using Marker
 
-Markdown extractor converts PDF, EPUB, and MOBI to markdown.  It's 10x faster than nougat, more accurate on most documents, and has low hallucination risk.
+Markdown extractor converts PDF, EPUB, and MOBI to markdown using Marker by Vik Paruchuri. It's 10x faster than nougat, more accurate on most documents, and has low hallucination risk. If you like it, please Star the [Marker GitHub Repo](https://github.com/VikParuchuri/marker)
 
 - Support for a range of PDF documents (optimized for books and scientific papers)
 - Removes headers/footers/other artifacts
@@ -34,13 +34,13 @@ Content(content_type="application/pdf", data=f.read())
 
 ##### code:
 ```python
-!indexify-extractor download hub://pdf/markdown
-!indexify-extractor join-server markdown.markdown_extractor:MarkdownExtractor
+!indexify-extractor download hub://pdf/marker
+!indexify-extractor join-server marker.markdown_extractor:MarkdownExtractor
 
 from indexify import IndexifyClient
 client = IndexifyClient()
 
-client.add_extraction_policy(extractor='tensorlake/markdown-extractor', name="markdown-extraction")
+client.add_extraction_policy(extractor='tensorlake/marker', name="md-extraction")
 
 import requests
 req = requests.get("https://arxiv.org/pdf/2310.16944.pdf")
