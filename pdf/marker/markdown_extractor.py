@@ -12,7 +12,7 @@ class MarkdownExtractorConfig(BaseModel):
     batch_multiplier: Optional[int] = 2
 
 class MarkdownExtractor(Extractor):
-    name = "tensorlake/markdown-extractor"
+    name = "tensorlake/marker"
     description = "Markdown Extractor for PDFs"
     system_dependencies = []
     input_mime_types = ["application/pdf"]
