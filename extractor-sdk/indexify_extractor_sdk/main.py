@@ -18,6 +18,7 @@ typer_app = typer.Typer(
     help="indexify-extractor - CLI for running and packaging indexify extractors", pretty_exceptions_enable=False
 )
 
+default_extractor_path = os.getenv('EXTRACTOR_PATH', None)
 
 # Hack to get around buffered output when not run using interactive terminal in docker
 # and to ensure that print statements are flushed immediately
@@ -52,7 +53,7 @@ def describe(extractor: str):
 @typer_app.command(help="Run the extractor locally on the given text or file")
 def run_local(
     extractor: str = typer.Argument(
-        None,
+        default_extractor_path,
         help="The extractor name in the format 'module_name:class_name'. For example, 'mock_extractor:MockExtractor'.",
     ),
     text: Optional[str] = typer.Option(None, help="Text to extract from"),
