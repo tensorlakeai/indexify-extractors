@@ -5,7 +5,7 @@
   {"type": "embedding", "module_name": "flag_embedding.bge_base:BGEBase"},
   {"type": "embedding", "module_name": "hash-embedding.identity_hash_embedding:IdentityHashEmbedding"},
   {"type": "embedding", "module_name": "jina_base_en.jina_base_en:JinaEmbeddingsBase"},
-  {"type": "embedding", "module_name": "minilm-l6.minilm_l6:MiniLML6Extractor"},
+  {"type": "embedding", "module_name": "minilm-l6.minilm_l6:MiniLML6Extractor", "with_gpu": true},
   {"type": "embedding", "module_name": "mpnet.mpnet_base_v2:MPNetV2"},
   {"type": "embedding", "module_name": "openai-embedding.openai_embedding:OpenAIEmbeddingExtractor"},
   {"type": "embedding", "module_name": "scibert.scibert_uncased:SciBERTExtractor"},

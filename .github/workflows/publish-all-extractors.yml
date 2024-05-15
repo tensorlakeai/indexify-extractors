@@ -58,6 +58,13 @@ jobs:
           pip install -r requirements.txt
           indexify-extractor package --to-file extractor.dockerfile $FILE:$CLASS
 
+      - name: Package extractor with GPU support
+        if: ${{ matrix.skip_deploy != true && matrix.with_gpu == true }}
+        run: |
+          cd $DIRECTORY
+          pip install -r requirements.txt
+          indexify-extractor package --to-file extractor.dockerfile $FILE:$CLASS --gpu
+
       - name: Get extractor name
         if: ${{ matrix.skip_deploy != true }}
         run: |
@@ -76,8 +83,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push to Docker Hub
+      - name: Push CPU extractor to Docker Hub
         if: ${{ matrix.skip_deploy != true }}
         run: |
           cd $DIRECTORY
           docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $NAME:latest -f extractor.dockerfile;
+
+      - name: Push GPU extractor to Docker Hub
+        if: ${{ matrix.skip_deploy != true && matrix.with_gpu == true }}
+        run: |
+          cd $DIRECTORY
+          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $NAME-gpu:latest -f extractor.dockerfile;
