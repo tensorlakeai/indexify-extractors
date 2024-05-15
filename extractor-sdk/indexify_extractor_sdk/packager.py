@@ -150,8 +150,13 @@ class ExtractorPackager:
             raise
 
         self.logger.info(f"Building image {self.extractor_description['name']}...")
+
+        image_name = self.extractor_description["name"]
+        if self.config.get("gpu", False):
+            image_name += "-gpu"
+
         try:
-            self._build_image(self.extractor_description["name"], compressed_tar_stream)
+            self._build_image(image_name, compressed_tar_stream)
         except Exception as e:
             self.logger.error(f"Failed to build image: {e}")
 
