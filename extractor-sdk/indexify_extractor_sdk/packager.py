@@ -149,11 +149,11 @@ class ExtractorPackager:
             self.logger.error(f"Failed to generate compressed tarball: {e}")
             raise
 
-        self.logger.info(f"Building image {self.extractor_description['name']}...")
-
         image_name = self.extractor_description["name"]
         if self.config.get("gpu", False):
             image_name += "-gpu"
+
+        self.logger.info(f"Building image {image_name}...")
 
         try:
             self._build_image(image_name, compressed_tar_stream)
