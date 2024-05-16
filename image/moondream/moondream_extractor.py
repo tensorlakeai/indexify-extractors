@@ -28,15 +28,17 @@ class MoondreamExtractor(Extractor):
 
         model_id = "vikhyatk/moondream2"
         revision = "2024-04-02"
-        self.model = AutoModelForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_id,
             trust_remote_code=True,
             revision=revision,
             torchscript=True,
-            device_map="auto",
-            torch_dtype=torch_dtype,
         )
 
+        if torch.cuda.is_available():
+            model = model.to("cuda")
+
+        self.model = model
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
