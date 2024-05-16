@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 import torch
 
+from accelerate import Accelerator
 from indexify_extractor_sdk import Extractor, Content, Feature
 from indexify_extractor_sdk.base_extractor import Content
 from transformers import AutoTokenizer, AutoModelForCausalLM
