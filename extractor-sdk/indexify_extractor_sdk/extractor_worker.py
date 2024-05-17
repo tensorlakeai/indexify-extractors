@@ -7,7 +7,6 @@ import sqlite3
 import os
 import sys
 import json
-import time
 
 class ExtractorModule(BaseModel):
     module_name: str
@@ -157,10 +156,7 @@ def _extract_content(
             params[task_id] = task_params_map[task_id]
 
         # Extract content using the right extractor
-        start_time = time.time()
         extracted = extractor_wrapper.extract_batch(task_contents, params)
-        end_time = time.time()
-        print(f"Extraction time: {end_time-start_time}s")
 
         # Add the extracted data to the result
         for task_id, extracted_data in extracted.items():
