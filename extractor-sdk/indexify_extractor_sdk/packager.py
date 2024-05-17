@@ -149,9 +149,14 @@ class ExtractorPackager:
             self.logger.error(f"Failed to generate compressed tarball: {e}")
             raise
 
-        self.logger.info(f"Building image {self.extractor_description['name']}...")
+        image_name = self.extractor_description["name"]
+        if self.config.get("gpu", False):
+            image_name += "-gpu"
+
+        self.logger.info(f"Building image {image_name}...")
+
         try:
-            self._build_image(self.extractor_description["name"], compressed_tar_stream)
+            self._build_image(image_name, compressed_tar_stream)
         except Exception as e:
             self.logger.error(f"Failed to build image: {e}")
 
@@ -240,6 +245,7 @@ class ExtractorPackager:
                     else "--extra-index-url https://download.pytorch.org/whl/cpu"
                 ),
                 dev=self.config.get("dev", False),
+                gpu=self.config.get("gpu", False),
             )
             .render()
         )

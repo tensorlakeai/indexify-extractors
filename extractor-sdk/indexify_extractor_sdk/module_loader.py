@@ -23,6 +23,5 @@ def load_indexify_extractors(base_path):
             # Import the submodule dynamically
             try:
                 importlib.import_module(module_name)
-                print(f"Successfully loaded: {module_name}")
             except Exception as e:
                 print(f"Failed to load: {module_name}, due to {e}")
