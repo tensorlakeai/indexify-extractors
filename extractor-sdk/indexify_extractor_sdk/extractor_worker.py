@@ -8,6 +8,7 @@ import os
 import sys
 import json
 
+
 class ExtractorModule(BaseModel):
     module_name: str
     class_name: str
