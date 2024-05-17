@@ -1,3 +1,4 @@
 transformers==4.38.2
 torch==2.2.1
 accelerate==0.29.2
+langchain==0.1.13
