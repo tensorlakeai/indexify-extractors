@@ -9,7 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 class SchemaExtractorConfig(BaseModel):
     service: str = Field(default='openai')
-    oai_model: Optional[str] = Field(default='gpt-3.5-turbo')
+    model_name: Optional[str] = Field(default='gpt-3.5-turbo')
     key: Optional[str] = Field(default=None)
     schema: dict = Field(default={'properties': {'name': {'title': 'Name', 'type': 'string'}}, 'required': ['name'], 'title': 'User', 'type': 'object'})
     data: Optional[str] = Field(default=None)
@@ -29,7 +29,7 @@ class SchemaExtractor(Extractor):
         text = content.data.decode("utf-8")
 
         service = params.service
-        oai_model = params.oai_model
+        model_name = params.model_name
         key = params.key
         schema = params.schema
         data = params.data
@@ -40,14 +40,14 @@ class SchemaExtractor(Extractor):
         if service == "openai":
             if ('OPENAI_API_KEY' not in os.environ) and (key is None):
                 response_content = "The OPENAI_API_KEY environment variable is not present."
-                feature = Feature.metadata(value={"model": oai_model}, name="text")
+                feature = Feature.metadata(value={"model": model_name}, name="text")
             else:
                 if ('OPENAI_API_KEY' in os.environ) and (key is None):
                     client = OpenAI()
                 else:
                     client = OpenAI(api_key=key)
                 response = client.chat.completions.create(
-                    model=oai_model,
+                    model=model_name,
                     messages=[
                         {"role": "system", "content": additional_messages + str(schema)},
                         {"role": "user", "content": data}
@@ -57,14 +57,21 @@ class SchemaExtractor(Extractor):
                 feature = Feature.metadata(value={"model": response.model, "completion_tokens": response.usage.completion_tokens, "prompt_tokens": response.usage.prompt_tokens}, name="text")
         
         if service == "gemini":
-            if key != None:
-                genai.configure(api_key=key)
-            generation_config = {"temperature": 1, "top_p": 0.95, "top_k": 0, "max_output_tokens": 8192}
-            model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest", generation_config=generation_config)
-            convo = model.start_chat(history=[])
-            convo.send_message(additional_messages + str(schema) + " " + data)
-            response_content = convo.last.text
-            feature = Feature.metadata(value={"model": convo.model.model_name}, name="text")
+            if ('GEMINI_API_KEY' not in os.environ) and (key is None):
+                response_content = "The GEMINI_API_KEY environment variable is not present."
+                feature = Feature.metadata(value={"model": model_name}, name="text")
+            else:
+                if ('GEMINI_API_KEY' in os.environ) and (key is None):
+                    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+                else:
+                    genai.configure(api_key=key)
+                generation_config = { "temperature": 1, "top_p": 0.95, "top_k": 64, "max_output_tokens": 8192, "response_mime_type": "text/plain", }
+                safety_settings = [ { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE", }, { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE", }, { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE", }, { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE", }, ]
+                model = genai.GenerativeModel( model_name="gemini-1.5-flash-latest", safety_settings=safety_settings, generation_config=generation_config, )
+                chat_session = model.start_chat( history=[ ] )
+                response = chat_session.send_message(additional_messages + str(schema) + " " + data)
+                response_content = response.text
+                feature = Feature.metadata(value={"model": model_name}, name="text")
         
         if '/' in service:
             model = AutoModelForCausalLM.from_pretrained(service, device_map="cuda", torch_dtype="auto", trust_remote_code=True)
