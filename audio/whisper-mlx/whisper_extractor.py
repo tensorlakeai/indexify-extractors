@@ -6,7 +6,7 @@ from indexify_extractor_sdk import (
 )
 from indexify_extractor_sdk.base_extractor import Feature
 from pydantic import BaseModel
-import whisper
+from . import whisper
 
 class InputParams(BaseModel):
     chunk_length: int = 30
