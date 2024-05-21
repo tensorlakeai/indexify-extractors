@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "indexify-extractor-sdk"
-version = "0.0.64"
+version = "0.0.65"
 description = "Indexify Extractor SDK to build new extractors for extraction from unstructured data"
 authors = ["Diptanu Gon Choudhury <diptanu@tensorlake.ai>"]
 readme = "README.md"
@@ -30,6 +30,7 @@ genson = "^1.2.2"
 rich = "^13.7.1"
 fsspec = "^2024.2.0"
 pyyaml = "^6.0.1"
+requests = "2.31.0"
 
 [tool.poetry.dev-dependencies]
 syrupy = "^4.0.0"
