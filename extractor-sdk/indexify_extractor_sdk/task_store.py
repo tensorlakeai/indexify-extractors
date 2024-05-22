@@ -5,6 +5,8 @@ from typing import Dict, List
 from pydantic import BaseModel
 from .ingestion_api_models import ApiContent, ApiFeature
 
+import asyncio
+
 
 class CompletedTask(BaseModel):
     task_id: str
@@ -19,6 +21,8 @@ class TaskStore:
         self._running_tasks: Dict[str, coordinator_service_pb2.Task] = {}
         self._finished: Dict[str, CompletedTask] = {}
         self._retries: Dict[str, int] = {}
+        self._new_task_event = asyncio.Event()
+        self._finished_task_event = asyncio.Event()
 
     def get_task(self, id) -> coordinator_service_pb2.Task:
         return self._tasks[id]
@@ -33,10 +37,17 @@ class TaskStore:
                 continue
             print(f"added task {task.id} to queue")
             self._tasks[task.id] = task
+            self._new_task_event.set()
 
-    def get_runnable_tasks(self) -> Dict[str, coordinator_service_pb2.Task]:
-        runnable_tasks = set(self._tasks) - set(self._running_tasks)
-        runnable_tasks = set(runnable_tasks) - set(self._finished)
+    async def get_runnable_tasks(self) -> Dict[str, coordinator_service_pb2.Task]:
+        while True:
+            runnable_tasks = set(self._tasks) - set(self._running_tasks)
+            runnable_tasks = set(runnable_tasks) - set(self._finished)
+            if len(runnable_tasks) == 0:
+                await self._new_task_event.wait()
+                self._new_task_event.clear()
+            else:
+                break
         out = {}
         for task_id in runnable_tasks:
             out[task_id] = self._tasks[task_id]
@@ -48,6 +59,7 @@ class TaskStore:
         self._finished[outcome.task_id] = outcome
         if outcome.task_id in self._running_tasks:
             self._running_tasks.pop(outcome.task_id)
+        self._finished_task_event.set()
 
     def retriable_failure(self, task_id: str):
         self._running_tasks.pop(task_id)
@@ -61,6 +73,8 @@ class TaskStore:
                     task_id=task_id, task_outcome="Failed", new_content=[], features=[]
                 )
             )
+        else:
+            self._new_task_event.set()
 
     def mark_reported(self, task_id: str):
         self._tasks.pop(task_id)
@@ -80,5 +94,11 @@ class TaskStore:
     def num_pending_tasks(self) -> int:
         return len(self._tasks) + len(self._running_tasks)
 
-    def task_outcomes(self) -> List[CompletedTask]:
+    async def task_outcomes(self) -> List[CompletedTask]:
+        while True:
+            if len(self._finished) == 0:
+                await self._finished_task_event.wait()
+                self._finished_task_event.clear()
+            else:
+                break
         return self._finished.copy().values()

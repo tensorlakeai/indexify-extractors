@@ -36,6 +36,7 @@ from websockets.exceptions import ConnectionClosed
 
 CONTENT_FRAME_SIZE = 1024 * 1024
 
+
 def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id):
     return ApiBeginExtractedContentIngest(
         BeginExtractedContentIngest=BeginExtractedContentIngest(
@@ -95,7 +96,9 @@ async def process_task_outcome(
     frame_size=CONTENT_FRAME_SIZE,
 ):
     try:
-        async with websockets.connect(url, ssl=ssl_context, ping_interval=5, ping_timeout=30) as ws:
+        async with websockets.connect(
+            url, ssl=ssl_context, ping_interval=5, ping_timeout=30
+        ) as ws:
             # start new extracted content ingest
             await ws.send(
                 begin_message(task_outcome, task, _executor_id).model_dump_json()
@@ -167,15 +170,19 @@ class ExtractorAgent:
         self.extractor_arg = extractor_arg
         self._use_tls = False
         if config_path:
-            with open(config_path, 'r') as f:
+            with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
                 self._config = config
-            if config.get('use_tls', False):
+            if config.get("use_tls", False):
                 print("Running the extractor with TLS enabled")
                 self._use_tls = True
-                tls_config = config['tls_config']
-                self._ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=tls_config['ca_bundle_path'])
-                self._ssl_context.load_cert_chain(certfile=tls_config['cert_path'], keyfile=tls_config['key_path'])
+                tls_config = config["tls_config"]
+                self._ssl_context = ssl.create_default_context(
+                    ssl.Purpose.SERVER_AUTH, cafile=tls_config["ca_bundle_path"]
+                )
+                self._ssl_context.load_cert_chain(
+                    certfile=tls_config["cert_path"], keyfile=tls_config["key_path"]
+                )
                 self._protocol = "wss"
             else:
                 self._use_tls = False
@@ -208,14 +215,18 @@ class ExtractorAgent:
         # because the old one might have been closed after hb was broken or we could never connect
         if self._use_tls:
             # Load the certificate and key files
-            with open(self._config['tls_config']['cert_path'], 'rb') as f:
+            with open(self._config["tls_config"]["cert_path"], "rb") as f:
                 cert = f.read()
-            with open(self._config['tls_config']['key_path'], 'rb') as f:
+            with open(self._config["tls_config"]["key_path"], "rb") as f:
                 key = f.read()
-            with open(self._config['tls_config']['ca_bundle_path'], 'rb') as f:
+            with open(self._config["tls_config"]["ca_bundle_path"], "rb") as f:
                 ca_cert = f.read()
-            credentials = grpc.ssl_channel_credentials(root_certificates=ca_cert, private_key=key, certificate_chain=cert)
-            self._channel = grpc.aio.secure_channel(self._coordinator_addr, credentials=credentials)
+            credentials = grpc.ssl_channel_credentials(
+                root_certificates=ca_cert, private_key=key, certificate_chain=cert
+            )
+            self._channel = grpc.aio.secure_channel(
+                self._coordinator_addr, credentials=credentials
+            )
         else:
             self._channel = grpc.aio.insecure_channel(self._coordinator_addr)
 
@@ -227,14 +238,18 @@ class ExtractorAgent:
         )
         return await self._stub.RegisterExecutor(req)
 
+    async def task_launcher(self):
+        while True:
+            tasks_to_launch = await self._task_store.get_runnable_tasks()
+            await self.launch_tasks(tasks_to_launch)
+
     async def task_completion_reporter(self):
         print("starting task completion reporter")
+        # We should copy only the keys and not the values
+        url = f"{self._protocol}://{self._ingestion_addr}/write_content"
         while True:
-            await asyncio.sleep(5)
-            await self.launch_tasks()
-            # We should copy only the keys and not the values
-            url = f"{self._protocol}://{self._ingestion_addr}/write_content"
-            for task_outcome in self._task_store.task_outcomes():
+            outcomes = await self._task_store.task_outcomes()
+            for task_outcome in outcomes:
                 print(
                     f"reporting outcome of task {task_outcome.task_id}, outcome: {task_outcome.task_outcome}, num_content: {len(task_outcome.new_content)}, num_features: {len(task_outcome.features)}"
                 )
@@ -258,10 +273,9 @@ class ExtractorAgent:
 
                 self._task_store.mark_reported(task_id=task_outcome.task_id)
 
-    async def launch_tasks(self):
-        tasks_to_launch = self._task_store.get_runnable_tasks()
-        if len(tasks_to_launch) == 0:
-            return
+    async def launch_tasks(
+        self, tasks_to_launch: Dict[str, coordinator_service_pb2.Task]
+    ):
         print("launching tasks : ", ",".join(tasks_to_launch.keys()))
         content_urls = {}
         for _, task in tasks_to_launch.items():
@@ -299,7 +313,9 @@ class ExtractorAgent:
         except BrokenProcessPool as bp:
             print(f"failed to execute tasks {bp}, retrying")
             self._executor.shutdown(wait=True, cancel_futures=True)
-            self._executor = create_executor(workers=self.num_workers, extractor_id=self.extractor_arg)
+            self._executor = create_executor(
+                workers=self.num_workers, extractor_id=self.extractor_arg
+            )
             for task_id in content_list.keys():
                 self._task_store.retriable_failure(task_id)
             return
@@ -343,6 +359,7 @@ class ExtractorAgent:
         if not self._advertise_addr:
             self._advertise_addr = await get_server_advertise_addr(self._http_server)
         print(f"advertise addr is {self._advertise_addr}")
+        asyncio.create_task(self.task_launcher())
         asyncio.create_task(self.task_completion_reporter())
         self._should_run = True
         while self._should_run:
