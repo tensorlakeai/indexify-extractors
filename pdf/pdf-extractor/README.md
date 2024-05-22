@@ -12,7 +12,7 @@ Content(content_type="application/pdf", data=f.read())
 
 ##### output:
 ```
-[Content(content_type='text/plain', data=b'I love playing football.', features=[Feature(feature_type='metadata', name='text', value={'page': 1}, comment=None)], labels={})]
+[Content(content_type='text/plain', data=b'I love playing football.', features=[Feature(feature_type='metadata', value={'type': 'text', 'page': 1}, comment=None)], labels={})]
 ```
 
 ##### code:

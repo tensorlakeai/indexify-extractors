@@ -25,7 +25,7 @@ class PDFExtractor(Extractor):
                 page = doc[i]
                 page_text = page.get_text()
                 image_list = page.get_images()
-                feature = Feature.metadata(value={"page": i+1}, name="text")
+                feature = Feature.metadata(value={"type": "text", "page": i+1})
                 contents.append(Content.from_text(page_text, features=[feature]))
 
                 for img in image_list:
@@ -33,13 +33,13 @@ class PDFExtractor(Extractor):
                     pix = fitz.Pixmap(doc, xref)
                     if not pix.colorspace.name in (fitz.csGRAY.name, fitz.csRGB.name):
                         pix = fitz.Pixmap(fitz.csRGB, pix)
-                    feature = Feature.metadata({"page": i+1}, name="image")
+                    feature = Feature.metadata({"type": "image", "page": i+1})
                     contents.append(Content(content_type="image/png", data=pix.tobytes(), features=[feature]))
 
         tables = get_tables(content.data)
 
         for page, content in tables.items():
-            feature = Feature.metadata({"page": int(page)}, name="table")
+            feature = Feature.metadata({"type": "table", "page": int(page)})
             contents.append(Content(content_type="application/json", data=json.dumps(content), features=[feature]))
         
         return contents
