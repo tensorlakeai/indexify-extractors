@@ -3,7 +3,7 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel
 from transformers import pipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownTextSplitter, LatexTextSplitter
-from indexify_text_splitter import FastRecursiveTextSplitter
+from .utils.chunk_module import FastRecursiveTextSplitter
 
 class InputParams(BaseModel):
     max_length: int = 130

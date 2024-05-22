@@ -1,7 +1,7 @@
 from typing import List, Union
 import io
 from indexify_extractor_sdk import Content, Extractor, Feature
-from utils.ocr_module import get_text
+from .utils.ocr_module import get_text
 import fitz
 import tempfile
 

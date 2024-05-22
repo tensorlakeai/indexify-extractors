@@ -7,7 +7,7 @@ from io import BytesIO
 from transformers import AutoProcessor, BitsAndBytesConfig, Idefics2ForConditionalGeneration
 from huggingface_hub import hf_hub_download
 from indexify_extractor_sdk import Content, Extractor, Feature
-from parse_utils import token2json
+from .parse_utils import token2json
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
