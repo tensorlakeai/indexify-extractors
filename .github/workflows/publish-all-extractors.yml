@@ -83,6 +83,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          docker-images: false
+
       - name: Push CPU extractor to Docker Hub
         if: ${{ matrix.skip_deploy != true }}
         run: |
