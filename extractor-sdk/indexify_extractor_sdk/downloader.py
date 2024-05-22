@@ -219,7 +219,7 @@ def download_extractor(extractor_path):
     description = get_extractor_description(extractor_full_name)
     
     if description.name.startswith("tensorlake"):
-        log_event("download-extractor", description.name)
+        log_event("extractor_download", description.name)
 
     try:
         save_extractor_description(extractor_full_name, description)

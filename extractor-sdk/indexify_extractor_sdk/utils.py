@@ -1,6 +1,6 @@
 from itertools import islice
 import requests
-
+import platform
 
 # https://docs.python.org/3/library/itertools.html#itertools.batched
 def batched(iterable, n):
@@ -15,8 +15,8 @@ def batched(iterable, n):
 def log_event(event, value):
     try:
         requests.post(
-            "https://www.tensorlake.ai/api/analytics", json={"event": event, "value": value}
-        )
+            "https://getindexify.ai/api/analytics", json={"event": event, "value": value, "platform":platform.platform(), "machine": platform.machine()}
+        , timeout=1)
     except Exception as e:
         # fail silently
         pass
