@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.panel import Panel
 from .extractor_worker import ExtractorWrapper
 from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH
-
+from .utils import log_event
 console = Console()
 
 VENV_PATH = os.path.join(EXTRACTORS_PATH, "ve")
@@ -214,9 +214,12 @@ def download_extractor(extractor_path):
     install_dependencies(os.path.join(EXTRACTOR_MODULE_PATH, base_extractor_path))
 
     # Store the extractor info in the database
-
+    
     extractor_full_name = get_extractor_full_name(base_extractor_path)
     description = get_extractor_description(extractor_full_name)
+    
+    if description.name.startswith("tensorlake"):
+        log_event("extractor_download", description.name)
 
     try:
         save_extractor_description(extractor_full_name, description)
