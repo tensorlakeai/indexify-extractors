@@ -101,7 +101,7 @@ def describe_sync(extractor):
     print(wrapper.describe())
 
 
-def check(extractor):
+def install_local(extractor):
     module, cls = extractor.split(":")
     wrapper = ExtractorWrapper(module, cls, local=True)
     description = wrapper.describe()

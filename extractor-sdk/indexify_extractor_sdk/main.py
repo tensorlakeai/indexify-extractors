@@ -155,8 +155,8 @@ def list(
 
 
 @typer_app.command(help="Check and prepare extractor in development for local testing")
-def check(extractor: str = typer.Argument(
+def install_local(extractor: str = typer.Argument(
     default_extractor_path,
     help="The extractor name in the format module_name:class_name",
 )):
-    indexify_extractor.check(extractor)
+    indexify_extractor.install_local(extractor)
