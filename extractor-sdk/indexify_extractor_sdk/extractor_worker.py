@@ -50,15 +50,23 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
     # When running the extractor as a Docker container,
     # the extractor ID is passed as an environment variable.
     # If there is ID or EXTRACTOR_PATH, load the extractor singularly.
-    if id:
+    if id and id.startswith("indexify_extractors"):
+        id = id[20:]
         cur.execute(f"SELECT * FROM extractors WHERE id = '{id}'")
         record = cur.fetchone()
         if record is None:
-            raise ValueError(f"Extractor <{id}> not found locally.")
+            raise ValueError(f"Extractor {id} not found locally.")
 
         load_extractor_description(record)
-        extractor_wrapper = create_extractor_wrapper(record[0])
+        module = f"indexify_extractors.{record[0]}"
+        extractor_wrapper = create_extractor_wrapper(module)
         extractor_wrapper_map[record[1]] = extractor_wrapper
+    elif id:
+        extractor_wrapper = create_extractor_wrapper(id)
+        description = extractor_wrapper.describe()
+        name = description.name
+        extractor_descriptions.append(description)
+        extractor_wrapper_map[name] = extractor_wrapper
     elif os.environ.get("EXTRACTOR_PATH"):
         extractor = os.environ.get("EXTRACTOR_PATH")
 
