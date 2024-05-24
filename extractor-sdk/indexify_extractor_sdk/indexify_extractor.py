@@ -21,7 +21,7 @@ def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None
     if file:
         content = Content.from_file(file)
     module, cls = extractor.split(":")
-    wrapper = ExtractorWrapper(module, cls, local=True)
+    wrapper = ExtractorWrapper(module, cls)
     result = wrapper.extract_batch({"task_id": content}, input_params={"task_id": "{}"})
     print(result)
 
@@ -103,7 +103,7 @@ def describe_sync(extractor):
 
 def install_local(extractor):
     module, cls = extractor.split(":")
-    wrapper = ExtractorWrapper(module, cls, local=True)
+    wrapper = ExtractorWrapper(module, cls)
     description = wrapper.describe()
 
     # Copy everything in the current directory to the extractors directory.
