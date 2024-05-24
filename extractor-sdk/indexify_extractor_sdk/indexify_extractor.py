@@ -2,13 +2,14 @@ import asyncio
 from . import coordinator_service_pb2
 from .base_extractor import ExtractorWrapper, ExtractorDescription
 from typing import Optional, Tuple, List
-from .base_extractor import Content
+from .base_extractor import Content, EXTRACTOR_MODULE_PATH
 import nanoid
 import json
 from .extractor_worker import ExtractorModule, create_executor, describe
 from .agent import ExtractorAgent
 import os
 from .coordinator_service_pb2 import Extractor
+from .downloader import save_extractor_description
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
     if text and file:
@@ -98,3 +99,21 @@ def describe_sync(extractor):
     module, cls = extractor.split(":")
     wrapper = ExtractorWrapper(module, cls)
     print(wrapper.describe())
+
+
+def check(extractor):
+    module, cls = extractor.split(":")
+    wrapper = ExtractorWrapper(module, cls, local=True)
+    description = wrapper.describe()
+
+    # Copy everything in the current directory to the extractors directory.
+    to_module = f"custom_{module}"
+    destination = os.path.join(EXTRACTOR_MODULE_PATH, to_module)
+    os.system(f"cp -r . {destination}")
+    print(f"copied to {destination} for testing")
+
+    # Create a new extractor description.
+    extractor_id = f"{to_module}.{module}:{cls}"
+    save_extractor_description(extractor_id, description)
+
+    print("extractor ready for testing. Run: indexify-extractor join-server")
