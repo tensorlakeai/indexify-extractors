@@ -1,1 +1,1 @@
-marker-pdf==0.2.5
+marker-pdf==0.2.9
