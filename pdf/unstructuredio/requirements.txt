@@ -5,3 +5,4 @@ pillow-heif
 opencv-python
 pdf2image
 pytesseract
+pikepdf
