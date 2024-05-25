@@ -18,5 +18,5 @@ indexify-extractor join-server
 | ocrmypdf             | hub://pdf/ocrmypdf             | ocr_my_pdf:OCRMyPDFExtractor             |
 | unstructuredio       | hub://pdf/unstructuredio       | unstructured_pdf:UnstructuredIOExtractor |
 | pdf-extractor        | hub://pdf/pdf-extractor        | pdf_extractor:PDFExtractor               |
-| markdown             | hub://pdf/markdown             | markdown_extractor:MarkdownExtractor     |
+| marker             | hub://pdf/marker             | markdown_extractor:MarkdownExtractor     |
 | easyocrpdf           | hub://pdf/easyocrpdf           | ocr_extractor:OCRExtractor     |
