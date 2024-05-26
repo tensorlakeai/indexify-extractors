@@ -42,23 +42,11 @@ def load_extractors(name: str):
 
 
 def create_extractor_wrapper_map(id: Optional[str] = None):
-    global extractor_wrapper_map
-
-    conn = sqlite3.connect(get_db_path())
-    cur = conn.cursor()
-
     # When running the extractor as a Docker container,
     # the extractor ID is passed as an environment variable.
     # If there is ID or EXTRACTOR_PATH, load the extractor singularly.
     if id:
-        cur.execute(f"SELECT * FROM extractors WHERE id = '{id}'")
-        record = cur.fetchone()
-        if record is None:
-            raise ValueError(f"Extractor <{id}> not found locally.")
-
-        load_extractor_description(record)
-        extractor_wrapper = create_extractor_wrapper(record[0])
-        extractor_wrapper_map[record[1]] = extractor_wrapper
+        get_local_extractor(id)
     elif os.environ.get("EXTRACTOR_PATH"):
         extractor = os.environ.get("EXTRACTOR_PATH")
 
@@ -69,6 +57,8 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
         extractor_descriptions.append(description)
         extractor_wrapper_map[name] = extractor_wrapper
     else:
+        conn = sqlite3.connect(get_db_path())
+        cur = conn.cursor()
         cur.execute("SELECT * FROM extractors")
         records = cur.fetchall()
         for record in records:
@@ -77,7 +67,32 @@ def create_extractor_wrapper_map(id: Optional[str] = None):
             # to the coordinator. The actual extractor will be loaded when needed.
             load_extractor_description(record)
 
-    conn.close()
+        conn.close()
+
+
+def get_local_extractor(module: str):
+    if module.startswith("indexify_extractors"):
+        id = module[20:]
+
+        conn = sqlite3.connect(get_db_path())
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM extractors WHERE id = '{id}'")
+
+        record = cur.fetchone()
+        if record is None:
+            raise ValueError(f"Extractor {id} not found locally.")
+
+        load_extractor_description(record)
+        module = f"indexify_extractors.{record[0]}"
+        extractor_wrapper = create_extractor_wrapper(module)
+        name = record[1]
+    else:
+        extractor_wrapper = create_extractor_wrapper(module)
+        description = extractor_wrapper.describe()
+        name = description.name
+        extractor_descriptions.append(description)
+        
+    extractor_wrapper_map[name] = extractor_wrapper
 
 
 def load_extractor_description(record) -> ExtractorDescription:

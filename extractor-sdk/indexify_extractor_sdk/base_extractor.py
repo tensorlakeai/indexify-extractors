@@ -235,7 +235,7 @@ def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
-        module = import_module(f"{EXTRACTORS_MODULE}.{module_name}")
+        module = import_module(module_name)
         cls = getattr(module, class_name)
         self._instance: Extractor = cls()
         self._param_cls = get_type_hints(cls.extract).get("params", None)
