@@ -1,5 +1,6 @@
 import logging
 import torch
+import requests
 import base64
 import os
 
@@ -118,7 +119,12 @@ class ASRExtractor(Extractor):
         return [Content.from_text(str(transcript), features=[feature])]
     
     def sample_input(self) -> Content:
-        return self.sample_mp3()
+        filepath = "sample.mp3"
+        with open(filepath, 'wb') as file:
+            file.write((requests.get("https://extractor-files.diptanu-6d5.workers.dev/sample-000009.mp3")).content)
+        with open(filepath, 'rb') as f:
+            audio_encoded = base64.b64encode(f.read()).decode("utf-8")
+        return Content(content_type="audio/mpeg", data=audio_encoded)
 
 if __name__ == "__main__":
     filepath = "sample.mp3"
