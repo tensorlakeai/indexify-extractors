@@ -1,13 +1,13 @@
 import logging
 import torch
-import requests
+import tempfile
 import base64
 import os
 
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pyannote.audio import Pipeline
 from transformers import pipeline, AutoModelForCausalLM
-from .diarization_utils import diarize
+from diarization_utils import diarize
 from huggingface_hub import HfApi
 from starlette.exceptions import HTTPException
 
@@ -79,59 +79,52 @@ class ASRExtractor(Extractor):
             self.diarization_pipeline = None
 
     def extract(self, content: Content, params: ASRExtractorConfig) -> List[Union[Feature, Content]]:
-        file = base64.b64decode(content.data)
-        logger.info(f"inference params: {params}")
+        with tempfile.NamedTemporaryFile() as fp:
+            fp.write(content.data)
+            file = open(fp.name, "rb").read()
+            logger.info(f"inference params: {params}")
 
-        generate_kwargs = {
-            "task": params.task, 
-            "language": params.language,
-            "assistant_model": self.assistant_model if params.assisted else None
-        }
+            generate_kwargs = {
+                "task": params.task, 
+                "language": params.language,
+                "assistant_model": self.assistant_model if params.assisted else None
+            }
 
-        try:
-            asr_outputs = self.asr_pipeline(
-                file,
-                chunk_length_s=params.chunk_length_s,
-                batch_size=params.batch_size,
-                generate_kwargs=generate_kwargs,
-                return_timestamps=True,
-            )
-        except RuntimeError as e:
-            logger.error(f"ASR inference error: {str(e)}")
-            raise HTTPException(status_code=400, detail=f"ASR inference error: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unknown error diring ASR inference: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Unknown error diring ASR inference: {str(e)}")
-
-        if self.diarization_pipeline:
             try:
-                transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
+                asr_outputs = self.asr_pipeline(
+                    file,
+                    chunk_length_s=params.chunk_length_s,
+                    batch_size=params.batch_size,
+                    generate_kwargs=generate_kwargs,
+                    return_timestamps=True,
+                )
             except RuntimeError as e:
-                logger.error(f"Diarization inference error: {str(e)}")
-                raise HTTPException(status_code=400, detail=f"Diarization inference error: {str(e)}")
+                logger.error(f"ASR inference error: {str(e)}")
+                raise HTTPException(status_code=400, detail=f"ASR inference error: {str(e)}")
             except Exception as e:
-                logger.error(f"Unknown error during diarization: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Unknown error during diarization: {str(e)}")
-        else:
-            transcript = []
+                logger.error(f"Unknown error diring ASR inference: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Unknown error diring ASR inference: {str(e)}")
 
-        feature = Feature.metadata(value={"chunks": asr_outputs["chunks"], "text": asr_outputs["text"]})
-        return [Content.from_text(str(transcript), features=[feature])]
+            if self.diarization_pipeline:
+                try:
+                    transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
+                except RuntimeError as e:
+                    logger.error(f"Diarization inference error: {str(e)}")
+                    raise HTTPException(status_code=400, detail=f"Diarization inference error: {str(e)}")
+                except Exception as e:
+                    logger.error(f"Unknown error during diarization: {str(e)}")
+                    raise HTTPException(status_code=500, detail=f"Unknown error during diarization: {str(e)}")
+            else:
+                transcript = []
+
+            feature = Feature.metadata(value={"chunks": asr_outputs["chunks"], "text": asr_outputs["text"]})
+            return [Content.from_text(str(transcript), features=[feature])]
     
     def sample_input(self) -> Content:
-        filepath = "sample.mp3"
-        with open(filepath, 'wb') as file:
-            file.write((requests.get("https://extractor-files.diptanu-6d5.workers.dev/sample-000009.mp3")).content)
-        with open(filepath, 'rb') as f:
-            audio_encoded = base64.b64encode(f.read()).decode("utf-8")
-        return Content(content_type="audio/mpeg", data=audio_encoded)
+        return self.sample_mp3()
 
 if __name__ == "__main__":
-    filepath = "sample.mp3"
-    with open(filepath, 'rb') as f:
-        audio_encoded = base64.b64encode(f.read()).decode("utf-8")
-    data = Content(content_type="audio/mpeg", data=audio_encoded)
     params = ASRExtractorConfig(batch_size=24)
     extractor = ASRExtractor()
-    results = extractor.extract(data, params=params)
+    results = extractor.extract(extractor.sample_mp3(), params=params)
     print(results)
