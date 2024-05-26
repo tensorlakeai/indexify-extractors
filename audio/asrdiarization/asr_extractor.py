@@ -118,10 +118,7 @@ class ASRExtractor(Extractor):
         return [Content.from_text(str(transcript), features=[feature])]
     
     def sample_input(self) -> Content:
-        filepath = "sample.mp3"
-        with open(filepath, 'rb') as f:
-            audio_encoded = base64.b64encode(f.read()).decode("utf-8")
-        return Content(content_type="audio/mpeg", data=audio_encoded)
+        return self.sample_mp3()
 
 if __name__ == "__main__":
     filepath = "sample.mp3"
