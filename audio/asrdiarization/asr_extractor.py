@@ -7,7 +7,7 @@ import os
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pyannote.audio import Pipeline
 from transformers import pipeline, AutoModelForCausalLM
-from diarization_utils import diarize
+from .diarization_utils import diarize
 from huggingface_hub import HfApi
 from starlette.exceptions import HTTPException
 
