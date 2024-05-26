@@ -64,13 +64,17 @@ If want to build a new extractor to give Indexify new data processing capabiliti
 
 #### Clone the template
 ```shell
-git clone https://github.com/tensorlakeai/indexify-extractor-template.git
+curl https://codeload.github.com/tensorlakeai/indexify-extractor-template/tar.gz/main | tar -xz  indexify-extractor-template-main
 ``` 
 
 #### Implement the extractor interface 
 ```python
 class MyExtractor(Extractor):
-    input_mime_types = ["text/plain", "application/pdf", "image/jpeg"]
+    name = "your-org-name/MyExtractor"
+    description = "Description of the extractor goes here."
+
+    system_dependencies = []
+    input_mime_types = ["text/plain"]
 
     def __init__(self):
         super().__init__()
@@ -78,37 +82,36 @@ class MyExtractor(Extractor):
     def extract(self, content: Content, params: InputParams) -> List[Content]:
         return [
             Content.from_text(
-                text="Hello World",
-                features=[
-                    Feature.embedding(values=[1, 2, 3]),
-                    Feature.metadata(json.loads('{"a": 1, "b": "foo"}')),
-                ],
-                labels={"url": "test.com"},
+                text="Hello World", features=[Feature.embedding(values=[1, 2, 3])]
             ),
             Content.from_text(
-                text="Pipe Baz",
-                features=[Feature.embedding(values=[1, 2, 3])],
-                labels={"url": "test.com"},
+                text="Pipe Baz", features=[Feature.embedding(values=[1, 2, 3])]
+            ),
+            Content.from_text(
+                text="Hello World",
+                features=[Feature.metadata({"key": "value"})],
             ),
         ]
 
     def sample_input(self) -> Content:
-        return Content.from_text("hello world")
+        Content.from_text(text="Hello World")
 
 ```
 
-Once you have developed the extractor you can test the extractor locally by running the `indexify-extractor local` command as described above.
+All the Python dependencies of the extractor goes into `requirements.txt` file adjacent to the extractor file.
+
+Once you have developed the extractor you can test the extractor locally by running the `indexify-extractor run-local` command as described above.
 
 #### Test and Deploy the extractor
 First test your extractor 
 ```python
-ex, config = load_extractor("my_extractor:MyExtractor")
+ex, config = load_extractor("custom_extractor:MyExtractor")
 config.schema()
-ex.extract(Content(...), config(...)# or ignore if you don't have config)
+ex.extract(Content(...), config(...))# or ignore config if you don't have config
 ```
 Run the extractor on shell
 ```bash
-indexify-extractor run-local my_extractor:MyExtractor --text "hello world" // or --file /path to file
+indexify-extractor run-local custom_extractor:MyExtractor --text "hello world" // or --file /path to file
 ```
 
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
@@ -119,7 +122,7 @@ indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-add
 #### Package the Extractor 
 Once you build a new extractor, and have tested it and it's time to deploy this in production, you can build a container with the extractor -
 ```bash
-indexify-extractor package my_extractor:MyExtractor
+indexify-extractor package custom_extractor:MyExtractor
 ```
 
 If you want to package an extractor in a container that support Nvidia CUDA GPU, you can pass the `--gpu` flag to the package command.
