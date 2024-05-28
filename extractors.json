@@ -32,6 +32,6 @@
   {"type": "text", "module_name": "llm-summary.summary_extractor:SummaryExtractor"},
   {"type": "text", "module_name": "llm.llm_extractor:LLMExtractor"},
   {"type": "text", "module_name": "schema.schema_extractor:SchemaExtractor"},
-  {"type": "text", "module_name": "text-lid.language_extractor:LanguageExtractor", "skip_deploy": true},
-  {"type": "text", "module_name": "instructor.instructor_extractor:Instructor"}
+  {"type": "text", "module_name": "instructor.instructor_extractor:Instructor"},
+  {"type": "text", "module_name": "llm.llm_extractor.LLMExtractor", "name":"tensorlake/llm"}
 ]
