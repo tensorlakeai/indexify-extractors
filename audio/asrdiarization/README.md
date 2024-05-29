@@ -17,6 +17,26 @@ If you do use an assistant model, a great choice for Whisper is a [distilled ver
 
 ### Example Notebook - [Open in Google Colab](https://colab.research.google.com/drive/1aW6DdAkxTQWZcCe1fS0QCVZ6GeQFji2S?usp=sharing)
 
+## Benchmark
+### Long audio without speculative decoding:
+```
+Audio duration: 77.30 seconds
+Transcription time: 8.15 s ± 49.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Real-time factor (RTF): 0.11
+```
+### Short audio without speculative decoding:
+```
+Audio duration: 4.44 seconds
+Transcription time: 1.04 s ± 60.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Real-time factor (RTF): 0.23
+```
+### Short audio with speculative decoding:
+```
+Audio duration: 4.44 seconds
+Transcription time: 670 ms ± 37.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Real-time factor (RTF): 0.15
+```
+
 ## Sample Input
 ```python
 filepath = "sample.mp3"
