@@ -1,7 +1,11 @@
 from typing import List, Union, Optional
+from pydantic import BaseModel, Field
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pptx import Presentation
 import tempfile
+
+class PPTExtractorConfig(BaseModel):
+    output_types: List[str] = Field(default_factory=lambda: ["text", "image", "table"])
 
 class PPTExtractor(Extractor):
     name = "tensorlake/ppt"
@@ -12,7 +16,7 @@ class PPTExtractor(Extractor):
     def __init__(self):
         super(PPTExtractor, self).__init__()
 
-    def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params: PPTExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pptx") as inputtmpfile:
             inputtmpfile.write(content.data)
@@ -21,11 +25,23 @@ class PPTExtractor(Extractor):
 
             for slide in prs.slides:
                 for shape in slide.shapes:
-                    if not shape.has_text_frame:
-                        continue
-                    for paragraph in shape.text_frame.paragraphs:
-                        for run in paragraph.runs:
-                            contents.append(Content.from_text(run.text))
+                    if "text" in params.output_types:
+                        if shape.has_text_frame:
+                            feature = Feature.metadata(value={"type": "text"})
+                            contents.append(Content.from_text(shape.text_frame.text, features=[feature]))
+                    if "table" in params.output_types:
+                        if shape.shape_type == 19:
+                            tb = shape.table
+                            rows = []
+                            for i in range(1, len(tb.rows)):
+                                rows.append("; ".join([tb.cell(0, j).text + ": " + tb.cell(i, j).text for j in range(len(tb.columns)) if tb.cell(i, j)]))
+                            stacked_rows = "\n".join(rows)
+                            feature = Feature.metadata({"type": "table"})
+                            contents.append(Content.from_text(stacked_rows, features=[feature]))
+                    if "image" in params.output_types:
+                        if shape.shape_type == 13:
+                            feature = Feature.metadata({"type": "image"})
+                            contents.append(Content(content_type="image/png", data=shape.image.blob, features=[feature]))
             
         return contents
 
@@ -38,5 +54,6 @@ if __name__ == "__main__":
         ppt_data = f.read()
     data = Content(content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation", data=ppt_data)
     extractor = PPTExtractor()
-    results = extractor.extract(data)
+    params = PPTExtractorConfig(output_types=["text", "table"])
+    results = extractor.extract(data, params)
     print(results)
