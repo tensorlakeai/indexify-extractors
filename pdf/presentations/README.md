@@ -2,6 +2,11 @@
 
 It can be used to analyze PowerPoint files from a corpus, perhaps to extract search indexing text and images. It runs on any Python capable platform, including macOS and Linux, and does not require the PowerPoint application to be installed or licensed.
 
+## Name
+```
+tensorlake/ppt
+```
+
 ## Example
 
 ### Input
