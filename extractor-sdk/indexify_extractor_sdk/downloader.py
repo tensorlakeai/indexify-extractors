@@ -144,6 +144,7 @@ def create_extractor_db():
 
 def get_extractor_description(name: str) -> ExtractorDescription:
     module, cls = name.split(":")
+    module = f"indexify_extractors.{module}"
     wrapper = ExtractorWrapper(module, cls)
     return wrapper.describe()
 
