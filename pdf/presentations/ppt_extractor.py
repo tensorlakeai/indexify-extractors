@@ -48,10 +48,7 @@ class PPTExtractor(Extractor):
 
     def sample_input(self) -> Content:
         req = requests.get("https://raw.githubusercontent.com/tensorlakeai/indexify/main/docs/docs/files/test.pptx")
-        with open('test.pptx','wb') as f:
-            f.write(req.content)
-        with open('test.pptx','rb') as f:
-            ppt_data = f.read()
+        ppt_data = req.content
         return Content(content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation", data=ppt_data)
 
 if __name__ == "__main__":
