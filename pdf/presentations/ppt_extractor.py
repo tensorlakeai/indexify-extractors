@@ -2,10 +2,11 @@ from typing import List, Union, Optional
 from pydantic import BaseModel, Field
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pptx import Presentation
+import requests
 import tempfile
 
 class PPTExtractorConfig(BaseModel):
-    output_types: List[str] = Field(default_factory=lambda: ["text", "image", "table"])
+    output_types: List[str] = Field(default_factory=lambda: ["text", "table"])
 
 class PPTExtractor(Extractor):
     name = "tensorlake/ppt"
@@ -46,7 +47,9 @@ class PPTExtractor(Extractor):
         return contents
 
     def sample_input(self) -> Content:
-        return self.sample_presentation()
+        req = requests.get("https://raw.githubusercontent.com/tensorlakeai/indexify/main/docs/docs/files/test.pptx")
+        ppt_data = req.content
+        return Content(content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation", data=ppt_data)
 
 if __name__ == "__main__":
     filepath = "test.pptx"

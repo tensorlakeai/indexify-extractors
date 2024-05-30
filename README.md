@@ -49,7 +49,7 @@ config.schema()
 
 #### Extract Locally on shell -
 ```bash
-indexify-extractor run-local minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
+indexify-extractor run-local indexify_extractor.minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
 ```
 
 #### Run Extractors as a Service for Continous Extraction and Indexing with Indexify Server
