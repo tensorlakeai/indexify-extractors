@@ -37,7 +37,8 @@ def load_extractors(name: str):
     if record is None:
         raise ValueError(f"Extractor {name} not found in the database.")
 
-    extractor_wrapper = create_extractor_wrapper(record[0])
+    extractor_id = f"indexify_extractors.{record[0]}"
+    extractor_wrapper = create_extractor_wrapper(extractor_id)
     extractor_wrapper_map[name] = extractor_wrapper
 
 
