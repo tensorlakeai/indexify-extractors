@@ -5,12 +5,13 @@ GroundingDINO is a technique or model in the field of artificial intelligence an
 
 The concept of "grounding" in GroundingDINO refers to the model's ability to associate specific parts of an image with corresponding textual descriptions or labels, even in the absence of explicit labeling during training. This can involve identifying and highlighting areas of an image that are most relevant to a particular concept or description, essentially giving the model a form of visual "attention" that helps it focus on the most important aspects of an image for classification or analysis. 
 
-### Example
-
-##### input params
-- prompt: str = "dog" # 
+### input params
+- prompt: str = "dog"
 - box_threshold: float = 0.35
 - text_threshold: float = 0.25
+
+### Example
+
 
 The boxes with similarity scores above the box_threshold are chosen, and words whose similarities are higher than the text_threshold as predicted labels.
 
