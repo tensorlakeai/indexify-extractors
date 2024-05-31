@@ -40,13 +40,13 @@ def find_extractor_subclasses(root_dir):
                     print(f"Syntax error in {filename}: {e}")
 
 
-def print_instructions(extractor: str):
-    message = """To run extractor, run the following:\n[bold #4AA4F4]"""
+def print_instructions():
+    message = """To use all the downloaded extractors run the following:\n[bold #4AA4F4]"""
 
     if not os.environ.get("VIRTUAL_ENV"):
         message += f"source {VENV_PATH}/bin/activate\n"
 
-    message += f"indexify-extractor join-server {extractor}[/]"
+    message += f"indexify-extractor join-server[/]"
     console.print(Panel(message, title="[bold magenta]Run the extractor[/]", expand=True))
 
 
@@ -229,4 +229,4 @@ def download_extractor(extractor_path):
         raise e
 
     # Print instruction last to improve user experience.
-    print_instructions(extractor_full_name)
+    print_instructions()
