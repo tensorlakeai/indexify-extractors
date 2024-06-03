@@ -34,5 +34,6 @@
   {"type": "text", "module_name": "schema.schema_extractor:SchemaExtractor", "name": "tensorlake/schema"},
   {"type": "text", "module_name": "instructor.instructor_extractor:Instructor", "name": "tensorlake/instructor"},
   {"type": "text", "module_name": "llm.llm_extractor.LLMExtractor", "name":"tensorlake/llm"},
+  {"type": "text", "module_name": "ollama.ollama_extractor.OllamaExtractor", "name":"tensorlake/ollama"},
   {"type": "text", "module_name": "ner.ner_extractor.NERExtractor", "name":"tensorlake/ner"}
 ]
