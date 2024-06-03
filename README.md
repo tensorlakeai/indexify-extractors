@@ -35,21 +35,21 @@ indexify-extractor download hub://embedding/minilm-l6
 #### Load and Run in Notebook or Python Applications 
 ```python
 from indexify_extractor_sdk import load_extractor, Content
-extractor, config_cls = load_extractor("minilm-l6.minilm_l6:MiniLML6Extractor")
+extractor, config_cls = load_extractor("indexify_extractors.minilm-l6.minilm_l6:MiniLML6Extractor")
 content = Content.from_text("hello world")
 out = extractor.extract(content)
 ```
 
 Extractors can be parameterized when they are called. The input parameters are Pydantic Models. Inspect the config class programatically or in the docs of the corresponding extractor -
 ```python
-ex, config = load_extractor("chunking.chunk_extractor:ChunkExtractor")
+ex, config = load_extractor("indexify_extractors.chunking.chunk_extractor:ChunkExtractor")
 config.schema()
 #{'properties': {'overlap': {'default': 0, 'title': 'Overlap', 'type': 'integer'}, 'chunk_size': {'default': 100, 'title': 'Chunk Size', 'type': 'integer'}, 'text_splitter': {'default': 'recursive', 'enum': ['char', 'recursive', 'markdown', 'html'], 'title': 'Text Splitter', 'type': 'string'}, 'headers_to_split_on': {'default': [], 'items': {'type': 'string'}, 'title': 'Headers To Split On', 'type': 'array'}}, 'title': 'ChunkExtractionInputParams', 'type': 'object'}
 ```
 
 #### Extract Locally on shell -
 ```bash
-indexify-extractor run-local minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
+indexify-extractor run-local indexify_extractor.minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
 ```
 
 #### Run Extractors as a Service for Continous Extraction and Indexing with Indexify Server

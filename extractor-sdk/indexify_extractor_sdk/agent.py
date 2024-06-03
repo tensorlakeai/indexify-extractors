@@ -36,6 +36,8 @@ from websockets.exceptions import ConnectionClosed
 
 CONTENT_FRAME_SIZE = 1024 * 1024
 
+MAX_MESSAGE_LENGTH = 16 * 1024 * 1024
+
 
 def begin_message(task_outcome, task: coordinator_service_pb2.Task, _executor_id):
     return ApiBeginExtractedContentIngest(
@@ -225,10 +227,21 @@ class ExtractorAgent:
                 root_certificates=ca_cert, private_key=key, certificate_chain=cert
             )
             self._channel = grpc.aio.secure_channel(
-                self._coordinator_addr, credentials=credentials
+                self._coordinator_addr,
+                credentials=credentials,
+                options=[
+                    ("grpc.max_send_message_length", MAX_MESSAGE_LENGTH),
+                    ("grpc.max_receive_message_length", MAX_MESSAGE_LENGTH),
+                ],
             )
         else:
-            self._channel = grpc.aio.insecure_channel(self._coordinator_addr)
+            self._channel = grpc.aio.insecure_channel(
+                self._coordinator_addr,
+                options=[
+                    ("grpc.max_send_message_length", MAX_MESSAGE_LENGTH),
+                    ("grpc.max_receive_message_length", MAX_MESSAGE_LENGTH),
+                ],
+            )
 
         self._stub: CoordinatorServiceStub = CoordinatorServiceStub(self._channel)
         req = coordinator_service_pb2.RegisterExecutorRequest(
