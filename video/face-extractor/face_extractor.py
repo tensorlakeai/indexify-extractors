@@ -23,14 +23,6 @@ logger = logging.getLogger(__name__)
 class FaceExtractor(Extractor):
     name = "tensorlake/face-extractor"
     description = "Extract unique faces from a video"
-    python_dependencies = [
-        "scikit-learn",
-        "pillow",
-        "numpy",
-        "face_recognition",
-        "opencv-python",
-        "imutils",
-    ]
     system_dependencies = []
     input_mime_types = ["video", "video/mp4"]
 
