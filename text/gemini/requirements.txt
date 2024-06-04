@@ -1,0 +1,3 @@
+google-generativeai
+sentencepiece
+pdf2image
