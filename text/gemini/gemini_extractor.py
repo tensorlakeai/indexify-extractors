@@ -1,7 +1,7 @@
 from typing import List, Union, Optional
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
-import os, time
+import os
 import google.generativeai as genai
 from pdf2image import convert_from_path
 import tempfile
