@@ -9,7 +9,7 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 class DonutBaseV2(Extractor):
     name = "tensorlake/donutcord"
     description = "An extractor that let's you do Document Parsing."
-    system_dependencies = []
+    system_dependencies = ["poppler-utils", "protobuf-compiler"]
     input_mime_types = ["application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
