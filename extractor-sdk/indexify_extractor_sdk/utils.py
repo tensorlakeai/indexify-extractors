@@ -1,6 +1,8 @@
 from itertools import islice
 import requests
 import platform
+import fsspec
+import json
 
 # https://docs.python.org/3/library/itertools.html#itertools.batched
 def batched(iterable, n):
@@ -20,3 +22,19 @@ def log_event(event, value):
     except Exception as e:
         # fail silently
         pass
+
+def read_extractors_json_file(filename):
+    # # debug
+    # with open(filename, "r") as file:
+    #     json_content = json.load(file)
+    # return json_content
+
+    fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
+    file_path = filename
+
+    with fs.open(file_path, "r") as file:
+        # Load the JSON content from the file
+        json_content = json.load(file)
+
+    return json_content
+

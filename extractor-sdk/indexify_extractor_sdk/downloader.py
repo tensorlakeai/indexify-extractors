@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.panel import Panel
 from .extractor_worker import ExtractorWrapper
 from .base_extractor import ExtractorDescription, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH
-from .utils import log_event
+from .utils import log_event, read_extractors_json_file
 console = Console()
 
 VENV_PATH = os.path.join(EXTRACTORS_PATH, "ve")
@@ -202,13 +202,25 @@ def save_extractor_description(id: str, description: ExtractorDescription):
     conn.commit()
     conn.close()
 
-def download_extractor(extractor_path):
+def extractors_by_name():
+    extractors_info_list = read_extractors_json_file("extractors.json")
+    result = {}
+    for extractor_info in extractors_info_list:
+        result[extractor_info["name"]] = extractor_info
+    return result
+
+def download_extractor(extractor_name):
     # Create extractor database if not exists
     create_extractor_db()
 
     console.print("[bold #4AA4F4]Downloading Extractor...[/]")
-    extractor_path = extractor_path.removeprefix("hub://")
+    extractors_index = extractors_by_name()
     fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
+    if extractor_name not in extractors_index:
+        console.print(f"[bold #f04318]Extractor {extractor_name} not found[/]")
+        console.print(f"[bold #f04318]Use command: [yellow]indexify-extractor list[/yellow] to see the list of available extractors[/]")
+        return
+    extractor_path = extractors_index[extractor_name]["path"]
 
     fs.get(extractor_path, EXTRACTOR_MODULE_PATH, recursive=True)
     base_extractor_path = os.path.basename(extractor_path)
