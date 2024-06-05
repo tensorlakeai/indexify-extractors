@@ -16,18 +16,17 @@ def list_extractors(extractor_type: Optional[str] = None):
 
     table.add_column("Type", style="magenta")
     table.add_column("Name", style="orange3")
-    table.add_column("Module Name", style="green")
+    table.add_column("Module Name", style="light_slate_grey")
 
     for extractor in extractor_data:
         if extractor_type and extractor_type != extractor.get("type"):
             continue
         module_name = extractor.get("module_name")
-        name = module_name.split(".")[0]
 
         table.add_row(
             extractor.get("type"),
             extractor.get("name"),
-            extractor.get("module_name"),
+            f"indexify_extractors.{module_name}",
         )
 
     console = Console()
