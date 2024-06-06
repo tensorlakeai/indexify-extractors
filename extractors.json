@@ -4,7 +4,7 @@
   {"type": "embedding", "module_name": "colbert.colbertv2:ColBERTv2Base", "name": "tensorlake/colbert", "path": "embedding/colbert"},
   {"type": "embedding", "module_name": "e5_embedding.e5_small_v2:E5SmallEmbeddings", "name": "tensorlake/E5_Small_Embedding", "path": "embedding/e5_embedding"},
   {"type": "embedding", "module_name": "flag_embedding.bge_base:BGEBase", "name":"tensorlake/bge-base-en", "path": "embedding/flag_embedding"},
-  {"type": "embedding", "module_name": "jina_base_en.jina_base_en:JinaEmbeddingsBase", "name": "tensorlake/jina-embeddings-base-en", "path": "jina_base_en"},
+  {"type": "embedding", "module_name": "jina_base_en.jina_base_en:JinaEmbeddingsBase", "name": "tensorlake/jina-embeddings-base-en", "path": "embedding/jina_base_en"},
   {"type": "embedding", "module_name": "minilm-l6.minilm_l6:MiniLML6Extractor", "name": "tensorlake/minilm-l6", "path": "embedding/minilm-l6"},
   {"type": "embedding", "module_name": "mpnet.mpnet_base_v2:MPNetV2", "name": "tensorlake/mpnet", "path": "embedding/mpnet"},
   {"type": "embedding", "module_name": "openai-embedding.openai_embedding:OpenAIEmbeddingExtractor", "name": "tensorlake/openai-embedding-ada-002-extractor", "path": "embedding/openai-embedding"},
