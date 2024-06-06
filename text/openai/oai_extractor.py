@@ -11,8 +11,8 @@ import mimetypes
 class OAIExtractorConfig(BaseModel):
     model_name: Optional[str] = Field(default='gpt-3.5-turbo')
     key: Optional[str] = Field(default=None)
-    prompt: str = Field(default='You are a helpful assistant.')
-    query: Optional[str] = Field(default=None)
+    system_prompt: str = Field(default='You are a helpful assistant.')
+    user_prompt: Optional[str] = Field(default=None)
 
 class OAIExtractor(Extractor):
     name = "tensorlake/openai"
@@ -27,8 +27,8 @@ class OAIExtractor(Extractor):
         contents = []
         model_name = params.model_name
         key = params.key
-        prompt = params.prompt
-        query = params.query
+        prompt = params.system_prompt
+        query = params.user_prompt
 
         if content.content_type in ["application/pdf"]:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
