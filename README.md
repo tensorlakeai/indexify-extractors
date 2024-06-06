@@ -69,17 +69,21 @@ curl https://codeload.github.com/tensorlakeai/indexify-extractor-template/tar.gz
 
 #### Implement the extractor interface 
 ```python
-class MyExtractor(Extractor):
-    name = "your-org-name/MyExtractor"
-    description = "Description of the extractor goes here."
+class InputParams(BaseModel):
+    a: int = 0
+    b: str = ""
 
+
+class MyExtractor(Extractor):
+    name = "yourorgname/myextractor"
+    description = "Description of the extractor goes here."
     system_dependencies = []
     input_mime_types = ["text/plain"]
 
     def __init__(self):
         super().__init__()
 
-    def extract(self, content: Content, params: InputParams) -> List[Content]:
+    def extract(self, content: Content, params: InputParams) -> List[Union[Feature, Content]]:
         return [
             Content.from_text(
                 text="Hello World", features=[Feature.embedding(values=[1, 2, 3])]
@@ -93,9 +97,8 @@ class MyExtractor(Extractor):
             ),
         ]
 
-    def sample_input(self) -> Content:
+    def sample_input(self) -> Tuple[Content, Type[BaseModel]]:
         Content.from_text(text="Hello World")
-
 ```
 
 All the Python dependencies of the extractor goes into `requirements.txt` file adjacent to the extractor file.
@@ -103,7 +106,7 @@ All the Python dependencies of the extractor goes into `requirements.txt` file a
 Once you have developed the extractor you can test the extractor locally by running the `indexify-extractor run-local` command as described above.
 
 #### Test and Deploy the extractor
-First test your extractor 
+You can test your extractor without running the Indexify server! 
 ```python
 ex, config = load_extractor("custom_extractor:MyExtractor")
 config.schema()
@@ -112,6 +115,12 @@ ex.extract(Content(...), config(...))# or ignore config if you don't have config
 Run the extractor on shell
 ```bash
 indexify-extractor run-local custom_extractor:MyExtractor --text "hello world" // or --file /path to file
+```
+
+#### Install your Extractor
+You can install your extractor locally
+```bash
+indexify-extractor install-local custom_extractor:MyExtractor
 ```
 
 When you are ready to deploy the extractor in production, package the extractor and deploy as many instances you want on your cluster for parallelism, and point it to the indexify server. 
