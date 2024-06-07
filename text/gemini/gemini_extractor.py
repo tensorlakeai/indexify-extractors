@@ -10,8 +10,8 @@ import mimetypes
 class GeminiExtractorConfig(BaseModel):
     model_name: Optional[str] = Field(default='gemini-1.5-flash-latest')
     key: Optional[str] = Field(default=None)
-    prompt: str = Field(default='You are a helpful assistant.')
-    query: Optional[str] = Field(default=None)
+    system_prompt: str = Field(default='You are a helpful assistant.')
+    user_prompt: Optional[str] = Field(default=None)
 
 class GeminiExtractor(Extractor):
     name = "tensorlake/gemini"
@@ -26,8 +26,8 @@ class GeminiExtractor(Extractor):
         contents = []
         model_name = params.model_name
         key = params.key
-        prompt = params.prompt
-        query = params.query
+        prompt = params.system_prompt
+        query = params.user_prompt
 
         if content.content_type in ["application/pdf"]:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:

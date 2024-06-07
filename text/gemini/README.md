@@ -8,14 +8,14 @@ This is an extractor that supports multiple kinds of input documents like text, 
 prompt = """Extract all text from the document."""
 f = open("resume.pdf", "rb")
 pdf_data = Content(content_type="application/pdf", data=f.read())
-input_params = GeminiExtractorConfig(prompt=prompt)
+input_params = GeminiExtractorConfig(system_prompt=prompt)
 extractor = GeminiExtractor()
 results = extractor.extract(pdf_data, params=input_params)
 print(results)
 
 prompt = """Extract all named entities from the text."""
 article = Content.from_text("My name is Rishiraj and I live in India.")
-input_params = GeminiExtractorConfig(prompt=prompt)
+input_params = GeminiExtractorConfig(system_prompt=prompt)
 extractor = GeminiExtractor()
 results = extractor.extract(article, params=input_params)
 print(results)

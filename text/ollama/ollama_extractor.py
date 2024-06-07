@@ -5,8 +5,8 @@ import ollama
 
 class OllamaExtractorConfig(BaseModel):
     model_name: Optional[str] = Field(default='llama3')
-    prompt: str = Field(default='You are a helpful assistant.')
-    query: Optional[str] = Field(default=None)
+    system_prompt: str = Field(default='You are a helpful assistant.')
+    user_prompt: Optional[str] = Field(default=None)
 
 class OllamaExtractor(Extractor):
     name = "tensorlake/ollama"
@@ -22,8 +22,8 @@ class OllamaExtractor(Extractor):
         text = content.data.decode("utf-8")
 
         model_name = params.model_name
-        prompt = params.prompt
-        query = params.query
+        prompt = params.system_prompt
+        query = params.user_prompt
         if query is None:
             query = text
         
