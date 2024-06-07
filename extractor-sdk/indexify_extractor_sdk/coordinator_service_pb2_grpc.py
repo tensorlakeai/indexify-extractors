@@ -5,7 +5,7 @@ import warnings
 
 from . import coordinator_service_pb2 as coordinator__service__pb2
 
-GRPC_GENERATED_VERSION = '1.63.0'
+GRPC_GENERATED_VERSION = '1.64.0'
 GRPC_VERSION = grpc.__version__
 EXPECTED_ERROR_RELEASE = '1.65.0'
 SCHEDULED_RELEASE_DATE = 'June 25, 2024'
@@ -193,6 +193,21 @@ class CoordinatorServiceStub(object):
                 '/indexify_coordinator.CoordinatorService/GetIngestionInfo',
                 request_serializer=coordinator__service__pb2.GetIngestionInfoRequest.SerializeToString,
                 response_deserializer=coordinator__service__pb2.GetIngestionInfoResponse.FromString,
+                _registered_method=True)
+        self.WaitContentExtraction = channel.unary_unary(
+                '/indexify_coordinator.CoordinatorService/WaitContentExtraction',
+                request_serializer=coordinator__service__pb2.WaitContentExtractionRequest.SerializeToString,
+                response_deserializer=coordinator__service__pb2.WaitContentExtractionResponse.FromString,
+                _registered_method=True)
+        self.ListActiveContents = channel.unary_unary(
+                '/indexify_coordinator.CoordinatorService/ListActiveContents',
+                request_serializer=coordinator__service__pb2.ListActiveContentsRequest.SerializeToString,
+                response_deserializer=coordinator__service__pb2.ListActiveContentsResponse.FromString,
+                _registered_method=True)
+        self.UpdateLabels = channel.unary_unary(
+                '/indexify_coordinator.CoordinatorService/UpdateLabels',
+                request_serializer=coordinator__service__pb2.UpdateLabelsRequest.SerializeToString,
+                response_deserializer=coordinator__service__pb2.UpdateLabelsResponse.FromString,
                 _registered_method=True)
 
 
@@ -385,6 +400,24 @@ class CoordinatorServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def WaitContentExtraction(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListActiveContents(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateLabels(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_CoordinatorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -543,10 +576,26 @@ def add_CoordinatorServiceServicer_to_server(servicer, server):
                     request_deserializer=coordinator__service__pb2.GetIngestionInfoRequest.FromString,
                     response_serializer=coordinator__service__pb2.GetIngestionInfoResponse.SerializeToString,
             ),
+            'WaitContentExtraction': grpc.unary_unary_rpc_method_handler(
+                    servicer.WaitContentExtraction,
+                    request_deserializer=coordinator__service__pb2.WaitContentExtractionRequest.FromString,
+                    response_serializer=coordinator__service__pb2.WaitContentExtractionResponse.SerializeToString,
+            ),
+            'ListActiveContents': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListActiveContents,
+                    request_deserializer=coordinator__service__pb2.ListActiveContentsRequest.FromString,
+                    response_serializer=coordinator__service__pb2.ListActiveContentsResponse.SerializeToString,
+            ),
+            'UpdateLabels': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateLabels,
+                    request_deserializer=coordinator__service__pb2.UpdateLabelsRequest.FromString,
+                    response_serializer=coordinator__service__pb2.UpdateLabelsResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'indexify_coordinator.CoordinatorService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('indexify_coordinator.CoordinatorService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -1380,6 +1429,87 @@ class CoordinatorService(object):
             '/indexify_coordinator.CoordinatorService/GetIngestionInfo',
             coordinator__service__pb2.GetIngestionInfoRequest.SerializeToString,
             coordinator__service__pb2.GetIngestionInfoResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def WaitContentExtraction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/indexify_coordinator.CoordinatorService/WaitContentExtraction',
+            coordinator__service__pb2.WaitContentExtractionRequest.SerializeToString,
+            coordinator__service__pb2.WaitContentExtractionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListActiveContents(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/indexify_coordinator.CoordinatorService/ListActiveContents',
+            coordinator__service__pb2.ListActiveContentsRequest.SerializeToString,
+            coordinator__service__pb2.ListActiveContentsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateLabels(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/indexify_coordinator.CoordinatorService/UpdateLabels',
+            coordinator__service__pb2.UpdateLabelsRequest.SerializeToString,
+            coordinator__service__pb2.UpdateLabelsResponse.FromString,
             options,
             channel_credentials,
             insecure,

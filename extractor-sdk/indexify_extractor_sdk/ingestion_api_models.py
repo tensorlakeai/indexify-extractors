@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Json
-from typing import List, Dict
+from typing import List, Dict, Any
 import json
 from .base_extractor import Feature, Content
 
@@ -22,7 +22,7 @@ class ApiContent(BaseModel):
     content_type: str
     bytes: List[int]
     features: List[ApiFeature] = []
-    labels: Dict[str, str] = {}
+    labels: Dict[str, Any] = {}
 
     @classmethod
     def from_content(cls, content: Content):
@@ -78,7 +78,7 @@ class ApiBeginMultipartContent(BaseModel):
 class FinishMultipartContent(BaseModel):
     content_type: str
     features: List[ApiFeature] = []
-    labels: Dict[str, str] = {}
+    labels: Dict[str, Any] = {}
 
 
 class ApiFinishMultipartContent(BaseModel):
