@@ -2,7 +2,7 @@ from typing import List, Union, Optional
 import json
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
-from .utils.tt_module import get_tables
+from utils.tt_module import get_tables
 import fitz
 import tempfile
 
