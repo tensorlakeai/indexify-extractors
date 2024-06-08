@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 class E5SmallEmbeddings(BaseEmbeddingExtractor):
-    name = "tensorlake/E5_Small_Embedding"
+    name = "tensorlake/e5_small_embedding"
     description = "E5 Small V2 model. HF Link - https://huggingface.co/intfloat/e5-small-v2"
     system_dependencies = []
 

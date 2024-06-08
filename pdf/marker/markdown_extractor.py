@@ -14,7 +14,7 @@ class MarkdownExtractorConfig(BaseModel):
 class MarkdownExtractor(Extractor):
     name = "tensorlake/marker"
     description = "Markdown Extractor for PDFs"
-    system_dependencies = []
+    system_dependencies = ["ffmpeg", "libsm6", "libxext6"]
     input_mime_types = ["application/pdf"]
 
     def __init__(self):
