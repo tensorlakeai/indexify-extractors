@@ -131,7 +131,7 @@ indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-add
 #### Package the Extractor 
 Once you build a new extractor, and have tested it and it's time to deploy this in production, you can build a container with the extractor -
 ```bash
-indexify-extractor package custom_extractor:MyExtractor
+indexify-extractor package indexify_extractors.<folder_name>.custom_extractor:MyExtractor
 ```
 
 If you want to package an extractor in a container that support Nvidia CUDA GPU, you can pass the `--gpu` flag to the package command.
