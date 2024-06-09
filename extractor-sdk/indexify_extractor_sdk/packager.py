@@ -70,8 +70,7 @@ class ExtractorPackager:
         Dynamically loads the extractor module based on configuration.
         """
         file_name = self.config["module_name"].replace(".", "/") + ".py"
-        cwd = pathlib.Path.cwd()
-        module_path = cwd.joinpath(file_name)
+        module_path = pathlib.Path(EXTRACTORS_PATH).joinpath(file_name)
         self.logger.info(f"Loading module from {module_path}")
 
         try:
@@ -182,12 +181,13 @@ class ExtractorPackager:
 
     def _get_python_dependencies(self):
         # get module path
-        module_path = pathlib.Path.cwd() / (
-            self.config["module_name"].replace(".", "/") + ".py"
-        )
+        print("diptanu ", self.config["module_name"])
+        module_path = pathlib.Path(EXTRACTORS_PATH).joinpath(self.config["module_name"].replace(".", "/") + ".py")
+        print("diptanu ", module_path)
 
         # check for requirements.txt
         requirements_path = module_path.joinpath(module_path.parent, "requirements.txt")
+        print("diptanu ", requirements_path)
         if requirements_path.exists():
             with open(requirements_path, "r") as f:
                 requirements = f.read()
