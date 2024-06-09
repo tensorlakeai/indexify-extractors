@@ -102,18 +102,20 @@ def describe_sync(extractor):
 
 
 def install_local(extractor):
-    module, cls = extractor.split(":")
-    wrapper = ExtractorWrapper(module, cls)
-    description = wrapper.describe()
-
     # Copy everything in the current directory to the extractors directory.
     parent_dir = os.path.basename(os.getcwd())
     destination = os.path.join(EXTRACTOR_MODULE_PATH, parent_dir)
     os.system(f"cp -r . {destination}")
     print(f"copied to {destination} for testing")
 
+    # Describe the extractor.
+    module, cls = extractor.split(":")
+    module_name = f"indexify_extractors.{parent_dir}.{module}"
+    wrapper = ExtractorWrapper(module_name, cls)
+    description = wrapper.describe()
+
     # Create a new extractor description.
-    extractor_id = f"{parent_dir}.{module}:{cls}"
+    extractor_id = f"{module}:{cls}"
     create_extractor_db()
     save_extractor_description(extractor_id, description)
 
