@@ -89,7 +89,7 @@ class ExtractorPathWrapper:
         return self
 
     def format(self) -> str:
-        return f"{self.module_name_local()}:{self.class_name}"
+        return f"indexify_extractors.{self.module_name_local()}:{self.class_name}"
 
     def module_name_local(self) -> str:
         # only the file name portion of the module name, without path.to.module

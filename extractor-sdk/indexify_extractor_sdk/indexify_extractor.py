@@ -107,13 +107,16 @@ def install_local(extractor):
     description = wrapper.describe()
 
     # Copy everything in the current directory to the extractors directory.
-    to_module = f"custom_{module}"
-    destination = os.path.join(EXTRACTOR_MODULE_PATH, to_module)
+    parent_dir = os.path.basename(os.getcwd())
+    destination = os.path.join(EXTRACTOR_MODULE_PATH, parent_dir)
     os.system(f"cp -r . {destination}")
     print(f"copied to {destination} for testing")
 
     # Create a new extractor description.
-    extractor_id = f"{to_module}.{module}:{cls}"
+    extractor_id = f"{parent_dir}.{module}:{cls}"
     save_extractor_description(extractor_id, description)
 
     print("extractor ready for testing. Run: indexify-extractor join-server")
+    print("The module name for the extractor is: indexify_extractors.f{module}:f{cls}")
+    print(f"To package the extractor in a docker container: indexify-extractor package indexify_extractors.{parent_dir}.{module}:{cls}")
+
