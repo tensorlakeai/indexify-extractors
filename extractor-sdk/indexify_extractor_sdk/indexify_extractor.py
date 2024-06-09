@@ -9,7 +9,7 @@ from .extractor_worker import ExtractorModule, create_executor, describe
 from .agent import ExtractorAgent
 import os
 from .coordinator_service_pb2 import Extractor
-from .downloader import save_extractor_description
+from .downloader import save_extractor_description, create_extractor_db
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
     if text and file:
@@ -114,9 +114,10 @@ def install_local(extractor):
 
     # Create a new extractor description.
     extractor_id = f"{parent_dir}.{module}:{cls}"
+    create_extractor_db()
     save_extractor_description(extractor_id, description)
 
     print("extractor ready for testing. Run: indexify-extractor join-server")
-    print("The module name for the extractor is: indexify_extractors.f{module}:f{cls}")
+    print(f"The module name for the extractor is: indexify_extractors.{parent_dir}.{module}:{cls}")
     print(f"To package the extractor in a docker container: indexify-extractor package indexify_extractors.{parent_dir}.{module}:{cls}")
 
