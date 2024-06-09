@@ -60,7 +60,7 @@ indexify-extractor join-server --coordinator-addr localhost:8950 --ingestion-add
 The `coordinator-addr` and `ingestion-addr` above are the default addresses exposed by the Indexify server to get extraction instructions and to upload extracted data, they can be configured in the server configuration.
 
 ## Build a new Extractor
-If want to build a new extractor to give Indexify new data processing capabilities you can write a new extractor by cloning this repository - https://tensorlakeai/indexify-extractor-template
+If want to build a new extractor to give Indexify new data processing capabilities you can write a new extractor by cloning this repository - https://github.com/tensorlakeai/indexify-extractor-template
 
 #### Clone the template
 ```shell
