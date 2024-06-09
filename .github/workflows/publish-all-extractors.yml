@@ -35,7 +35,7 @@ jobs:
           module_name=`echo "${{ matrix.module_name }}"`
           module=`echo "${{ matrix.module_name }}" | sed 's/\./\//g'`
           full_dir=$(echo "${{ matrix.type }}/$module")
-          extractor_name = "${{ matrix.name }}"
+          extractor_name = `echo "${{ matrix.name }}"`
 
           dir=$(dirname $full_dir | cut -d':' -f1)
           class=$(echo $full_dir | cut -d':' -f2)
