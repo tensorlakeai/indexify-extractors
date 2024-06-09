@@ -11,11 +11,6 @@ RUN apt-get update -y && \
 
 RUN update-ca-certificates
 
-# Add Tini
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini tini
-RUN chmod +x tini
-
 RUN apt-get install -y python3.11 python3.11-dev python3-pip python3.11-venv && \
     apt-get install -y  {{ system_dependencies }} && \
     apt-get -y clean
