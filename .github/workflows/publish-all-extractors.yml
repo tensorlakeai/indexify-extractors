@@ -46,6 +46,7 @@ jobs:
           echo "DIRECTORY=$dir" >> $GITHUB_ENV
           echo "CLASS=$class" >> $GITHUB_ENV
           echo "FILE=$file" >> $GITHUB_ENV
+          echo "MODULE=$module" >> $GITHUB_ENV
 
       - name: Install extractor SDK
         if: ${{ matrix.skip_deploy != true }}
@@ -56,14 +57,15 @@ jobs:
         run: |
           cd $DIRECTORY
           pip install -r requirements.txt
-          indexify-extractor package --to-file extractor.dockerfile $FILE:$CLASS
+          indexify-extractor install-local $FILE:$CLASS
+          indexify-extractor package --to-file extractor.dockerfile $MODULE
 
       - name: Package extractor with GPU support
         if: ${{ matrix.skip_deploy != true && matrix.with_gpu == true }}
         run: |
           cd $DIRECTORY
           pip install -r requirements.txt
-          indexify-extractor package --to-file extractor.dockerfile $FILE:$CLASS --gpu
+          indexify-extractor package --to-file extractor.dockerfile $MODULE --gpu
 
       - name: Get extractor name
         if: ${{ matrix.skip_deploy != true }}
