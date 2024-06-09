@@ -35,6 +35,7 @@ jobs:
           module_name=`echo "${{ matrix.module_name }}"`
           module=`echo "${{ matrix.module_name }}" | sed 's/\./\//g'`
           full_dir=$(echo "${{ matrix.type }}/$module")
+          extractor_name = "${{ matrix.name }}"
 
           dir=$(dirname $full_dir | cut -d':' -f1)
           class=$(echo $full_dir | cut -d':' -f2)
@@ -48,6 +49,7 @@ jobs:
           echo "CLASS=$class" >> $GITHUB_ENV
           echo "FILE=$file" >> $GITHUB_ENV
           echo "MODULE=$module_name" >> $GITHUB_ENV
+          echo "EXTRACTOR_NAME=$extractor_name" >> $GITHUB_ENV
 
       - name: Install extractor SDK
         if: ${{ matrix.skip_deploy != true }}
@@ -68,13 +70,6 @@ jobs:
           pip install -r requirements.txt
           indexify-extractor install-local --install-system-dependencies $FILE:$CLASS
           indexify-extractor package --to-file extractor.dockerfile indexify_extractors.$MODULE --gpu
-
-      - name: Get extractor name
-        if: ${{ matrix.skip_deploy != true }}
-        run: |
-          cd $DIRECTORY
-          output=$(python -c "from $FILE import $CLASS as extractorclass; print(extractorclass.name)")
-          echo "NAME=$output" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         if: ${{ matrix.skip_deploy != true }}
@@ -97,10 +92,10 @@ jobs:
         if: ${{ matrix.skip_deploy != true }}
         run: |
           cd $DIRECTORY
-          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $NAME:latest -f extractor.dockerfile;
+          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $EXTRACTOR_NAME:latest -f extractor.dockerfile;
 
       - name: Push GPU extractor to Docker Hub
         if: ${{ matrix.skip_deploy != true && matrix.with_gpu == true }}
         run: |
           cd $DIRECTORY
-          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $NAME-gpu:latest -f extractor.dockerfile;
+          docker buildx build --platform=linux/amd64,linux/arm64/v8 --push . -t $EXTRACTOR_NAME-gpu:latest -f extractor.dockerfile;
