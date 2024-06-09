@@ -32,6 +32,7 @@ jobs:
       - name: Set up variables
         if: ${{ matrix.skip_deploy != true }}
         run: |
+          module_name=`echo "${{ matrix.module_name }}"`
           module=`echo "${{ matrix.module_name }}" | sed 's/\./\//g'`
           full_dir=$(echo "${{ matrix.type }}/$module")
 
@@ -46,7 +47,7 @@ jobs:
           echo "DIRECTORY=$dir" >> $GITHUB_ENV
           echo "CLASS=$class" >> $GITHUB_ENV
           echo "FILE=$file" >> $GITHUB_ENV
-          echo "MODULE=$module" >> $GITHUB_ENV
+          echo "MODULE=$module_name" >> $GITHUB_ENV
 
       - name: Install extractor SDK
         if: ${{ matrix.skip_deploy != true }}
