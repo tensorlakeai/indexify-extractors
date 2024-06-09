@@ -59,7 +59,7 @@ jobs:
           cd $DIRECTORY
           pip install -r requirements.txt
           indexify-extractor install-local $FILE:$CLASS
-          indexify-extractor package --to-file extractor.dockerfile $MODULE
+          indexify-extractor package --to-file extractor.dockerfile indexify_extractors.$MODULE
 
       - name: Package extractor with GPU support
         if: ${{ matrix.skip_deploy != true && matrix.with_gpu == true }}
