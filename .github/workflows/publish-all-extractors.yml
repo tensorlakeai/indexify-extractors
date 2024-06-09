@@ -66,6 +66,7 @@ jobs:
         run: |
           cd $DIRECTORY
           pip install -r requirements.txt
+          indexify-extractor install-local --install-system-dependencies $FILE:$CLASS
           indexify-extractor package --to-file extractor.dockerfile indexify_extractors.$MODULE --gpu
 
       - name: Get extractor name
