@@ -101,7 +101,7 @@ def describe_sync(extractor):
     print(wrapper.describe())
 
 
-def install_local(extractor):
+def install_local(extractor, install_system_dependencies=False):
     # Copy everything in the current directory to the extractors directory.
     parent_dir = os.path.basename(os.getcwd())
     destination = os.path.join(EXTRACTOR_MODULE_PATH, parent_dir)
@@ -112,6 +112,11 @@ def install_local(extractor):
     module, cls = extractor.split(":")
     module_name = f"indexify_extractors.{parent_dir}.{module}"
     wrapper = ExtractorWrapper(module_name, cls)
+    # FIX ME - This doesn't work on Mac
+    # Meant to only work on Ubuntu
+    if install_system_dependencies:
+        install_system_dependencies = wrapper._instance.system_dependencies
+        os.system(f"sudo apt-get install -y {' '.join(install_system_dependencies)}")
     description = wrapper.describe()
 
     # Create a new extractor description.

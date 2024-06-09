@@ -181,13 +181,10 @@ class ExtractorPackager:
 
     def _get_python_dependencies(self):
         # get module path
-        print("diptanu ", self.config["module_name"])
         module_path = pathlib.Path(EXTRACTORS_PATH).joinpath(self.config["module_name"].replace(".", "/") + ".py")
-        print("diptanu ", module_path)
 
         # check for requirements.txt
         requirements_path = module_path.joinpath(module_path.parent, "requirements.txt")
-        print("diptanu ", requirements_path)
         if requirements_path.exists():
             with open(requirements_path, "r") as f:
                 requirements = f.read()
