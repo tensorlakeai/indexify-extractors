@@ -9,7 +9,7 @@ from indexify_extractor_sdk.base_extractor import (
 
 
 class BaseEmbeddingExtractor(Extractor):
-    input_mimes = ["text/plain"]
+    input_mimes = ["text/plain", "application/json"]
 
     def __init__(self, max_context_length: int):
         self._model_context_length: int = max_context_length
