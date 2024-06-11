@@ -8,6 +8,7 @@ from .list_extractors import list_extractors
 import sys
 from .downloader import get_db_path
 from .base_extractor import EXTRACTORS_PATH
+from enum import Enum
 
 import multiprocessing
 from typing_extensions import Annotated
@@ -15,10 +16,12 @@ from typing_extensions import Annotated
 cpu_count = multiprocessing.cpu_count()
 
 typer_app = typer.Typer(
-    help="indexify-extractor - CLI for running and packaging indexify extractors", pretty_exceptions_enable=False
+    help="indexify-extractor - CLI for running and packaging indexify extractors",
+    pretty_exceptions_enable=False,
 )
 
-default_extractor_path = os.getenv('EXTRACTOR_PATH', None)
+default_extractor_path = os.getenv("EXTRACTOR_PATH", None)
+
 
 # Hack to get around buffered output when not run using interactive terminal in docker
 # and to ensure that print statements are flushed immediately
@@ -39,6 +42,11 @@ class Unbuffered(object):
 
 
 sys.stdout = Unbuffered(sys.stdout)
+
+
+class DownloadMethod(str, Enum):
+    direct = "direct"
+    server_proxy = "server-proxy"
 
 
 def print_version():
@@ -75,6 +83,11 @@ def join_server(
         0,
         help="The port to listen on for extractor API extract functions.",
     ),
+    download_method: DownloadMethod = typer.Option(
+        DownloadMethod.direct,
+        help="Method to download the content. Can be 'direct' to access storage url directly "
+        "or 'server-proxy' to use ingestion server as proxy.",
+    ),
     advertise_addr: str = typer.Option(
         None,
         help="Override advertise address.",
@@ -82,13 +95,17 @@ def join_server(
     workers: Annotated[
         int, typer.Option(help="number of worker processes for extraction")
     ] = 1,
-    config_path: Optional[str] = typer.Option(None, help="Path to the TLS configuration file")
+    config_path: Optional[str] = typer.Option(
+        None, help="Path to the TLS configuration file"
+    ),
 ):
     print_version()
 
     # Check if any extractors are downloaded.
     if not os.path.isdir(EXTRACTORS_PATH):
-        raise Exception("No extractors found. Download extractors using the downloader.")
+        raise Exception(
+            "No extractors found. Download extractors using the downloader."
+        )
 
     print("workers ", workers)
     print("config path provided ", config_path)
@@ -96,6 +113,7 @@ def join_server(
     indexify_extractor.join(
         workers=workers,
         coordinator_addr=coordinator_addr,
+        download_method=download_method,
         ingestion_addr=ingestion_addr,
         listen_port=listen_port,
         advertise_addr=advertise_addr,
@@ -113,7 +131,9 @@ def package(
     verbose: bool = typer.Option(False, "--verbose", help="Run in verbose mode."),
     dev: bool = typer.Option(False, "--dev", help="Run in development mode."),
     gpu: bool = typer.Option(False, "--gpu", help="Use GPU acceleration."),
-    tofile: str = typer.Option(None, "--to-file", help="Write Dockerfile to a specific file"),
+    tofile: str = typer.Option(
+        None, "--to-file", help="Write Dockerfile to a specific file"
+    ),
 ):
     """
     Packages an extractor into a Docker image, including Dockerfile generation and tarball creation.
@@ -127,7 +147,7 @@ def package(
         verbose=verbose,
         dev=dev,
         gpu=gpu,
-        tofile=tofile
+        tofile=tofile,
     )
     packager.package()
 
@@ -137,6 +157,7 @@ def download(extractor_path: str = typer.Argument(..., help="Extractor Name")):
     from .downloader import download_extractor
 
     download_extractor(extractor_path)
+
 
 @typer_app.command(name="version", help="Print the version of the SDK and the CLI")
 def _version():
@@ -155,8 +176,15 @@ def list(
 
 
 @typer_app.command(help="Check and prepare extractor in development for local testing")
-def install_local(extractor: str = typer.Argument(
-    default_extractor_path,
-    help="The extractor name in the format module_name:class_name",
-), install_system_dependencies: bool = typer.Option(False, help="Install system dependencies")):
-    indexify_extractor.install_local(extractor, install_system_dependencies=install_system_dependencies)
+def install_local(
+    extractor: str = typer.Argument(
+        default_extractor_path,
+        help="The extractor name in the format module_name:class_name",
+    ),
+    install_system_dependencies: bool = typer.Option(
+        False, help="Install system dependencies"
+    ),
+):
+    indexify_extractor.install_local(
+        extractor, install_system_dependencies=install_system_dependencies
+    )

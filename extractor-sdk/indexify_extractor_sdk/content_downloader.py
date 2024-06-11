@@ -10,6 +10,13 @@ import httpx
 from typing import Dict
 import asyncio
 from google.protobuf.json_format import MessageToDict
+from dataclasses import dataclass
+
+
+@dataclass
+class UrlConfig:
+    url: str
+    config: Dict[str, str]
 
 
 def disk_loader(file_path: str):
@@ -59,38 +66,49 @@ def gcp_storage_loader(storage_url: str) -> bytes:
     return blob.download_as_bytes()
 
 
-async def fetch_url(id, url):
+async def fetch_url(id: str, url_config: UrlConfig):
     try:
-        async with httpx.AsyncClient() as client:
-            print(f"downloading url {url}")
-            response = await client.get(url, follow_redirects=True)
+        kwargs = {}
+        if url_config.config.get("use_tls"):
+            kwargs["cert"] = (
+                url_config.config["tls_config"]["cert_path"],
+                url_config.config["tls_config"]["key_path"],
+            )
+            kwargs["verify"] = url_config.config["tls_config"]["ca_bundle_path"]
+            kwargs["http2"] = True
+
+        async with httpx.AsyncClient(**kwargs) as client:
+            print(f"downloading url {url_config.url}")
+            response = await client.get(url_config.url, follow_redirects=True)
             response.raise_for_status()
             return id, response.read()
     except Exception as e:
         return id, e
 
 
-async def download_parallel(urls):
-    tasks = [fetch_url(id, url) for id, url in urls.items()]
+async def download_parallel(urls: Dict[str, UrlConfig]):
+    tasks = [fetch_url(id, url_config) for id, url_config in urls.items()]
     results = await asyncio.gather(*tasks, return_exceptions=True)
     return results
 
 
-async def download_content(urls: Dict[str, str]) -> Dict[str, Content]:
+async def download_content(urls: Dict[str, UrlConfig]) -> Dict[str, Content]:
     out = {}
     disk_urls = {}
     s3_urls = {}
     http_urls = {}
     gs_urls = {}
-    for task_id, url in urls.items():
-        if url.startswith("file://"):
-            disk_urls[task_id] = url
-        elif url.startswith("s3://"):
-            s3_urls[task_id] = url
-        elif url.startswith("https://") or url.startswith("http://"):
-            http_urls[task_id] = url
-        elif url.startswith("gs://"):
-            gs_urls[task_id] = url
+    for task_id, url_config in urls.items():
+        if url_config.url.startswith("file://"):
+            disk_urls[task_id] = url_config.url
+        elif url_config.url.startswith("s3://"):
+            s3_urls[task_id] = url_config.url
+        elif url_config.url.startswith("https://") or url_config.url.startswith(
+            "http://"
+        ):
+            http_urls[task_id] = url_config
+        elif url_config.url.startswith("gs://"):
+            gs_urls[task_id] = url_config.url
         else:
             out[task_id] = Exception(f"unsupported storage url {url}")
     for task_id, url in gs_urls.items():
