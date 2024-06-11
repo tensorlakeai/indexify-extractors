@@ -18,7 +18,7 @@ class OCRMyPDFExtractor(Extractor):
     description = "This extractor uses ocrmypdf to generate searchable PDF/A content from a regular PDF and then extract the text into plain text content."
     input_mime_types = ["application/pdf"]
     # language packs can be added to system dependencies
-    system_dependencies = ["tesseract-ocr", "tesseract-ocr-spa", "tesseract-ocr-chi-sim", "tesseract-ocr-fra", "tesseract-ocr-deu"]
+    system_dependencies = ["ghostscript", "tesseract-ocr", "tesseract-ocr-spa", "tesseract-ocr-chi-sim", "tesseract-ocr-fra", "tesseract-ocr-deu"]
 
     def __init__(self):
         super(OCRMyPDFExtractor, self).__init__()

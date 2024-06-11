@@ -9,7 +9,7 @@ from .extractor_worker import ExtractorModule, create_executor, describe
 from .agent import ExtractorAgent
 import os
 from .coordinator_service_pb2 import Extractor
-from .downloader import save_extractor_description
+from .downloader import save_extractor_description, create_extractor_db
 
 def local(extractor: str, text: Optional[str] = None, file: Optional[str] = None):
     if text and file:
@@ -101,19 +101,30 @@ def describe_sync(extractor):
     print(wrapper.describe())
 
 
-def install_local(extractor):
-    module, cls = extractor.split(":")
-    wrapper = ExtractorWrapper(module, cls)
-    description = wrapper.describe()
-
+def install_local(extractor, install_system_dependencies=False):
     # Copy everything in the current directory to the extractors directory.
-    to_module = f"custom_{module}"
-    destination = os.path.join(EXTRACTOR_MODULE_PATH, to_module)
+    parent_dir = os.path.basename(os.getcwd())
+    destination = os.path.join(EXTRACTOR_MODULE_PATH, parent_dir)
     os.system(f"cp -r . {destination}")
     print(f"copied to {destination} for testing")
 
+    # Describe the extractor.
+    module, cls = extractor.split(":")
+    module_name = f"indexify_extractors.{parent_dir}.{module}"
+    wrapper = ExtractorWrapper(module_name, cls)
+    # FIX ME - This doesn't work on Mac
+    # Meant to only work on Ubuntu
+    if install_system_dependencies:
+        install_system_dependencies = wrapper._instance.system_dependencies
+        os.system(f"sudo apt-get install -y {' '.join(install_system_dependencies)}")
+    description = wrapper.describe()
+
     # Create a new extractor description.
-    extractor_id = f"{to_module}.{module}:{cls}"
+    extractor_id = f"{module}:{cls}"
+    create_extractor_db()
     save_extractor_description(extractor_id, description)
 
     print("extractor ready for testing. Run: indexify-extractor join-server")
+    print(f"The module name for the extractor is: indexify_extractors.{parent_dir}.{module}:{cls}")
+    print(f"To package the extractor in a docker container: indexify-extractor package indexify_extractors.{parent_dir}.{module}:{cls}")
+

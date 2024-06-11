@@ -9,6 +9,7 @@ from google.cloud import storage
 import httpx
 from typing import Dict
 import asyncio
+from google.protobuf.json_format import MessageToDict
 
 
 def disk_loader(file_path: str):
@@ -108,6 +109,14 @@ async def download_content(urls: Dict[str, str]) -> Dict[str, Content]:
 
 def create_content(bytes, task: coordinator_service_pb2.Task) -> Content:
     metadata = task.content_metadata
+
+    labels = {}
+    for key, value in metadata.labels.items():
+        labels[key] = MessageToDict(value)
+
     return Content(
-        content_type=metadata.mime, data=bytes, features=[], labels=metadata.labels
+        content_type=metadata.mime,
+        data=bytes,
+        features=[],
+        labels=labels,
     )

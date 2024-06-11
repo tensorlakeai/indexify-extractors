@@ -1,2 +1,3 @@
 openai
 sentencepiece
+pdf2image

@@ -3,7 +3,7 @@ from typing import Tuple, Dict, List, Type, Optional
 from types import ModuleType
 import json
 from importlib import import_module
-from typing import get_type_hints, Literal, Union, Dict
+from typing import get_type_hints, Literal, Union, Dict, Any
 from pydantic import BaseModel, Json, Field
 from genson import SchemaBuilder
 import requests
@@ -83,11 +83,11 @@ class Content(BaseModel):
     content_type: Optional[str]
     data: bytes
     features: List[Feature] = []
-    labels: Dict[str, str] = {}
+    labels: Dict[str, Any] = {}
 
     @classmethod
     def from_text(
-        cls, text: str, features: List[Feature] = [], labels: Dict[str, str] = {}
+        cls, text: str, features: List[Feature] = [], labels: Dict[str, Any] = {}
     ):
         return cls(
             content_type="text/plain",

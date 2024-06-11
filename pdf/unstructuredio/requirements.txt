@@ -6,3 +6,4 @@ opencv-python
 pdf2image
 pytesseract
 pikepdf
+pyopenssl==24.1.0

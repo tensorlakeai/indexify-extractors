@@ -158,5 +158,5 @@ def list(
 def install_local(extractor: str = typer.Argument(
     default_extractor_path,
     help="The extractor name in the format module_name:class_name",
-)):
-    indexify_extractor.install_local(extractor)
+), install_system_dependencies: bool = typer.Option(False, help="Install system dependencies")):
+    indexify_extractor.install_local(extractor, install_system_dependencies=install_system_dependencies)
