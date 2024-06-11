@@ -5,124 +5,25 @@ This extractor uses [unstructured](https://github.com/Unstructured-IO/unstructur
 text/plain for each element found
 
 ### Input parameters
-strategy: Literal['hi_res', 'fast', 'ocr_only', 'auto'] = "fast"
-languages: Optional[Iterable[str]] = None
+strategy: Optional[str] = Field(default="auto") # "auto", "hi_res", "ocr_only", and "fast"
+hi_res_model_name: Optional[str] = Field(default="yolox")
+infer_table_structure: Optional[bool] = True
 
 ### Strategies
 [Four strategies are available](https://github.com/Unstructured-IO/unstructured-api?tab=readme-ov-file#strategies) for processing PDF/Images files: hi_res, fast, ocr_only and auto. fast is the default strategy and works well for documents that do not have text embedded in images.
 
 hi_res is the better choice for PDFs that may have text within embedded images, or for achieving greater precision of element types in the response JSON.
 
-### Metadata:
-[Metadata extracted](https://unstructured-io.github.io/unstructured/metadata.html) from unstructured also applied to the content.
-
-detection_class_prob: Optional[float] = None # From unstructured-inference, hi-res strategy.
-coordinates: Coordinates
-last_modified: str
-filetype: str
-languages: List[str]
-page_number: int
-file_directory: str
-filename: str
-type: str
-
-### Example
-
-##### content (pdf):
-<img src="sample.png" style="max-width:400px;" alt="Invoice" title="Invoice">
+### Example:
+##### input:
+f = open("resume.pdf", "rb")
+data = Content(content_type="application/pdf", data=f.read())
+params = UnstructuredIOConfig(strategy="hi_res")
+extractor = UnstructuredIOExtractor()
+results = extractor.extract(data, params=params)
+print(results)
 
 ##### output:
-```json
-[
-  {
-    "contentType": "text/plain",
-    "data": "Sample Scientific Paper",
-    "features": [
-      {
-        "featureType": "metadata",
-        "name": "metadata",
-        "value": {
-          "coordinates": {
-            "points": [
-              [185.283, 41.349000000000046],
-              [185.283, 69.34900000000005],
-              [469.93100000000004, 69.34900000000005],
-              [469.93100000000004, 41.349000000000046]
-            ],
-            "system": "PixelSpace",
-            "layoutWidth": 612.0,
-            "layoutHeight": 792.0
-          },
-          "fileDirectory": "/var/folders/04/ysg_dpf16px3f4_bq92dpxww0000gn/T",
-          "filename": "tmp3n50zewo.pdf",
-          "languages": ["eng"],
-          "lastModified": "2024-03-14T11:52:33",
-          "pageNumber": 1,
-          "filetype": "application/pdf",
-          "type": "Header"
-        }
-      }
-    ]
-  },
-  {
-    "contentType": "text/plain",
-    "data": "Investigating how macrophages and adipocytes influence breast cancer metastasis using the chick embryo model",
-    "features": [
-      {
-        "featureType": "metadata",
-        "name": "metadata",
-        "value": {
-          "coordinates": {
-            "points": [
-              [86.04, 74.48399999999992],
-              [86.04, 100.28399999999988],
-              [528.8363999999996, 100.28399999999988],
-              [528.8363999999996, 74.48399999999992]
-            ],
-            "system": "PixelSpace",
-            "layoutWidth": 612.0,
-            "layoutHeight": 792.0
-          },
-          "fileDirectory": "/var/folders/04/ysg_dpf16px3f4_bq92dpxww0000gn/T",
-          "filename": "tmp3n50zewo.pdf",
-          "languages": ["eng"],
-          "lastModified": "2024-03-14T11:52:33",
-          "pageNumber": 1,
-          "parentId": "42a49f252ef50427f37b1b9280f06cc8",
-          "filetype": "application/pdf",
-          "type": "NarrativeText"
-        }
-      }
-    ]
-  }...
 ```
-
-### Additional Language Support
-This extractor depends on having [tesseract](https://github.com/tesseract-ocr/tesseract) installed.
-
-Install for Mac users
-```bash
-brew install tesseract
-```
-
-Install for Linux/Ubuntu
-```bash
-sudo apt install tesseract-ocr
-```
-
-To view currently installed language packs
-```bash
-tesseract --list-langs
-```
-
-To search for additional language packs:
-
-Linux
-```bash
-apt search tesseract-ocr
-```
-
-Install language packs on Mac
-```bash
-brew install tesseract-lang
+[Content(content_type='text/plain', data=b'First Last Adm. No. 22JEXXXX oJ XXX-XXX-XXXX MG firstlast@gmail.com [ linkedin.com/in/firstlast \xc2\xa9 github.com/firstlast', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Image', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Education', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Expected May 20XX City, State \xe2\x80\xa2 Relevant Coursework: Data Structures and Algorithms (C++), Prob & Stat in CS (Python), Intro to CS II (C++), Linear', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Text', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'University Name Bachelor of Science in Computer Science (GPA: 4.00 / 4.00)', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Algebra w/Computational Applications (Python)', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Experience', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Company Name 1 Software Engineer', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Jan 20XX \xe2\x80\x93 May 20XX City, State', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Implemented microservices architecture using Node.js and Express, improving API response time by 25% and reducing server load by 30%.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Led a cross-functional team in implementing a new feature using React and Redux, resulting in a 20% increase in user engagement within the \xef\xac\x81rst month.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Optimized MySQL database queries, reducing page load times by 15% and enhancing overall application performance.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Projects', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Project Name 1 | React.js, Angular, Vue.js, Django, Flask, Ruby on Rails', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Led the development of a microservices-based e-commerce platform using Node.js, resulting in a 40% increase in daily transactions within the \xef\xac\x81rst quarter.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Designed and deployed a scalable RESTful API using Django and Django REST Framework, achieving a 30% improvement in data retrieval speed.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Implemented a real-time chat feature using WebSocket and Socket.io, enhancing user engagement and reducing response time by 20%.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Project Name 2 | Spring Boot, Express.js, TensorFlow, PyTorch, jQuery, Bootstrap', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Developed a data visualization dashboard using D3.js, providing stakeholders with real-time insights and improving decision-making processes.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Built a CI/CD pipeline using Jenkins and Docker, reducing deployment time by 40% and ensuring consistent and reliable releases.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Technical Skills', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Languages: Rust, Kotlin, Swift, Go, Scala, TypeScript, R, Perl, Haskell, Groovy, Julia, Dart Technologies: React.js, Angular, Vue.js, Django, Flask, Ruby on Rails, Spring Boot, Express.js, TensorFlow, PyTorch, jQuery, Bootstrap, Laravel, Flask, ASP.NET, Node.js, Electron, Android SDK, iOS SDK, Symfony Concepts: Compiler, Operating System, Virtual Memory, Cache Memory, Encryption, Decryption, Arti\xef\xac\x81cial Intelligence, Machine Learning, Neural Networks, API, Database Normalization, Agile Methodology, Cloud Computing', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Achievements', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'\xe2\x80\xa2 Pls Add your Achvements here e.g., Hackathons, Exam Ranks, etc.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'ListItem', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Social Engagements', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'Title', 'page_number': 1}, comment=None)], labels={}), Content(content_type='text/plain', data=b'Vice-President: Of Association of Exploration Geophysicist - Student Chapter, IIT Dhanbad Club Member : at CYBER LABS -tech society of IIT Dhanbad Volunteer: at KARTAVYA - NGO run by students of IIT Dhanbad to educate underprivileged childrens. Organisor:Concetto\xe2\x80\x9922 (Tech-fest) Khanan\xe2\x80\x9922 (Geo-Mining fest) . Sports-Engagements: Badminton(state-level) , chess , cricket ,table-tennis.', features=[Feature(feature_type='metadata', name='metadata', value={'type': 'NarrativeText', 'page_number': 1}, comment=None)], labels={})]
 ```
