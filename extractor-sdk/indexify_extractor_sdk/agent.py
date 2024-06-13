@@ -8,7 +8,7 @@ import json
 from typing import List, Dict, Union, Optional
 from .base_extractor import ExtractorDescription
 from .base_extractor import Content, Feature, Embedding
-from .content_downloader import download_content, create_content
+from .content_downloader import download_content, create_content, UrlConfig
 from .extractor_worker import extract_content, create_executor, describe
 from concurrent.futures.process import BrokenProcessPool
 from .ingestion_api_models import (
@@ -167,6 +167,7 @@ class ExtractorAgent:
         advertise_addr: Optional[str],
         ingestion_addr: str = "localhost:8900",
         config_path: Optional[str] = None,
+        download_method: str = "direct",
     ):
         self.num_workers = num_workers
         self.extractor_arg = extractor_arg
@@ -186,13 +187,14 @@ class ExtractorAgent:
                     certfile=tls_config["cert_path"], keyfile=tls_config["key_path"]
                 )
                 self._protocol = "wss"
+                self._tls_config = tls_config
             else:
-                self._use_tls = False
                 self._ssl_context = None
                 self._protocol = "ws"
         else:
             self._ssl_context = None
             self._protocol = "ws"
+            self._config = {}
 
         self._task_store: TaskStore = TaskStore()
         self._executor_id = executor_id
@@ -203,6 +205,7 @@ class ExtractorAgent:
         self._listen_port = listen_port
         self._advertise_addr = advertise_addr
         self._executor = executor
+        self._download_method = download_method
 
     async def ticker(self):
         while True:
@@ -292,7 +295,14 @@ class ExtractorAgent:
         print("launching tasks : ", ",".join(tasks_to_launch.keys()))
         content_urls = {}
         for _, task in tasks_to_launch.items():
-            content_urls[task.id] = task.content_metadata.storage_url
+            if self._download_method == "server-proxy":
+                protocol = "https://" if self._config.get("use_tls") else "http://"
+                url = f"{protocol}{self._ingestion_addr}/namespaces/{task.content_metadata.namespace}/content/{task.content_metadata.id}/download"
+                content_urls[task.id] = UrlConfig(url=url, config=self._config)
+            else:
+                content_urls[task.id] = UrlConfig(
+                    url=task.content_metadata.storage_url, config={}
+                )
         content_bytes = await download_content(content_urls)
         content_list = {}
         task_params_map = {}
