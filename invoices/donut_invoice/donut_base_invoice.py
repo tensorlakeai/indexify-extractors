@@ -1,5 +1,6 @@
 import io
 import torch
+import json
 from PIL import Image
 from typing import List
 from pydantic import BaseModel
@@ -83,15 +84,9 @@ class SimpleInvoiceParserExtractor(Extractor):
             image = self._convert_image_data_to_image(content.data)
 
         data = self._process_document(image)[0]
-        print(data)
         return [
-                Content.from_text(
-                    text="",
-                    features=[Feature.metadata(
-                        value=data, name="invoice_simple_donut"
-                    )],
-                )
-            ]
+            Content(content_type="application/json", data=json.dumps(data))
+        ]
     
     def sample_input(self) -> Content:
         return self.sample_invoice_pdf()
