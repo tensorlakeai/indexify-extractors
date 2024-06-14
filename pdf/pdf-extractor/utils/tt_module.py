@@ -225,6 +225,6 @@ def get_tables(pdf_path):
                 cell_coordinates = get_cell_coordinates_by_row(cells)
 
                 data = apply_ocr(cell_coordinates, cropped_table)
-                data_dict[f"{index+1}_{table_index+1}"] = data
+                data_dict[f"{index+1}.{table_index+1}"] = data
     
     return data_dict
