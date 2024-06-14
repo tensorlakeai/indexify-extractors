@@ -8,6 +8,7 @@ class UnstructuredIOConfig(BaseModel):
     strategy: Optional[str] = Field(default="auto") # "auto", "hi_res", "ocr_only", and "fast"
     hi_res_model_name: Optional[str] = Field(default="yolox")
     infer_table_structure: Optional[bool] = True
+    output_types: List[str] = Field(default_factory=lambda: ["text"])
 
 class UnstructuredIOExtractor(Extractor):
     name = "tensorlake/unstructuredio"
@@ -29,9 +30,17 @@ class UnstructuredIOExtractor(Extractor):
             inputtmpfile.flush()
 
             elements = partition_pdf(inputtmpfile.name, strategy=strategy, hi_res_model_name=hi_res_model_name, infer_table_structure=infer_table_structure)
-            for el in elements:
-                feature = Feature.metadata(value={"type": type(el).__name__, "page_number": el.metadata.page_number})
-                contents.append(Content.from_text(el.text, features=[feature]))
+
+            if "text" in params.output_types:
+                md_text = "\n\n".join([str(el) for el in elements])
+                feature = Feature.metadata(value={"type": "text"})
+                contents.append(Content.from_text(md_text, features=[feature]))
+            
+            if "table" in params.output_types:
+                tables = [el for el in elements if el.category == "Table"]
+                for table in tables:
+                    feature = Feature.metadata({"type": "table"})
+                    contents.append(Content.from_text(table.metadata.text_as_html, features=[feature]))
 
         return contents
 
