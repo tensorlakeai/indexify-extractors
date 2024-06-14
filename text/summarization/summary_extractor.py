@@ -6,7 +6,7 @@ from .utils.chunk_module import FastRecursiveTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownTextSplitter, LatexTextSplitter
 
 class InputParams(BaseModel):
-    max_length: int = 130
+    max_length: int = 3000
     min_length: int = 30
     chunk_method: str = "indexify" # recursive, markdown, latex
 
