@@ -3,7 +3,7 @@ from marker.models import load_all_models
 import tempfile
 from indexify_extractor_sdk import Content, Extractor, Feature
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Literal, List, Union
 
 class MarkdownExtractorConfig(BaseModel):
