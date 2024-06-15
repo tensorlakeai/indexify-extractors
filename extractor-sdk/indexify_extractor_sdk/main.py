@@ -84,7 +84,7 @@ def join_server(
         help="The port to listen on for extractor API extract functions.",
     ),
     download_method: DownloadMethod = typer.Option(
-        DownloadMethod.direct,
+        DownloadMethod.server_proxy,
         help="Method to download the content. Can be 'direct' to access storage url directly "
         "or 'server-proxy' to use ingestion server as proxy.",
     ),
