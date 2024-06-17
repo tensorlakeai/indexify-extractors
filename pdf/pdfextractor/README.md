@@ -17,13 +17,13 @@ Content(content_type="application/pdf", data=f.read())
 
 ##### code:
 ```python
-!indexify-extractor download hub://pdf/pdf-extractor
+!indexify-extractor download hub://pdf/pdfextractor
 !indexify-extractor join-server
 
 from indexify import IndexifyClient
 client = IndexifyClient()
 
-client.add_extraction_policy(extractor='tensorlake/pdf-extractor', name="pdf-extraction")
+client.add_extraction_policy(extractor='tensorlake/pdfextractor', name="pdf-extraction")
 
 import requests
 req = requests.get("https://arxiv.org/pdf/2310.16944.pdf")

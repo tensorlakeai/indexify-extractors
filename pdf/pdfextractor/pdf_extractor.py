@@ -11,7 +11,7 @@ class PDFExtractorConfig(BaseModel):
     output_types: List[str] = Field(default_factory=lambda: ["text"])
 
 class PDFExtractor(Extractor):
-    name = "tensorlake/pdf-extractor"
+    name = "tensorlake/pdfextractor"
     description = "PDF Extractor for Texts, Images & Tables"
     system_dependencies = ["poppler-utils"]
     input_mime_types = ["application/pdf"]
