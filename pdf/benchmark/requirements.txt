@@ -1,0 +1,17 @@
+indexify-extractor-sdk
+sentencepiece
+pdf2image
+marker-pdf
+easyocr
+pypdf
+PyMuPDF
+pymupdf4llm
+accelerate
+bitsandbytes
+peft
+transformers
+numpy
+pydantic
+pydantic-settings
+rapidfuzz
+unstructured[pdf]

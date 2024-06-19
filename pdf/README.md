@@ -17,6 +17,6 @@ indexify-extractor join-server
 | layoutlm_document_qa | hub://pdf/layoutlm_document_qa | layoutlm_document_qa:LayoutLMDocumentQA  |
 | ocrmypdf             | hub://pdf/ocrmypdf             | ocr_my_pdf:OCRMyPDFExtractor             |
 | unstructuredio       | hub://pdf/unstructuredio       | unstructured_pdf:UnstructuredIOExtractor |
-| pdf-extractor        | hub://pdf/pdf-extractor        | pdf_extractor:PDFExtractor               |
+| pdfextractor        | hub://pdf/pdfextractor        | pdf_extractor:PDFExtractor               |
 | marker             | hub://pdf/marker             | markdown_extractor:MarkdownExtractor     |
 | easyocrpdf           | hub://pdf/easyocrpdf           | ocr_extractor:OCRExtractor     |

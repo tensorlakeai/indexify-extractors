@@ -1,9 +1,1 @@
-unstructured
-pdfminer.six
-pillow
-pillow-heif
-opencv-python
-pdf2image
-pytesseract
-pikepdf
-pyopenssl==24.1.0
+unstructured[pdf]
