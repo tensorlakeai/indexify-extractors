@@ -11,6 +11,7 @@ class OCRMyPDFConfig(BaseModel):
     language: Optional[Iterable[str]] = None
     remove_background: Optional[bool] = None
     rotate_pages: Optional[bool] = None
+    skip_text: Optional[bool] = True
 
 
 class OCRMyPDFExtractor(Extractor):
