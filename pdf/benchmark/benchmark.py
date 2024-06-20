@@ -1,9 +1,11 @@
 import math
-
 from rapidfuzz import fuzz
 import re
 import regex
 from statistics import mean
+import os
+import time
+from indexify import IndexifyClient, ExtractionGraph
 
 CHUNK_MIN_CHARS = 25
 
@@ -11,7 +13,6 @@ def chunk_text(text, chunk_len=500):
     chunks = [text[i:i+chunk_len] for i in range(0, len(text), chunk_len)]
     chunks = [c for c in chunks if c.strip() and len(c) > CHUNK_MIN_CHARS]
     return chunks
-
 
 def overlap_score(hypothesis_chunks, reference_chunks):
     length_modifier = len(hypothesis_chunks) / len(reference_chunks)
@@ -31,59 +32,37 @@ def overlap_score(hypothesis_chunks, reference_chunks):
         chunk_scores.append(max_score)
     return chunk_scores
 
-
 def score_text(hypothesis, reference):
-    # Returns a 0-1 alignment score
     hypothesis_chunks = chunk_text(hypothesis)
     reference_chunks = chunk_text(reference)
     chunk_scores = overlap_score(hypothesis_chunks, reference_chunks)
     return mean(chunk_scores)
 
+# Download the extractors and join the server
+os.system("!indexify-extractor download tensorlake/marker")
+os.system("!indexify-extractor download tensorlake/pdf-extractor")
+os.system("!indexify-extractor download tensorlake/unstructuredio")
+os.system("!indexify-extractor download tensorlake/easyocr")
+os.system("!indexify-extractor download tensorlake/ocrmypdf")
+os.system("!indexify-extractor join-server")
 
-import os
-import time
-from marker.markdown_extractor import MarkdownExtractorConfig, MarkdownExtractor
-from pdfextractor.pdf_extractor import PDFExtractorConfig, PDFExtractor
-from unstructuredio.unstructured_pdf import UnstructuredIOConfig, UnstructuredIOExtractor
-from indexify_extractor_sdk import Content
+# Initialize the Indexify client
+client = IndexifyClient()
 
-# Initialize extractors
-markdown_extractor = MarkdownExtractor()
-pdf_extractor = PDFExtractor()
-unstructured_extractor = UnstructuredIOExtractor()
-
-# Function to extract text content from extractor output
-def extract_text_content(result):
-    if isinstance(result, list):
-        result = result[0]
-    return result.data.decode('utf-8')
-
-# Function to run Marker extractor
-def use_marker(pdf_filepath):
-    with open(pdf_filepath, "rb") as f:
-        pdf_data = f.read()
-    content = Content(content_type="application/pdf", data=pdf_data)
-    config = MarkdownExtractorConfig(output_types=["text"])
-    result = markdown_extractor.extract(content, config)
-    return extract_text_content(result)
-
-# Function to run PDF extractor
-def use_pdf_extractor(pdf_filepath):
-    with open(pdf_filepath, "rb") as f:
-        pdf_data = f.read()
-    content = Content(content_type="application/pdf", data=pdf_data)
-    config = PDFExtractorConfig(output_types=["text"])
-    result = pdf_extractor.extract(content, config)
-    return extract_text_content(result)
-
-# Function to run Unstructured IO extractor
-def use_unstructured(pdf_filepath):
-    with open(pdf_filepath, "rb") as f:
-        pdf_data = f.read()
-    content = Content(content_type="application/pdf", data=pdf_data)
-    config = UnstructuredIOConfig(output_types=["text"])
-    result = unstructured_extractor.extract(content, config)
-    return extract_text_content(result)
+# Function to create and run extraction graphs
+def create_and_run_extraction_graph(graph_name, extractor_name, pdf_filepath):
+    extraction_graph_spec = f"""
+    name: '{graph_name}'
+    extraction_policies:
+       - extractor: '{extractor_name}'
+         name: 'pdf_to_text'
+    """
+    extraction_graph = ExtractionGraph.from_yaml(extraction_graph_spec)
+    client.create_extraction_graph(extraction_graph)
+    content_id = client.upload_file(graph_name, pdf_filepath)
+    client.wait_for_extraction(content_id)
+    extracted_content = client.get_extracted_content(content_id=content_id, graph_name=graph_name, policy_name="pdf_to_text")
+    return extracted_content
 
 # Directories containing PDF and reference files
 pdf_dir = "/content/pdfs"
@@ -101,21 +80,35 @@ for pdf_file in os.listdir(pdf_dir):
 
         # Run Marker extractor
         start_time = time.time()
-        marker_output = use_marker(pdf_path)
+        marker_output = create_and_run_extraction_graph("markerbench", "tensorlake/marker", pdf_path)
         marker_time = time.time() - start_time
         marker_score = score_text(marker_output, reference_text)
         print(f"Marker score for {pdf_file}: {marker_score} (Time taken: {marker_time:.2f} seconds)")
 
         # Run PDF extractor
         start_time = time.time()
-        pdf_extractor_output = use_pdf_extractor(pdf_path)
+        pdf_extractor_output = create_and_run_extraction_graph("pdfbench", "tensorlake/pdf-extractor", pdf_path)
         pdf_extractor_time = time.time() - start_time
         pdf_extractor_score = score_text(pdf_extractor_output, reference_text)
         print(f"PDF extractor score for {pdf_file}: {pdf_extractor_score} (Time taken: {pdf_extractor_time:.2f} seconds)")
 
         # Run Unstructured IO extractor
         start_time = time.time()
-        unstructured_output = use_unstructured(pdf_path)
+        unstructured_output = create_and_run_extraction_graph("unstructuredbench", "tensorlake/unstructuredio", pdf_path)
         unstructured_time = time.time() - start_time
         unstructured_score = score_text(unstructured_output, reference_text)
         print(f"Unstructured IO score for {pdf_file}: {unstructured_score} (Time taken: {unstructured_time:.2f} seconds)")
+
+        # Run EasyOCR extractor
+        start_time = time.time()
+        easyocr_output = create_and_run_extraction_graph("easyocrbench", "tensorlake/easyocr", pdf_path)
+        easyocr_time = time.time() - start_time
+        easyocr_score = score_text(easyocr_output, reference_text)
+        print(f"Easy OCR score for {pdf_file}: {easyocr_score} (Time taken: {easyocr_time:.2f} seconds)")
+
+        # Run OCRMyPDF extractor
+        start_time = time.time()
+        ocrmypdf_output = create_and_run_extraction_graph("ocrmypdfbench", "tensorlake/ocrmypdf", pdf_path)
+        ocrmypdf_time = time.time() - start_time
+        ocrmypdf_score = score_text(ocrmypdf_output, reference_text)
+        print(f"OCR My PDF score for {pdf_file}: {ocrmypdf_score} (Time taken: {ocrmypdf_time:.2f} seconds)")
