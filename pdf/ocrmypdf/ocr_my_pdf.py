@@ -31,19 +31,18 @@ class OCRMyPDFExtractor(Extractor):
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as outtmpfile:
                 ocrmypdf.ocr(inputtmpfile.name, outtmpfile.name, **dict(params))
 
-                new_content = []
+                contents = []
+                full_text = ""
+
                 # extract text from each page
                 doc = fitz.open(outtmpfile.name)
                 for i, page in enumerate(doc):
-                    new_content.append(
-                        Content(
-                            content_type="text/plain",
-                            data=bytes(page.get_text(), "utf-8"),
-                            features=[Feature.metadata(value={"page": i+1}, name="text")],
-                        )
-                    )
+                    full_text += page.get_text() + " "
+                
+                feature = Feature.metadata(value={"type": "text"})
+                contents.append(Content.from_text(full_text, features=[feature]))
 
-                return new_content
+                return contents
 
     def sample_input(self) -> Content:
         return self.sample_image_based_pdf()

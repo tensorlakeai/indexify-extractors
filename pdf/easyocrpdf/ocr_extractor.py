@@ -16,6 +16,7 @@ class OCRExtractor(Extractor):
 
     def extract(self, content: Content, params = None) -> List[Union[Feature, Content]]:
         contents = []
+        full_text = ""
 
         suffix = f'.{content.content_type.split("/")[-1]}'
         if not suffix.endswith(".pdf"):
@@ -31,15 +32,18 @@ class OCRExtractor(Extractor):
                     page = doc[i]
                     page_text = page.get_text()
                     image_list = page.get_images()
-                    feature = Feature.metadata(value={"page": i+1}, name="text")
+
                     if page_text:
-                        contents.append(Content.from_text(page_text, features=[feature]))
+                        full_text += page_text + " "
 
                     for img in image_list:
                         xref = img[0]
                         pix = fitz.Pixmap(doc, xref)
                         image_text = get_text(pix.tobytes())
-                        contents.append(Content.from_text(image_text, features=[feature]))
+                        full_text += image_text + " "
+                
+                feature = Feature.metadata(value={"type": "text"})
+                contents.append(Content.from_text(full_text, features=[feature]))
         
         return contents
 
