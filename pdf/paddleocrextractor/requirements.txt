@@ -1,0 +1,8 @@
+easyocr==1.7.1
+pdf2image==1.17.0
+pypdf==4.1.0
+PyMuPDF==1.24.2
+transformers==4.38.2
+torch==2.2.1
+torchvision==0.17.1
+pymupdf4llm==0.0.5
