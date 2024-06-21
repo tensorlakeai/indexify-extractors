@@ -48,7 +48,7 @@ class PaddleOCRExtractor(Extractor):
         return self.sample_scientific_pdf()
 
 if __name__ == "__main__":
-    f = open("2310.16944.pdf", "rb")
+    f = open("W2_Summary.pdf", "rb")
     pdf_data = Content(content_type="application/pdf", data=f.read())
     extractor = PaddleOCRExtractor()
     params = PaddleOCRExtractorConfig(output_types=["text"])
