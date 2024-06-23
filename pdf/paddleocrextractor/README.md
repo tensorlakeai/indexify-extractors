@@ -1,8 +1,7 @@
-# Multipurpose PDF Extractor
+# PaddleOCR PDF Extractor
 
-This is a multipurpose PDF Extractor that can extract text, images and tables from PDF files. For text and image extraction we use PyPDF and for table extraction we use [Table Transformer](https://github.com/microsoft/table-transformer) from Microsoft.
-
-This is able to extract all kinds of tables from PDFs, even the ones that have no boundaries which are undetected by other models.
+This is a PaddleOCR based PDF extractor formulated using the [PaddleOCR] (https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.7) library. 
+The PaddleOCR PDF Extractor API leverages the capabilities of PaddlePaddle OCR to efficiently extract text from various types of PDF documents. It supports multiple languages and can handle diverse document formats, including invoices, academic papers, and forms. PaddleOCR integrates many OCR algorithms, text detection algorithms include DB, EAST, SAST, etc., text recognition algorithms include CRNN, RARE, StarNet, Rosetta, SRN and other algorithms.
 
 ### Example:
 ##### input:
@@ -12,10 +11,10 @@ Content(content_type="application/pdf", data=f.read())
 
 ##### output:
 ```
-[Content(content_type='text/plain', data=b'I love playing football.', features=[Feature(feature_type='metadata', value={'type': 'text', 'page': 1}, comment=None)], labels={})]
+Content(content_type='text/plain', data=b"Form 1040\nForms W-2 & W-2G Summary\n2023\nKeep for your records\n Name(s) Shown on Return\nSocial Security Number\nJohn H & Jane K Doe\n321-12-3456\nEmployer\nTotal local tax withheld .", features=[Feature(feature_type='metadata', name='metadata', value={'type': 'text'}, comment=None)], labels={})]
 ```
 
-##### code:
+##### python sdk:
 ```python
 !indexify-extractor download hub://pdf/pdfextractor
 !indexify-extractor join-server
@@ -23,13 +22,15 @@ Content(content_type="application/pdf", data=f.read())
 from indexify import IndexifyClient
 client = IndexifyClient()
 
-client.add_extraction_policy(extractor='tensorlake/pdfextractor', name="pdf-extraction")
+client.add_extraction_policy(extractor='tensorlake/paddleocr_extractor', name="pdf-extraction")
 
 import requests
-req = requests.get("https://arxiv.org/pdf/2310.16944.pdf")
+req = requests.get("sample_form.pdf")
 
-with open('2310.16944.pdf','wb') as f:
+with open('sample_form.pdf','wb') as f:
     f.write(req.content)
 
-client.upload_file(path="2310.16944.pdf")
+client.upload_file(path="sample_form.pdf")
 ```
+
+The extractor can also be chained with other extractors for maximum effect. 
