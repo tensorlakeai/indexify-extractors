@@ -36,6 +36,7 @@
   {"type": "text", "module_name": "llm.llm_extractor:LLMExtractor", "name":"tensorlake/llm", "path": "text/llm"},
   {"type": "text", "module_name": "gemini.gemini_extractor:GeminiExtractor", "name":"tensorlake/gemini", "path": "text/gemini"},
   {"type": "text", "module_name": "openai.oai_extractor:OAIExtractor", "name":"tensorlake/openai", "path": "text/openai"},
+  {"type": "text", "module_name": "mistralai.mistral_extractor:MistralExtractor", "name":"tensorlake/mistral", "path": "text/mistralai"},
   {"type": "text", "module_name": "ollama.ollama_extractor:OllamaExtractor", "name":"tensorlake/ollama", "path": "text/ollama"},
   {"type": "text", "module_name": "ner.ner_extractor:NERExtractor", "name":"tensorlake/ner", "path": "text/ner"}
 ]
