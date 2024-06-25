@@ -11,6 +11,7 @@
   {"type": "embedding", "module_name": "scibert.scibert_uncased:SciBERTExtractor", "name": "tensorlake/scibert", "path": "embedding/scibert"},
   {"type": "audio", "module_name": "whisper-asr.whisper_extractor:WhisperExtractor", "with_gpu": true, "name": "tensorlake/whisper-asr", "path": "audio/whisper-asr"},
   {"type": "audio", "module_name": "whisper-mlx.whisper_extractor:WhisperExtractor", "skip_deploy": true,"name": "tensorlake/whisper-mlx", "path": "audio/whisper-mlx"},
+  {"type": "audio", "module_name": "groq.whisper:WhisperExtractor", "skip_deploy": true, "name": "tensorlake/whispergroq", "path": "audio/groq"},
   {"type": "audio", "module_name": "asrdiarization.asr_extractor:ASRExtractor", "with_gpu": true, "name": "tensorlake/asrdiarization", "path": "audio/asrdiarization"},
   {"type": "video", "module_name": "audio-extractor.audio_extractor:AudioExtractor", "name": "tensorlake/audio-extractor", "path": "video/audio-extractor"},
   {"type": "video", "module_name": "face-extractor.face_extractor:FaceExtractor", "skip_deploy": true, "name": "tensorlake/face-extractor", "path": "video/face-extractor"},
@@ -36,6 +37,7 @@
   {"type": "text", "module_name": "llm.llm_extractor:LLMExtractor", "name":"tensorlake/llm", "path": "text/llm"},
   {"type": "text", "module_name": "gemini.gemini_extractor:GeminiExtractor", "name":"tensorlake/gemini", "path": "text/gemini"},
   {"type": "text", "module_name": "openai.oai_extractor:OAIExtractor", "name":"tensorlake/openai", "path": "text/openai"},
+  {"type": "text", "module_name": "mistralai.mistral_extractor:MistralExtractor", "name":"tensorlake/mistral", "path": "text/mistralai"},
   {"type": "text", "module_name": "ollama.ollama_extractor:OllamaExtractor", "name":"tensorlake/ollama", "path": "text/ollama"},
   {"type": "text", "module_name": "ner.ner_extractor:NERExtractor", "name":"tensorlake/ner", "path": "text/ner"}
 ]
