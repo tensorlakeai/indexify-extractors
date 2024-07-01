@@ -40,7 +40,7 @@ class GeminiExtractor(Extractor):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_image_file:
                         image.save(temp_image_file.name, 'JPEG')
                         response = self._process_image(temp_image_file.name, model_name, key, prompt, query)
-                        all_responses.append(f"Page {i+1}:\n{response}")
+                        all_responses.append(f"{response}")
                     os.unlink(temp_image_file.name)
                 
                 response_content = "\n\n".join(all_responses)
