@@ -30,52 +30,80 @@ class OAIExtractor(Extractor):
         prompt = params.system_prompt
         query = params.user_prompt
 
-        if content.content_type in ["application/pdf"]:
+        if content.content_type == "application/pdf":
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 temp_file.write(content.data)
                 file_path = temp_file.name
                 images = convert_from_path(file_path)
-                image_files = []
-                for i in range(len(images)):
+                
+                all_responses = []
+                for i, image in enumerate(images):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_image_file:
-                        images[i].save(temp_image_file.name, 'JPEG')
-                        image_files.append(temp_image_file.name)
+                        image.save(temp_image_file.name, 'JPEG')
+                        response = self._process_image(temp_image_file.name, model_name, key, prompt, query)
+                        all_responses.append(f"Page {i+1}:\n{response}")
+                    os.unlink(temp_image_file.name)
+                
+                response_content = "\n\n".join(all_responses)
+                os.unlink(file_path)
+        
         elif content.content_type in ["image/jpeg", "image/png"]:
-            image_files = []
             suffix = mimetypes.guess_extension(content.content_type)
             with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_image_file:
                 temp_image_file.write(content.data)
-                file_path = temp_image_file.name
-                image_files.append(file_path)
+                response_content = self._process_image(temp_image_file.name, model_name, key, prompt, query)
+            os.unlink(temp_image_file.name)
+        
         else:
             text = content.data.decode("utf-8")
             if query is None:
                 query = text
-            file_path = None
-        
-        def encode_image(image_path):
-            with open(image_path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode('utf-8')
-
-        if ('OPENAI_API_KEY' not in os.environ) and (key is None):
-            response_content = "The OPENAI_API_KEY environment variable is not present."
-        else:
-            if ('OPENAI_API_KEY' in os.environ) and (key is None):
-                client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-            else:
-                client = OpenAI(api_key=key)
-            if file_path:
-                encoded_images = [encode_image(image_path) for image_path in image_files]
-                messages_content = [ { "role": "user", "content": [ { "type": "text", "text": prompt, } ] + [ { "type": "image_url", "image_url": { "url": f"data:image/jpeg;base64,{encoded_image}", }, } for encoded_image in encoded_images ], } ]
-            else:
-                messages_content = [ {"role": "system", "content": prompt}, {"role": "user", "content": query} ]
-
-            response = client.chat.completions.create( model=model_name, messages=messages_content )
-            response_content = response.choices[0].message.content
+            response_content = self._process_text(model_name, key, prompt, query)
         
         contents.append(Content.from_text(response_content))
-        
         return contents
+
+    def _process_image(self, image_path, model_name, key, prompt, query):
+        if ('OPENAI_API_KEY' not in os.environ) and (key is None):
+            return "The OPENAI_API_KEY environment variable is not present."
+        
+        if ('OPENAI_API_KEY' in os.environ) and (key is None):
+            client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        else:
+            client = OpenAI(api_key=key)
+        
+        with open(image_path, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
+        
+        messages_content = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt + " " + (query or "")},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}}
+                ]
+            }
+        ]
+        
+        response = client.chat.completions.create(model=model_name, messages=messages_content)
+        return response.choices[0].message.content
+
+    def _process_text(self, model_name, key, prompt, query):
+        if ('OPENAI_API_KEY' not in os.environ) and (key is None):
+            return "The OPENAI_API_KEY environment variable is not present."
+        
+        if ('OPENAI_API_KEY' in os.environ) and (key is None):
+            client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        else:
+            client = OpenAI(api_key=key)
+        
+        messages_content = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": query}
+        ]
+        
+        response = client.chat.completions.create(model=model_name, messages=messages_content)
+        return response.choices[0].message.content
 
     def sample_input(self) -> Content:
         return Content.from_text("Hello world, I am a good boy.")
@@ -84,7 +112,7 @@ if __name__ == "__main__":
     prompt = """Extract all text from the document."""
     f = open("resume.pdf", "rb")
     pdf_data = Content(content_type="application/pdf", data=f.read())
-    input_params = OAIExtractorConfig(prompt=prompt, model_name="gpt-4o")
+    input_params = OAIExtractorConfig(prompt=prompt, model_name="gpt-4-vision-preview")
     extractor = OAIExtractor()
     results = extractor.extract(pdf_data, params=input_params)
     print(results)
