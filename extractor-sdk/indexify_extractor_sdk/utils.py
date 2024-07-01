@@ -29,8 +29,9 @@ def read_extractors_json_file(filename):
     #     json_content = json.load(file)
     # return json_content
 
-    fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
-    file_path = filename
+    file_path = f's3://indexifyextractors/indexify-extractors/{filename}'
+
+    fs = fsspec.filesystem('s3', anon=True)
 
     with fs.open(file_path, "r") as file:
         # Load the JSON content from the file
