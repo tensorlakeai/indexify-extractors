@@ -85,18 +85,19 @@ def install_dependencies(directory_path):
     requirements_path = os.path.join(directory_path, "requirements.txt")
 
     if not os.path.exists(requirements_path):
-        raise ValueError("Unable to find requirements.txt")
+            raise ValueError("Unable to find requirements.txt")
 
-    # Use sys.executable to get the path of the current Python interpreter
-    python_executable = sys.executable
-    pip_command = [python_executable, "-m", "pip", "install", "-r", requirements_path]
+    if os.environ.get("VIRTUAL_ENV"):
+        # install requirements to current env
+        pip_path = os.path.join(os.environ.get("VIRTUAL_ENV"), 'bin', 'pip')
+        subprocess.check_call([pip_path, 'install', '-r', requirements_path])
+    else:
+        create_new_venv()
 
-    try:
-        subprocess.check_call(pip_command)
-        subprocess.check_call([python_executable, "-m", "pip", "install", "indexify-extractor-sdk"])
-    except subprocess.CalledProcessError as e:
-        console.print(f"[bold #f04318]Error installing dependencies: {e}[/]")
-        raise
+        # install requirements to new venv
+        pip_path = os.path.join(VENV_PATH, 'bin', 'pip')
+        subprocess.check_call([pip_path, 'install', '-r', requirements_path])
+        subprocess.check_call([pip_path, 'install', 'indexify-extractor-sdk']) 
 
 
 def get_db_path():
