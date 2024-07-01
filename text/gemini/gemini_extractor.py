@@ -29,56 +29,85 @@ class GeminiExtractor(Extractor):
         prompt = params.system_prompt
         query = params.user_prompt
 
-        if content.content_type in ["application/pdf"]:
+        if content.content_type == "application/pdf":
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 temp_file.write(content.data)
                 file_path = temp_file.name
                 images = convert_from_path(file_path)
-                image_files = []
-                for i in range(len(images)):
+                
+                all_responses = []
+                for i, image in enumerate(images):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_image_file:
-                        images[i].save(temp_image_file.name, 'JPEG')
-                        image_files.append(temp_image_file.name)
+                        image.save(temp_image_file.name, 'JPEG')
+                        response = self._process_image(temp_image_file.name, model_name, key, prompt, query)
+                        all_responses.append(f"Page {i+1}:\n{response}")
+                    os.unlink(temp_image_file.name)
+                
+                response_content = "\n\n".join(all_responses)
+                os.unlink(file_path)
+        
         elif content.content_type in ["image/jpeg", "image/png"]:
-            image_files = []
             suffix = mimetypes.guess_extension(content.content_type)
             with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_image_file:
                 temp_image_file.write(content.data)
-                file_path = temp_image_file.name
-                image_files.append(file_path)
+                response_content = self._process_image(temp_image_file.name, model_name, key, prompt, query)
+            os.unlink(temp_image_file.name)
+        
         else:
             text = content.data.decode("utf-8")
             if query is None:
                 query = text
-            file_path = None
-        
-        def upload_to_gemini(path, mime_type=None):
-            file = genai.upload_file(path, mime_type=mime_type)
-            print(f"Uploaded file '{file.display_name}' as: {file.uri}")
-            return file
-
-        if ('GEMINI_API_KEY' not in os.environ) and (key is None):
-            response_content = "The GEMINI_API_KEY environment variable is not present."
-        else:
-            if ('GEMINI_API_KEY' in os.environ) and (key is None):
-                genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-            else:
-                genai.configure(api_key=key)
-            generation_config = { "temperature": 1, "top_p": 0.95, "top_k": 64, "max_output_tokens": 8192, "response_mime_type": "text/plain", }
-            model = genai.GenerativeModel( model_name=model_name, generation_config=generation_config, )
-            if file_path:
-                files = [upload_to_gemini(image_file, mime_type="image/jpeg") for image_file in image_files]
-                chat_session = model.start_chat( history=[ { "role": "user", "parts": files, }, ] )
-                response = chat_session.send_message(prompt)
-            else:
-                chat_session = model.start_chat( history=[ ] )
-                response = chat_session.send_message(prompt + " " + query)
-
-            response_content = response.text
+            response_content = self._process_text(model_name, key, prompt, query)
         
         contents.append(Content.from_text(response_content))
-        
         return contents
+
+    def _process_image(self, image_path, model_name, key, prompt, query):
+        if ('GEMINI_API_KEY' not in os.environ) and (key is None):
+            return "The GEMINI_API_KEY environment variable is not present."
+        
+        if ('GEMINI_API_KEY' in os.environ) and (key is None):
+            genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        else:
+            genai.configure(api_key=key)
+        
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        }
+        model = genai.GenerativeModel(model_name=model_name, generation_config=generation_config)
+        
+        file = genai.upload_file(image_path, mime_type="image/jpeg")
+        chat_session = model.start_chat(history=[{"role": "user", "parts": [file]}])
+        response = chat_session.send_message(prompt + " " + (query or ""))
+        
+        return response.text
+
+    def _process_text(self, model_name, key, prompt, query):
+        if ('GEMINI_API_KEY' not in os.environ) and (key is None):
+            return "The GEMINI_API_KEY environment variable is not present."
+        
+        if ('GEMINI_API_KEY' in os.environ) and (key is None):
+            genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        else:
+            genai.configure(api_key=key)
+        
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        }
+        model = genai.GenerativeModel(model_name=model_name, generation_config=generation_config)
+        
+        chat_session = model.start_chat(history=[])
+        response = chat_session.send_message(prompt + " " + query)
+        
+        return response.text
 
     def sample_input(self) -> Content:
         return Content.from_text("Hello world, I am a good boy.")
