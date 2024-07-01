@@ -214,8 +214,12 @@ def download_extractor(extractor_name):
     create_extractor_db()
 
     console.print("[bold #4AA4F4]Downloading Extractor...[/]")
-    extractors_index = extractors_by_name()
-
+    try:
+        extractors_index = extractors_by_name()
+    except Exception as e:
+        value = {"extractor_name": extractor_name, "stage": "extractor_list", "error": str(e)}
+        log_event("extractor_download_failed", value=value)
+        raise e
     fs = fsspec.filesystem('s3', anon=True)
 
     if extractor_name not in extractors_index:
@@ -225,14 +229,29 @@ def download_extractor(extractor_name):
 
     extractor_path = f's3://indexifyextractors/indexify-extractors/{extractors_index[extractor_name]["path"]}'
 
-    fs.get(extractor_path, EXTRACTOR_MODULE_PATH, recursive=True)
+    try:
+        fs.get(extractor_path, EXTRACTOR_MODULE_PATH, recursive=True)
+    except Exception as e:
+        value = {"extractor_name": extractor_name, "stage": "extractor_download", "error": str(e)}
+        log_event("extractor_download_failed", value=value)
+        raise e
     base_extractor_path = os.path.basename(extractor_path)
-    install_dependencies(os.path.join(EXTRACTOR_MODULE_PATH, base_extractor_path))
+    try:
+        install_dependencies(os.path.join(EXTRACTOR_MODULE_PATH, base_extractor_path))
+    except Exception as e:
+        value = {"extractor_name": extractor_name, "stage": "install_dependencies", "error": str(e)}
+        log_event("extractor_download_failed", value=value)
+        raise e
 
     # Store the extractor info in the database
     
     extractor_full_name = get_extractor_full_name(base_extractor_path)
-    description = get_extractor_description(extractor_full_name)
+    try:
+        description = get_extractor_description(extractor_full_name)
+    except Exception as e:
+        value = {"extractor_name": extractor_name, "stage": "extractor_description", "error": str(e)}
+        log_event("extractor_download_failed", value=value)
+        raise e
     
     if description.name.startswith("tensorlake"):
         log_event("extractor_download", description.name)
@@ -241,6 +260,8 @@ def download_extractor(extractor_name):
         save_extractor_description(extractor_full_name, description)
     except Exception as e:
         print(f"Error saving extractor description: {e}")
+        value = {"extractor_name": extractor_name, "stage": "save_description", "error": str(e)}
+        log_event("extractor_download_failed", value=value)
         raise e
 
     # Print instruction last to improve user experience.
