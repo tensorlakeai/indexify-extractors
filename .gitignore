@@ -12,3 +12,4 @@ dist
 *sample.pdf
 text_splitters/target
 .dev-tls
+.idea/*
