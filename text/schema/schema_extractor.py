@@ -18,6 +18,7 @@ class SchemaExtractorConfig(BaseModel):
         'title': 'User',
         'type': 'object'
     }, alias='schema')
+    example_text: Optional[str] = Field(default=None)
     data: Optional[str] = Field(default=None)
     additional_messages: str = Field(default='Extract information in JSON according to this schema and return only the output.')
 
