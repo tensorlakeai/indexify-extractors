@@ -29,7 +29,7 @@ indexify-extractor list
 #### Download an Extractor
 Find the name of the extractor you want.
 ```bash
-indexify-extractor download hub://embedding/minilm-l6
+indexify-extractor download tensorlake/minilm-l6
 ```
 
 #### Load and Run in Notebook or Python Applications 
@@ -49,7 +49,7 @@ config.schema()
 
 #### Extract Locally on shell -
 ```bash
-indexify-extractor run-local indexify_extractor.minilm_l6:MiniLML6Extractor --text "hello world" // or --file 
+indexify-extractor run-local indexify_extractors.minilm-l6.minilm_l6:MiniLML6Extractor --text "hello world" // or --file
 ```
 
 #### Run Extractors as a Service for Continous Extraction and Indexing with Indexify Server

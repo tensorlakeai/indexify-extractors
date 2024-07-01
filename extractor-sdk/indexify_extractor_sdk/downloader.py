@@ -215,12 +215,15 @@ def download_extractor(extractor_name):
 
     console.print("[bold #4AA4F4]Downloading Extractor...[/]")
     extractors_index = extractors_by_name()
-    fs = fsspec.filesystem("github", org="tensorlakeai", repo="indexify-extractors")
+
+    fs = fsspec.filesystem('s3', anon=True)
+
     if extractor_name not in extractors_index:
         console.print(f"[bold #f04318]Extractor {extractor_name} not found[/]")
         console.print(f"[bold #f04318]Use command: [yellow]indexify-extractor list[/yellow] to see the list of available extractors[/]")
         return
-    extractor_path = extractors_index[extractor_name]["path"]
+
+    extractor_path = f's3://indexifyextractors/indexify-extractors/{extractors_index[extractor_name]["path"]}'
 
     fs.get(extractor_path, EXTRACTOR_MODULE_PATH, recursive=True)
     base_extractor_path = os.path.basename(extractor_path)
