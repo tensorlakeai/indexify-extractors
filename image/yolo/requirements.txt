@@ -1,3 +1,2 @@
-ultralytics
-numpy
-opencv-python
+ultralytics==8.2.48
+opencv-python==4.8.0.76
