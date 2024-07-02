@@ -1,46 +1,63 @@
+from typing import List, Union, Optional
 from indexify_extractor_sdk import Content, Extractor, Feature
-from typing import List, Union
+from pydantic import BaseModel, Field
+import json
 from ultralytics import YOLO
-import numpy as np
 import cv2
+import numpy as np
 
+class YoloExtractorConfig(BaseModel):
+    model_name: str = Field(default='yolov8n.pt')
+    conf: float = Field(default=0.25)
+    iou: float = Field(default=0.7)
 
 class YoloExtractor(Extractor):
     name = "tensorlake/yolo-extractor"
-    description = "Extract yolo features from images"
-    input_mime_types = ["image", "image/jpeg", "image/png"]
-    system_dependencies = ["ffmpeg", "libsm6", "libxext6"]
+    description = "An extractor that uses YOLO for object detection in images."
+    system_dependencies = []
+    input_mime_types = ["image/jpeg", "image/png"]
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
-        self._download_file("https://extractor-files.diptanu-6d5.workers.dev/yolov9e.pt","yolov9e.pt")
-        self.model = YOLO("yolov9e.pt")
 
-    def extract(self, content: Content, params=None) -> List[Union[Feature, Content]]:
-        image_array = np.frombuffer(content.data, dtype=np.uint8)
-        image = cv2.imdecode(image_array, cv2.IMREAD_ANYCOLOR)
+    def extract(self, content: Content, params: YoloExtractorConfig) -> List[Union[Feature, Content]]:
+        contents = []
+        
+        # Load the YOLO model
+        model = YOLO(params.model_name)
 
-        results = self.model(image)
+        # Decode the image data
+        nparr = np.frombuffer(content.data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        features = []
-        for r in results:
-            boxes = r.boxes
+        # Run inference
+        results = model(img, conf=params.conf, iou=params.iou)
+
+        for result in results:
+            boxes = result.boxes
             for box in boxes:
-                b = box.xyxy[0]
-                c = box.cls
-                name = self.model.names[int(c)]
-                feature = Feature.metadata(
-                    value={"bounding_box": b.tolist(), "object_name": name},
-                    comment={"bounding_box": "Bounding box coordinates in the format [x1, y1, x2, y2]"}
-                )
-                features.append(feature)
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                class_id = int(box.cls)
+                class_name = result.names[class_id]
+                confidence = float(box.conf)
 
-        return features
+                detection = {
+                    "bbox": [x1, y1, x2, y2],
+                    "class": class_name
+                }
+
+                feature = Feature.metadata({"score": confidence})
+                contents.append(Content(content_type="application/json", data=json.dumps(detection), features=[feature]))
+
+        return contents
 
     def sample_input(self) -> Content:
         return self.sample_jpg()
 
 if __name__ == "__main__":
+    with open("test_image.jpg", "rb") as f:
+        image_data = f.read()
+    input_content = Content(content_type="image/jpeg", data=image_data)
+    input_params = YoloExtractorConfig()
     extractor = YoloExtractor()
-    input = extractor.sample_input()
-    extractor.extract(input)
+    results = extractor.extract(input_content, params=input_params)
