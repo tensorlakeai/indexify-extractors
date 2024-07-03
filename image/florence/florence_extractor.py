@@ -64,9 +64,7 @@ class FlorenceImageExtractor(Extractor):
         return contents
 
     def sample_input(self) -> Content:
-        url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg?download=true"
-        response = requests.get(url)
-        return Content(data=response.content, mime_type="image/jpeg")
+        return self.sample_jpg()
 
 if __name__ == "__main__":
     image_url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg?download=true"
