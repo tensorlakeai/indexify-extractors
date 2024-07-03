@@ -1,1 +1,4 @@
+flash-attn==2.5.9.post1
+timm==1.0.7
+einops==0.8.0
 transformers
