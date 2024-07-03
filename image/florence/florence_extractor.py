@@ -15,7 +15,7 @@ class FlorenceImageExtractorConfig(BaseModel):
 class FlorenceImageExtractor(Extractor):
     name = "tensorlake/florence"
     description = "An extractor that uses the Florence-2 model for image analysis tasks."
-    system_dependencies = ["torch", "transformers", "pillow", "requests"]
+    system_dependencies = []
     input_mime_types = ["image/jpeg", "image/png", "image/gif"]
 
     def __init__(self):
