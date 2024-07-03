@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 import os
 from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
+import torch
 import requests
 import io
 
@@ -20,12 +21,14 @@ class FlorenceImageExtractor(Extractor):
 
     def __init__(self):
         super(FlorenceImageExtractor, self).__init__()
+        device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.model = None
         self.processor = None
 
     def load_model(self, model_name):
         if self.model is None or self.processor is None:
-            self.model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).eval().cuda()
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).eval()
+            self.model.to(device)
             self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
 
     def extract(self, content: Content, params: FlorenceImageExtractorConfig) -> List[Union[Feature, Content]]:
@@ -45,8 +48,8 @@ class FlorenceImageExtractor(Extractor):
 
         inputs = self.processor(text=prompt, images=image, return_tensors="pt")
         generated_ids = self.model.generate(
-            input_ids=inputs["input_ids"].cuda(),
-            pixel_values=inputs["pixel_values"].cuda(),
+            input_ids=inputs["input_ids"],
+            pixel_values=inputs["pixel_values"],
             max_new_tokens=1024,
             early_stopping=False,
             do_sample=False,
