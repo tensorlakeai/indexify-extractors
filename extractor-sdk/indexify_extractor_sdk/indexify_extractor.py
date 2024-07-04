@@ -129,7 +129,7 @@ def install_local(extractor, install_system_dependencies=False):
     description = wrapper.describe()
 
     # Create a new extractor description.
-    extractor_id = f"{module}:{cls}"
+    extractor_id = f"{parent_dir}.{module}:{cls}"
     create_extractor_db()
     save_extractor_description(extractor_id, description)
 
