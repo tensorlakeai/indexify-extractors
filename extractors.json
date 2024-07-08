@@ -40,5 +40,6 @@
   {"type": "text", "module_name": "openai.oai_extractor:OAIExtractor", "name":"tensorlake/openai", "path": "text/openai"},
   {"type": "text", "module_name": "mistralai.mistral_extractor:MistralExtractor", "name":"tensorlake/mistral", "path": "text/mistralai"},
   {"type": "text", "module_name": "ollama.ollama_extractor:OllamaExtractor", "name":"tensorlake/ollama", "path": "text/ollama"},
+  {"type": "text", "module_name": "outlines.outlines_extractor:OutlinesExtractor", "name":"tensorlake/outlines", "path": "text/outlines"},
   {"type": "text", "module_name": "ner.ner_extractor:NERExtractor", "name":"tensorlake/ner", "path": "text/ner"}
 ]
