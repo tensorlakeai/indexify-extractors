@@ -1,1 +1,4 @@
 outlines
+bitsandbytes
+accelerate
+sentencepiece
