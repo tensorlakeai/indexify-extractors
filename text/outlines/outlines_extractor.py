@@ -17,7 +17,7 @@ class OutlinesExtractorConfig(BaseModel):
     regex_pattern: Optional[str] = Field(default=None)
     choices: Optional[List[str]] = Field(default=None)
     output_type: Optional[str] = Field(default=None)
-    json_schema: Optional[dict] = Field(default=None)
+    json_schema: Optional[str] = Field(default=None)
     cfg_grammar: Optional[str] = Field(default=None)
     hf_token: Optional[str] = Field(default=token)
 
