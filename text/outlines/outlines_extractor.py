@@ -10,7 +10,7 @@ from huggingface_hub import login
 token = os.getenv('HF_TOKEN')
 
 class OutlinesExtractorConfig(BaseModel):
-    model_name: str = Field(default='mistralai/Mistral-7B-Instruct-v0.2')
+    model_name: str = Field(default='unsloth/mistral-7b-instruct-v0.3-bnb-4bit')
     generation_type: str = Field(default='text')
     prompt: str = Field(default='You are a helpful assistant.')
     max_tokens: int = Field(default=100)
