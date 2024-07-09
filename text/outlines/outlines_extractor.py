@@ -39,7 +39,7 @@ class OutlinesExtractor(Extractor):
         login(token=params.hf_token)
 
         text_input = content.data.decode("utf-8")
-        full_prompt = f"{prompt}\n\n{text_input}"
+        full_prompt = f"{prompt} {text_input}"
 
         model = transformers(model_name)
 
@@ -57,6 +57,7 @@ class OutlinesExtractor(Extractor):
             generator = regex(model, params.regex_pattern)
             response = generator(full_prompt, max_tokens=max_tokens)
         elif generation_type == 'json' and params.json_schema:
+            print(params.json_schema)
             generator = json(model, params.json_schema)
             response = generator(full_prompt)
         elif generation_type == 'cfg' and params.cfg_grammar:
