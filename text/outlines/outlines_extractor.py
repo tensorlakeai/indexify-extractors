@@ -6,7 +6,9 @@ import outlines
 from outlines.models import transformers
 from outlines.generate import text, choice, format, regex, json, cfg
 from huggingface_hub import login
+import sys
 
+sys.set_int_max_str_digits(0)
 token = os.getenv('HF_TOKEN')
 
 class OutlinesExtractorConfig(BaseModel):
@@ -57,7 +59,6 @@ class OutlinesExtractor(Extractor):
             generator = regex(model, params.regex_pattern)
             response = generator(full_prompt, max_tokens=max_tokens)
         elif generation_type == 'json' and params.json_schema:
-            print(params.json_schema)
             generator = json(model, params.json_schema)
             response = generator(full_prompt)
         elif generation_type == 'cfg' and params.cfg_grammar:
@@ -74,11 +75,11 @@ class OutlinesExtractor(Extractor):
         return Content.from_text("Hello world, I am using Outlines.")
 
 if __name__ == "__main__":
-    article = Content.from_text("I love using Outlines for NLP tasks!")
+    article = Content.from_text("Create a mysterious elven ranger character.")
     input_params = OutlinesExtractorConfig(
-        generation_type='choice',
-        prompt="You are a sentiment analysis assistant. Classify the following text as either Positive or Negative.",
-        choices=["Positive", "Negative"]
+        generation_type='json',
+        json_schema='''{ "title": "Character", "type": "object", "properties": { "name": { "title": "Name", "maxLength": 10, "type": "string" }, "age": { "title": "Age", "type": "integer" }, "armor": {"$ref": "#/definitions/Armor"}, "weapon": {"$ref": "#/definitions/Weapon"} }, "required": ["name", "age", "armor", "weapon", "strength"], "definitions": { "Armor": { "title": "Armor", "description": "An enumeration.", "enum": ["leather", "chainmail", "plate"], "type": "string" }, "Weapon": { "title": "Weapon", "description": "An enumeration.", "enum": ["sword", "axe", "mace", "spear", "bow", "crossbow"], "type": "string" } } }''',
+        prompt="Generate a character description for a fantasy role-playing game."
     )
     extractor = OutlinesExtractor()
     results = extractor.extract(article, params=input_params)
