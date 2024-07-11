@@ -43,11 +43,11 @@ class YoloExtractor(Extractor):
 
                 detection = {
                     "bbox": [x1, y1, x2, y2],
-                    "class": class_name
+                    "class": class_name,
+                    "score": confidence,
                 }
 
-                feature = Feature.metadata({"score": confidence})
-                contents.append(Content(content_type="application/json", data=json.dumps(detection), features=[feature]))
+                contents.append(Content(content_type="application/json", data=json.dumps(detection)))
 
         return contents
 
