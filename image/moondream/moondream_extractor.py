@@ -42,33 +42,31 @@ class MoondreamExtractor(Extractor):
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
     def extract_batch(
-        self, content_list: Dict[str, Content], input_params: Dict[str, MoondreamConfig]
-    ) -> Dict[str, List[Union[Feature, Content]]]:
+        self, content_list: List[Content], params: List[MoondreamConfig]
+    ) -> List[List[Union[Feature, Content]]]:
         images = []
         prompts = []
-        tasks = []
-        for (task_id, content) in content_list.items():
+        for (content, config) in zip(content_list, params):
             image = Image.open(io.BytesIO(content.data))
-            config = input_params.get(task_id, MoondreamConfig())
             images.append(image)
             prompts.append(config.prompt)
-            tasks.append(task_id)
         answers = self.model.batch_answer(images, prompts, self.tokenizer)
-        results = {}
-        for (task_id, answer) in zip(tasks, answers):
-            results[task_id] = [Content.from_text(answer)]
+        results = []
+        for answer in answers:
+            results.append([Content.from_text(answer)])
         return results
 
     def extract(
-        self, content: Content, params: MoondreamConfig = None
+        self, content: Content, params: MoondreamConfig
     ) -> List[Union[Feature, Content]]:
         raise NotImplementedError()
 
     def sample_input(self) -> Content:
-        return self.sample_jpg()
+        config = MoondreamConfig()
+        return (self.sample_jpg(), config.model_dump_json())
 
 if __name__ == "__main__":
     extractor = MoondreamExtractor()
     input = extractor.sample_input()
-    results = extractor.extract_batch({"task_id": input}, {"task_id": MoondreamConfig()})
+    results = extractor.extract_batch({"task_id": input}, {"task_id": config.model_dump_json()})
     print(results)
