@@ -1,14 +1,22 @@
-from abc import ABC, abstractmethod
-from typing import Tuple, Dict, List, Type, Optional
-from types import ModuleType
 import json
-from importlib import import_module
-from typing import get_type_hints, Literal, Union, Dict, Any
-from pydantic import BaseModel, Json, Field
-from genson import SchemaBuilder
-import requests
 import os
-import sys
+from abc import ABC, abstractmethod
+from importlib import import_module
+from typing import (
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    get_type_hints,
+)
+
+import requests
+from genson import SchemaBuilder
+from pydantic import BaseModel, Field, Json
 
 EXTRACTORS_PATH = os.path.join(os.path.expanduser("~"), ".indexify-extractors")
 EXTRACTORS_MODULE = "indexify_extractors"
@@ -50,7 +58,7 @@ class Feature(BaseModel):
             feature_type="embedding",
             name=name,
             value=embedding.model_dump_json(),
-            comment=None
+            comment=None,
         )
 
     @classmethod
@@ -75,7 +83,7 @@ class Feature(BaseModel):
 
                 if self.comment is not None and k in self.comment:
                     schema[k]["comment"] = self.comment[k]
-            
+
             return schema
 
 
@@ -213,7 +221,7 @@ class Extractor(ABC):
         )
         f = open(file_name, "rb")
         return Content(content_type="application/pdf", data=f.read(), features=features)
-    
+
     def sample_presentation(self, features: List[Feature] = []) -> Content:
         file_name = "test.pptx"
         self._download_file(
@@ -221,12 +229,16 @@ class Extractor(ABC):
             file_name,
         )
         f = open(file_name, "rb")
-        return Content(content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation", data=f.read(), features=features)
-    
+        return Content(
+            content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            data=f.read(),
+            features=features,
+        )
+
     def sample_text(self, features: List[Feature] = []) -> Content:
         article = """New York (CNN)When Liana Barrientos was 23 years old, she got married in Westchester County, New York. A year later, she got married again in Westchester County, but to a different man and without divorcing her first husband. Only 18 days after that marriage, she got hitched yet again. Then, Barrientos declared "I do" five more times, sometimes only within two weeks of each other. In 2010, she married once more, this time in the Bronx. In an application for a marriage license, she stated it was her "first and only" marriage. Barrientos, now 39, is facing two criminal counts of "offering a false instrument for filing in the first degree," referring to her false statements on the 2010 marriage license application, according to court documents. Prosecutors said the marriages were part of an immigration scam. On Friday, she pleaded not guilty at State Supreme Court in the Bronx, according to her attorney, Christopher Wright, who declined to comment further. After leaving court, Barrientos was arrested and charged with theft of service and criminal trespass for allegedly sneaking into the New York subway through an emergency exit, said Detective Annette Markowski, a police spokeswoman. In total, Barrientos has been married 10 times, with nine of her marriages occurring between 1999 and 2002. All occurred either in Westchester County, Long Island, New Jersey or the Bronx. She is believed to still be married to four men, and at one time, she was married to eight men at once, prosecutors say. Prosecutors said the immigration scam involved some of her husbands, who filed for permanent residence status shortly after the marriages. Any divorces happened only after such filings were approved. It was unclear whether any of the men will be prosecuted. The case was referred to the Bronx District Attorney\'s Office by Immigration and Customs Enforcement and the Department of Homeland Security\'s Investigation Division. Seven of the men are from so-called "red-flagged" countries, including Egypt, Turkey, Georgia, Pakistan and Mali. Her eighth husband, Rashid Rajput, was deported in 2006 to his native Pakistan after an investigation by the Joint Terrorism Task Force. If convicted, Barrientos faces up to four years in prison.  Her next court appearance is scheduled for May 18."""
         return Content(content_type="text/plain", data=article, features=features)
-    
+
     def sample_html(self, features: List[Feature] = []) -> Content:
         file_name = "sample.html"
         self._download_file(
@@ -241,6 +253,7 @@ def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
     module_name, class_name = name.split(":")
     wrapper = ExtractorWrapper(module_name, class_name)
     return (wrapper._instance, wrapper._param_cls)
+
 
 class ExtractorWrapper:
     def __init__(self, module_name: str, class_name: str):
@@ -301,7 +314,8 @@ class ExtractorWrapper:
                 else None
             )
         outputs: Dict[str, List[Union[Feature, Content]]] = self.extract_batch(
-            {"task_id": s_input}, {"task_id": input_params},
+            {"task_id": s_input},
+            {"task_id": input_params},
         )
         embedding_schemas = {}
         metadata_schemas = {}

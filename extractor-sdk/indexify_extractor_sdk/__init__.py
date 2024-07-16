@@ -1,7 +1,17 @@
-from .base_extractor import Content, Extractor, Feature, EmbeddingSchema, load_extractor, EXTRACTORS_PATH, EXTRACTOR_MODULE_PATH
-from .module_loader import load_indexify_extractors
 import os
 import sys
+
+from .base_extractor import (
+    EXTRACTOR_MODULE_PATH,
+    EXTRACTORS_PATH,
+    Content,
+    EmbeddingSchema,
+    Extractor,
+    Feature,
+    load_extractor,
+)
+from .decorator import extractor
+from .module_loader import load_indexify_extractors
 
 sys.path.append(".")
 
@@ -19,6 +29,7 @@ load_indexify_extractors(EXTRACTOR_MODULE_PATH)
 __all__ = [
     "Content",
     "EmbeddingSchema",
+    "extractor",
     "Extractor",
     "Feature",
     "load_extractor",
