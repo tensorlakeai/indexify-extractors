@@ -5,17 +5,23 @@ from .base_extractor import Content, Feature
 from .extractor_worker import extract_content, ExtractorModule
 import uvicorn
 import asyncio
+import json
+import netifaces
 import concurrent
 
 from fastapi import FastAPI, APIRouter
+
+
 class ExtractionRequest(BaseModel):
     extractor_name: str
     content: ApiContent
     input_params: Optional[Json]
 
+
 class ExtractionResponse(BaseModel):
     content: List[ApiContent]
     features: List[ApiFeature]
+
 
 class ServerRouter:
     def __init__(self, executor: concurrent.futures.ProcessPoolExecutor):
@@ -84,7 +90,49 @@ async def get_server_advertise_addr(
     for server in server.servers:
         for sock in server.sockets:
             port = sock.getsockname()[1]
-            host = sock.getsockname()[0]
             break
-    addr = host if advertise_addr == "" else advertise_addr
+    addr = (
+        get_most_publicly_addressable_ip() if advertise_addr == "" else advertise_addr
+    )
     return f"{addr}:{port}"
+
+
+def get_most_publicly_addressable_ip():
+    # IP address priorities
+    ip_priorities = {"public": 1, "private": 2, "loopback": 3}
+
+    def ip_type(ip_address):
+        """Determine IP address type based on known ranges."""
+        if ip_address.startswith("127."):
+            return "loopback"
+        elif (
+            ip_address.startswith("10.")
+            or ip_address.startswith("172.16.")
+            or ip_address.startswith("172.31.")
+            or ip_address.startswith("192.168.")
+        ):
+            return "private"
+        else:
+            return "public"
+
+    def sort_key(ip):
+        """Sort key for IP addresses based on their type."""
+        return ip_priorities[ip_type(ip)]
+
+    ip_addresses = []
+    # List all network interfaces
+    for interface in netifaces.interfaces():
+        addrs = netifaces.ifaddresses(interface)
+        # Consider IPv4 addresses only
+        if netifaces.AF_INET in addrs:
+            for addr_info in addrs[netifaces.AF_INET]:
+                ip_addresses.append(addr_info["addr"])
+
+    # Sort IP addresses by their type
+    ip_addresses.sort(key=sort_key)
+
+    # Return the most publicly addressable IP, if available
+    if ip_addresses:
+        return ip_addresses[0]
+    else:
+        raise Exception("No IP address available")
