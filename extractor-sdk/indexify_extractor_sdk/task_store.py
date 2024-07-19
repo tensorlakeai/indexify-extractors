@@ -69,7 +69,7 @@ class TaskStore:
         if self._retries[task_id] > 3:
             self._retries.pop(task_id)
             self.complete(
-                completed_task=CompletedTask(
+                outcome=CompletedTask(
                     task_id=task_id, task_outcome="Failed", new_content=[], features=[]
                 )
             )
