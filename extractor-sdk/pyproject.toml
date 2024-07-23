@@ -9,7 +9,7 @@ readme = "README.md"
 indexify-extractor = "indexify_extractor_sdk.main:typer_app"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 typer = { extras = ["all"], version = "^0.9.0" }
 pydantic = "^2.6.1"
 fastapi = "^0.109.2"
