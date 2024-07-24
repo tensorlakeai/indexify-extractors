@@ -18,6 +18,7 @@ def preprocess_inputs(inputs, sampling_rate):
 
     if len(inputs.shape) != 1:
         logger.error(f"Diarization pipeline expecs single channel audio, received {inputs.shape}")
+        raise Exception(f"Diarization pipeline expecs single channel audio, received {inputs.shape}")
 
     # diarization model expects float32 torch tensor of shape `(channels, seq_len)`
     diarizer_inputs = torch.from_numpy(inputs).float()
