@@ -90,16 +90,30 @@ class ASRExtractor(Extractor):
                 "assistant_model": self.assistant_model if params.assisted else None
             }
 
-            asr_outputs = self.asr_pipeline(
-                file,
-                chunk_length_s=params.chunk_length_s,
-                batch_size=params.batch_size,
-                generate_kwargs=generate_kwargs,
-                return_timestamps=True,
-            )
+            try:
+                asr_outputs = self.asr_pipeline(
+                    file,
+                    chunk_length_s=params.chunk_length_s,
+                    batch_size=params.batch_size,
+                    generate_kwargs=generate_kwargs,
+                    return_timestamps=True,
+                )
+            except RuntimeError as e:
+                logger.error(f"ASR inference error: {str(e)}")
+                raise RuntimeError(f"ASR inference error: {str(e)}")
+            except Exception as e:
+                logger.error(f"Unknown error diring ASR inference: {str(e)}")
+                raise Exception(f"Unknown error during ASR inference: {str(e)}")
 
             if self.diarization_pipeline:
-                transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
+                try:
+                    transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
+                except RuntimeError as e:
+                    logger.error(f"Diarization inference error: {str(e)}")
+                    raise RuntimeError(f"Diarization inference error: {str(e)}")
+                except Exception as e:
+                    logger.error(f"Unknown error during diarization: {str(e)}")
+                    raise Exception(f"Unknown error during diarization: {str(e)}")
             else:
                 transcript = []
 
