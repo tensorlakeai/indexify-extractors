@@ -84,8 +84,12 @@ class OAIExtractor(Extractor):
                 ]
             }
         ]
-        
-        response = client.chat.completions.create(model=model_name, messages=messages_content)
+
+        try: 
+            response = client.chat.completions.create(model=model_name, messages=messages_content)
+        except Exception as e:
+            print(f"unable to process image: {str(e)}")
+            raise e
         return response.choices[0].message.content
 
     def _process_text(self, model_name, key, prompt, query):
@@ -101,8 +105,12 @@ class OAIExtractor(Extractor):
             {"role": "system", "content": prompt},
             {"role": "user", "content": query}
         ]
-        
-        response = client.chat.completions.create(model=model_name, messages=messages_content)
+
+        try: 
+            response = client.chat.completions.create(model=model_name, messages=messages_content)
+        except Exception as e:
+            print(f"unable to process text: {str(e)}")
+            raise e
         return response.choices[0].message.content
 
     def sample_input(self) -> Content:
