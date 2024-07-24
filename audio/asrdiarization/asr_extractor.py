@@ -47,8 +47,8 @@ class ASRExtractor(Extractor):
         super(ASRExtractor, self).__init__()
 
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        logger.info(f"Using device: {device.type}")
         torch_dtype = torch.float32 if device.type == "cpu" else torch.float16
+        print(f"Using device: {device.type} data_type: {torch_dtype}")
 
         self.assistant_model = AutoModelForCausalLM.from_pretrained(
             model_settings.assistant_model,
