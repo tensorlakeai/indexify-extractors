@@ -16,7 +16,7 @@ class MistralExtractor(Extractor):
     name = "tensorlake/mistral"
     description = "An extractor that let's you use LLMs from Mistral."
     system_dependencies = []
-    input_mime_types = ["text/plain"]
+    input_mime_types = ["text/plain", "application/json"]
 
     def __init__(self):
         super(MistralExtractor, self).__init__()
