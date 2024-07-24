@@ -95,6 +95,15 @@ class Content(BaseModel):
             features=features,
             labels=labels,
         )
+    
+    @classmethod
+    def from_json(cls, json_data: Json, features: List[Feature] = [], labels: Dict[str, Any] = {}):
+        return cls(
+            content_type="application/json",
+            data=bytes(json.dumps(json_data), "utf-8"),
+            features=features,
+            labels=labels,
+        )
 
     @classmethod
     def from_file(cls, path: str):
