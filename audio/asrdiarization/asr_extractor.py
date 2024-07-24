@@ -85,7 +85,7 @@ class ASRExtractor(Extractor):
             logger.info(f"inference params: {params}")
 
             generate_kwargs = {
-                "task": params.task, 
+                "task": params.task,
                 "language": params.language,
                 "assistant_model": self.assistant_model if params.assisted else None
             }
@@ -117,9 +117,8 @@ class ASRExtractor(Extractor):
             else:
                 transcript = []
 
-            feature = Feature.metadata(value={"chunks": asr_outputs["chunks"], "text": asr_outputs["text"]})
-            return [Content.from_text(str(transcript), features=[feature])]
-    
+            return [Content.from_json(transcript)]
+
     def sample_input(self) -> Content:
         return self.sample_mp3()
 
