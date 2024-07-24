@@ -2,6 +2,7 @@ import json
 import os
 from abc import ABC, abstractmethod
 from importlib import import_module
+from types import ModuleType
 from typing import (
     Any,
     Dict,
@@ -39,8 +40,8 @@ class ExtractorDescription(BaseModel):
     description: str
     python_dependencies: List[str]
     system_dependencies: List[str]
-    embedding_schemas: dict[str, EmbeddingSchema]
-    metadata_schemas: dict[str, Dict]
+    embedding_schemas: Dict[str, EmbeddingSchema]
+    metadata_schemas: Dict[str, Dict]
     input_params: Optional[str]
     input_mime_types: List[str]
 
@@ -100,6 +101,15 @@ class Content(BaseModel):
         return cls(
             content_type="text/plain",
             data=bytes(text, "utf-8"),
+            features=features,
+            labels=labels,
+        )
+    
+    @classmethod
+    def from_json(cls, json_data: Json, features: List[Feature] = [], labels: Dict[str, Any] = {}):
+        return cls(
+            content_type="application/json",
+            data=bytes(json.dumps(json_data), "utf-8"),
             features=features,
             labels=labels,
         )

@@ -9,8 +9,8 @@ import tempfile
 import mimetypes
 
 class OAIExtractorConfig(BaseModel):
-    model_name: Optional[str] = Field(default='gpt-3.5-turbo')
-    key: Optional[str] = Field(default=None)
+    model: Optional[str] = Field(default='gpt-4')
+    api_key: Optional[str] = Field(default=None)
     system_prompt: str = Field(default='You are a helpful assistant.')
     user_prompt: Optional[str] = Field(default=None)
 
@@ -18,15 +18,15 @@ class OAIExtractor(Extractor):
     name = "tensorlake/openai"
     description = "An extractor that let's you use LLMs from OpenAI."
     system_dependencies = []
-    input_mime_types = ["text/plain", "application/pdf", "image/jpeg", "image/png"]
+    input_mime_types = ["text/plain", "application/json", "application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
         super(OAIExtractor, self).__init__()
 
     def extract(self, content: Content, params: OAIExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
-        model_name = params.model_name
-        key = params.key
+        model_name = params.model
+        key = params.api_key
         prompt = params.system_prompt
         query = params.user_prompt
 
@@ -84,8 +84,12 @@ class OAIExtractor(Extractor):
                 ]
             }
         ]
-        
-        response = client.chat.completions.create(model=model_name, messages=messages_content)
+
+        try: 
+            response = client.chat.completions.create(model=model_name, messages=messages_content)
+        except Exception as e:
+            print(f"unable to process image: {str(e)}")
+            raise e
         return response.choices[0].message.content
 
     def _process_text(self, model_name, key, prompt, query):
@@ -101,8 +105,12 @@ class OAIExtractor(Extractor):
             {"role": "system", "content": prompt},
             {"role": "user", "content": query}
         ]
-        
-        response = client.chat.completions.create(model=model_name, messages=messages_content)
+
+        try: 
+            response = client.chat.completions.create(model=model_name, messages=messages_content)
+        except Exception as e:
+            print(f"unable to process text: {str(e)}")
+            raise e
         return response.choices[0].message.content
 
     def sample_input(self) -> Content:

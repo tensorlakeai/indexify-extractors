@@ -17,7 +17,7 @@ class GeminiExtractor(Extractor):
     name = "tensorlake/gemini"
     description = "An extractor that let's you use LLMs from Gemini."
     system_dependencies = []
-    input_mime_types = ["text/plain", "application/pdf", "image/jpeg", "image/png"]
+    input_mime_types = ["text/plain", "application/json", "application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
         super(GeminiExtractor, self).__init__()

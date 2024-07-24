@@ -47,8 +47,8 @@ class ASRExtractor(Extractor):
         super(ASRExtractor, self).__init__()
 
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        logger.info(f"Using device: {device.type}")
         torch_dtype = torch.float32 if device.type == "cpu" else torch.float16
+        print(f"Using device: {device.type} data_type: {torch_dtype}")
 
         self.assistant_model = AutoModelForCausalLM.from_pretrained(
             model_settings.assistant_model,
@@ -85,7 +85,7 @@ class ASRExtractor(Extractor):
             logger.info(f"inference params: {params}")
 
             generate_kwargs = {
-                "task": params.task, 
+                "task": params.task,
                 "language": params.language,
                 "assistant_model": self.assistant_model if params.assisted else None
             }
@@ -117,9 +117,8 @@ class ASRExtractor(Extractor):
             else:
                 transcript = []
 
-            feature = Feature.metadata(value={"chunks": asr_outputs["chunks"], "text": asr_outputs["text"]})
-            return [Content.from_text(str(transcript), features=[feature])]
-    
+            return [Content.from_json(transcript)]
+
     def sample_input(self) -> Content:
         return self.sample_mp3()
 
