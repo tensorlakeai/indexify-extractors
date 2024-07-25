@@ -8,7 +8,7 @@ class ModelConfig(BaseModel):
     model: str = Field(default='microsoft/Phi-3-mini-4k-instruct-gguf')
     filename: str = Field(default='*q4.gguf')
     system_prompt: str = Field(default='You are a helpful assistant.')
-    max_tokens: int = Field(default=8000)
+    max_tokens: int = Field(default=4000)
 
 class LlamaCppExtractor(Extractor):
     name = "tensorlake/llama_cpp"
