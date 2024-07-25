@@ -8,7 +8,6 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 from pyannote.audio import Pipeline
 from transformers import pipeline, AutoModelForCausalLM
 from .diarization_utils import diarize
-from huggingface_hub import HfApi
 from starlette.exceptions import HTTPException
 
 from pydantic import BaseModel
@@ -16,13 +15,11 @@ from pydantic_settings import BaseSettings
 from typing import Optional, Literal, List, Union
 
 logger = logging.getLogger(__name__)
-token = os.getenv('HF_TOKEN')
 
 class ModelSettings(BaseSettings):
     asr_model: str = "tensorlake/whisper-large-v3"
     assistant_model: Optional[str] = "tensorlake/distil-large-v3"
     diarization_model: Optional[str] = "tensorlake/speaker-diarization-3.1"
-    hf_token: Optional[str] = token
 
 model_settings = ModelSettings()
 
@@ -68,11 +65,8 @@ class ASRExtractor(Extractor):
         )
 
         if model_settings.diarization_model:
-            # diarization pipeline doesn't raise if there is no token
-            HfApi().whoami(model_settings.hf_token)
             self.diarization_pipeline = Pipeline.from_pretrained(
                 checkpoint_path=model_settings.diarization_model,
-                use_auth_token=model_settings.hf_token,
             )
             self.diarization_pipeline.to(device)
         else:
