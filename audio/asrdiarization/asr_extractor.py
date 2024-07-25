@@ -94,20 +94,20 @@ class ASRExtractor(Extractor):
                 )
             except RuntimeError as e:
                 logger.error(f"ASR inference error: {str(e)}")
-                raise HTTPException(status_code=400, detail=f"ASR inference error: {str(e)}")
+                raise RuntimeError(f"ASR inference error: {str(e)}")
             except Exception as e:
                 logger.error(f"Unknown error diring ASR inference: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Unknown error diring ASR inference: {str(e)}")
+                raise Exception(f"Unknown error during ASR inference: {str(e)}")
 
             if self.diarization_pipeline:
                 try:
                     transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
                 except RuntimeError as e:
                     logger.error(f"Diarization inference error: {str(e)}")
-                    raise HTTPException(status_code=400, detail=f"Diarization inference error: {str(e)}")
+                    raise RuntimeError(f"Diarization inference error: {str(e)}")
                 except Exception as e:
                     logger.error(f"Unknown error during diarization: {str(e)}")
-                    raise HTTPException(status_code=500, detail=f"Unknown error during diarization: {str(e)}")
+                    raise Exception(f"Unknown error during diarization: {str(e)}")
             else:
                 transcript = []
 
