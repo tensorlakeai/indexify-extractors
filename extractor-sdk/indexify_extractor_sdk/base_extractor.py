@@ -312,7 +312,7 @@ class ExtractorWrapper:
             out[task_id] = self._instance.extract(content, param_instance)
         return out
 
-    def describe(self, input_params: Type[BaseModel] = None) -> ExtractorDescription:
+    def describe(self) -> ExtractorDescription:
         s_input = self._instance.sample_input()
         if type(s_input) == tuple:
             (s_input, input_params) = s_input
