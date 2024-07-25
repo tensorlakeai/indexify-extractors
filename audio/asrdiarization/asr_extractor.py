@@ -19,9 +19,9 @@ logger = logging.getLogger(__name__)
 token = os.getenv('HF_TOKEN')
 
 class ModelSettings(BaseSettings):
-    asr_model: str = "openai/whisper-large-v3"
-    assistant_model: Optional[str] = "distil-whisper/distil-large-v3"
-    diarization_model: Optional[str] = "pyannote/speaker-diarization-3.1"
+    asr_model: str = "tensorlake/whisper-large-v3"
+    assistant_model: Optional[str] = "tensorlake/distil-large-v3"
+    diarization_model: Optional[str] = "tensorlake/speaker-diarization-3.1"
     hf_token: Optional[str] = token
 
 model_settings = ModelSettings()
