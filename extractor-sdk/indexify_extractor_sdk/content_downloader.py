@@ -110,7 +110,7 @@ async def download_content(urls: Dict[str, UrlConfig]) -> Dict[str, Content]:
         elif url_config.url.startswith("gs://"):
             gs_urls[task_id] = url_config.url
         else:
-            out[task_id] = Exception(f"unsupported storage url {url}")
+            out[task_id] = Exception(f"unsupported storage url {url_config.url}")
     for task_id, url in gs_urls.items():
         out[task_id] = gcp_storage_loader(url)
     for task_id, url in s3_urls.items():
