@@ -112,7 +112,7 @@ class ASRExtractor(Extractor):
                 transcript = []
 
             return [Content.from_json(transcript)]
-
+    
     def sample_input(self) -> Content:
         return self.sample_mp3()
 
