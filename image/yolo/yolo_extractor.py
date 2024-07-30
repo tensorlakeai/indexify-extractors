@@ -14,7 +14,7 @@ class YoloExtractorConfig(BaseModel):
 class YoloExtractor(Extractor):
     name = "tensorlake/yolo-extractor"
     description = "An extractor that uses YOLO for object detection in images."
-    system_dependencies = ["libsm6", "libxext6"]
+    system_dependencies = ["libsm6","libglib2.0-0", "libxext6", "libgl1-mesa-glx"]
     input_mime_types = ["image/jpeg", "image/png"]
 
     def __init__(self):
