@@ -14,7 +14,7 @@ class YoloExtractorConfig(BaseModel):
 class YoloExtractor(Extractor):
     name = "tensorlake/yolo-extractor"
     description = "An extractor that uses YOLO for object detection in images."
-    system_dependencies = []
+    system_dependencies = ["libsm6", "libxext6"]
     input_mime_types = ["image/jpeg", "image/png"]
 
     def __init__(self):
@@ -22,7 +22,7 @@ class YoloExtractor(Extractor):
 
     def extract(self, content: Content, params: YoloExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
-        
+
         # Load the YOLO model
         model = YOLO(params.model_name)
 
