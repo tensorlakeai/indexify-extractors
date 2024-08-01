@@ -1,1 +1,2 @@
-llama-cpp-python -C cmake.args="-DLLAMA_CUBLAS=on"
+llama-cpp-python -C cmake.args="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS";sys_platform == "linux" or sys_platform == "windows"
+llama-cpp-python -C cmake.args="-DGGML_METAL=on";sys_platform == "darwin"

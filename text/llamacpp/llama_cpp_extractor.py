@@ -17,20 +17,25 @@ class LlamaCppExtractor(Extractor):
 
     def __init__(self):
         super(LlamaCppExtractor, self).__init__()
+        self._models = {}
 
     def extract(self, content: Content, params: ModelConfig) -> List[Content]:
         model = params.model
         filename = params.filename
         system_prompt = params.system_prompt
-        max_tokens = params.max_tokens
         user_input = content.data.decode("utf-8")
 
-        llm = Llama.from_pretrained(repo_id=model, filename=filename, verbose=False)        
+        if model not in self._models:
+            self._models[model] = Llama.from_pretrained(repo_id=model, filename=filename, verbose=False)
+
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_input}
         ]
-        response = llm.create_chat_completion(messages, max_tokens=params.max_tokens)
+        try:
+            response = self._models[model].create_chat_completion(messages, max_tokens=params.max_tokens)
+        except Exception as e:
+            print(f"exception calling llama.cpp {e}")
         result = response["choices"][0]["message"]["content"]
         return [Content.from_text(result)]
     
