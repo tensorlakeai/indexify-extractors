@@ -19,19 +19,21 @@ class YoloExtractor(Extractor):
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
+        self._models = {}
 
     def extract(self, content: Content, params: YoloExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
 
         # Load the YOLO model
-        model = YOLO(params.model_name)
+        if params.model_name not in self._models:
+            self._models[params.model_name] = YOLO(params.model_name)
 
         # Decode the image data
         nparr = np.frombuffer(content.data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Run inference
-        results = model(img, conf=params.conf, iou=params.iou)
+        results = self._models[params.model_name](img, conf=params.conf, iou=params.iou)
 
         for result in results:
             boxes = result.boxes
