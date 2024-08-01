@@ -30,8 +30,7 @@ class PDFExtractor(Extractor):
             if "text" in params.output_types:
                 if params.output_format == "markdown":
                     md_text = pymupdf4llm.to_markdown(inputtmpfile.name)
-                    feature = Feature.metadata(value={"type": "text"})
-                    contents.append(Content.from_text(md_text, features=[feature]))
+                    contents.append(Content.from_text(md_text))
                 else:
                     with pymupdf.open(inputtmpfile.name) as doc:
                         for page_num, page in enumerate(doc):
@@ -46,13 +45,13 @@ class PDFExtractor(Extractor):
                         xref = img[0]
                         base_image = doc.extract_image(xref)
                         image_bytes = base_image["image"]
-                        feature = Feature.metadata({"type": "image", "page": float(f"{page_num+1}.{img_index+1}")})
+                        feature = Feature.metadata({"page": page_num, "img_num": img_index})
                         contents.append(Content(content_type="image/png", data=image_bytes, features=[feature]))
 
             if "table" in params.output_types:
                 tables = get_tables(content.data)
                 for page_index, content in tables.items():
-                    feature = Feature.metadata({"type": "table", "page": float(page_index)})
+                    feature = Feature.metadata({"page": page_index})
                     contents.append(Content(content_type="application/json", data=json.dumps(content), features=[feature]))
 
         return contents
