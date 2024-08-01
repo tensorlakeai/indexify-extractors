@@ -1,14 +1,16 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Literal
 import json
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 from .utils.tt_module import get_tables
+import pymupdf
 import fitz
 import pymupdf4llm
 import tempfile
 
 class PDFExtractorConfig(BaseModel):
     output_types: List[str] = Field(default_factory=lambda: ["text"])
+    output_format: Literal['markdown', 'text'] = "markdown"
 
 class PDFExtractor(Extractor):
     name = "tensorlake/pdfextractor"
@@ -26,9 +28,15 @@ class PDFExtractor(Extractor):
             inputtmpfile.flush()
 
             if "text" in params.output_types:
-                md_text = pymupdf4llm.to_markdown(inputtmpfile.name)
-                feature = Feature.metadata(value={"type": "text"})
-                contents.append(Content.from_text(md_text, features=[feature]))
+                if params.output_format == "markdown":
+                    md_text = pymupdf4llm.to_markdown(inputtmpfile.name)
+                    feature = Feature.metadata(value={"type": "text"})
+                    contents.append(Content.from_text(md_text, features=[feature]))
+                else:
+                    with pymupdf.open(inputtmpfile.name) as doc:
+                        for page_num, page in enumerate(doc):
+                            text = page.get_text()
+                            contents.append(Content.from_text(text, features=[Feature.metadata({"page_num": page_num})]))
 
             if "image" in params.output_types:
                 doc = fitz.open(inputtmpfile.name)
@@ -50,7 +58,8 @@ class PDFExtractor(Extractor):
         return contents
 
     def sample_input(self) -> Content:
-        return self.sample_scientific_pdf()
+        config = PDFExtractorConfig()
+        return (self.sample_scientific_pdf(), config.model_dump_json())
 
 if __name__ == "__main__":
     f = open("2310.16944.pdf", "rb")
