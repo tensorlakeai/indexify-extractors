@@ -21,10 +21,9 @@ class PPTExtractor(Extractor):
     def extract(self, content: Content, params: PPTExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
         prs = None
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pptx") as inputtmpfile:
+        with tempfile.NamedTemporaryFile(delete=True, suffix=".pptx") as inputtmpfile:
             inputtmpfile.write(content.data)
             inputtmpfile.flush()
-            print(inputtmpfile.name)    
             prs = Presentation(inputtmpfile.name)
         
             # Iterate through slides
@@ -34,7 +33,8 @@ class PPTExtractor(Extractor):
             for shape in slide.shapes:
                 if shape.has_text_frame:
                     for paragraph in shape.text_frame.paragraphs:
-                        contents.append(Content.from_text(paragraph.text, features=[Feature.metadata({"page": slide_idx})]))
+                        text_output.append(paragraph.text)
+                    contents.append(Content.from_text("\n".join(text_output), features=[Feature.metadata({"page": slide_idx})]))
 
             # Extract images
             for shape in slide.shapes:
