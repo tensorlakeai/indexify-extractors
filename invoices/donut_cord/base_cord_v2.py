@@ -64,7 +64,7 @@ class DonutBaseV2(Extractor):
             image = self._convert_image_data_to_image(content.data)
 
         data = self._process_document(image)[0]
-        return [Content.from_text("", features=[Feature.metadata(value=data, name="invoice_simple_donut")])]
+        return [Content.from_text(str(data), features=[Feature.metadata(value=data, name="invoice_simple_donut")])]
     
     def sample_input(self) -> Content:
         return self.sample_invoice_pdf()

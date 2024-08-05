@@ -314,6 +314,7 @@ class ExtractorWrapper:
 
     def describe(self) -> ExtractorDescription:
         s_input = self._instance.sample_input()
+        input_params = None
         if type(s_input) == tuple:
             (s_input, input_params) = s_input
         # Come back to this when we can support schemas based on user defined input params

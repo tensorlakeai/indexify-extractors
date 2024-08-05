@@ -14,24 +14,26 @@ class YoloExtractorConfig(BaseModel):
 class YoloExtractor(Extractor):
     name = "tensorlake/yolo-extractor"
     description = "An extractor that uses YOLO for object detection in images."
-    system_dependencies = []
+    system_dependencies = ["libsm6","libglib2.0-0", "libxext6", "libgl1-mesa-glx"]
     input_mime_types = ["image/jpeg", "image/png"]
 
     def __init__(self):
         super(YoloExtractor, self).__init__()
+        self._models = {}
 
     def extract(self, content: Content, params: YoloExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
-        
+
         # Load the YOLO model
-        model = YOLO(params.model_name)
+        if params.model_name not in self._models:
+            self._models[params.model_name] = YOLO(params.model_name)
 
         # Decode the image data
         nparr = np.frombuffer(content.data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Run inference
-        results = model(img, conf=params.conf, iou=params.iou)
+        results = self._models[params.model_name](img, conf=params.conf, iou=params.iou)
 
         for result in results:
             boxes = result.boxes

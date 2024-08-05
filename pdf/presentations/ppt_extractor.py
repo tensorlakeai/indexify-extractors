@@ -2,6 +2,7 @@ from typing import List, Union, Optional
 from pydantic import BaseModel, Field
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE_TYPE
 import requests
 import tempfile
 
@@ -19,35 +20,46 @@ class PPTExtractor(Extractor):
 
     def extract(self, content: Content, params: PPTExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pptx") as inputtmpfile:
+        prs = None
+        with tempfile.NamedTemporaryFile(delete=True, suffix=".pptx") as inputtmpfile:
             inputtmpfile.write(content.data)
             inputtmpfile.flush()
             prs = Presentation(inputtmpfile.name)
+        
+            # Iterate through slides
+        for slide_idx, slide in enumerate(prs.slides):
+            # Extract text
+            text_output = []
+            for shape in slide.shapes:
+                if shape.has_text_frame:
+                    for paragraph in shape.text_frame.paragraphs:
+                        text_output.append(paragraph.text)
+                    contents.append(Content.from_text("\n".join(text_output), features=[Feature.metadata({"page": slide_idx})]))
 
-            for slide in prs.slides:
-                for shape in slide.shapes:
-                    if "text" in params.output_types:
-                        if shape.has_text_frame:
-                            feature = Feature.metadata(value={"type": "text"})
-                            contents.append(Content.from_text(shape.text_frame.text, features=[feature]))
-                    if "table" in params.output_types:
-                        if shape.shape_type == 19:
-                            tb = shape.table
-                            rows = []
-                            for i in range(1, len(tb.rows)):
-                                rows.append("; ".join([tb.cell(0, j).text + ": " + tb.cell(i, j).text for j in range(len(tb.columns)) if tb.cell(i, j)]))
-                            stacked_rows = "\n".join(rows)
-                            feature = Feature.metadata({"type": "table"})
-                            contents.append(Content.from_text(stacked_rows, features=[feature]))
-                    if "image" in params.output_types:
-                        if shape.shape_type == 13:
-                            feature = Feature.metadata({"type": "image"})
-                            contents.append(Content(content_type="image/png", data=shape.image.blob, features=[feature]))
-            
+            # Extract images
+            for shape in slide.shapes:
+                if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+                    image = shape.image
+                    contents.append(Content(content_type="image/png", data=image.blob, features=[Feature.metadata({"page": slide_idx})]))
+
+            # Extract tables
+            for shape in slide.shapes:
+                if shape.has_table:
+                    table = shape.table
+                    table_data = []
+                    for row in table.rows:
+                        row_data = []
+                        for cell in row.cells:
+                            row_data.append(cell.text)
+                        table_data.append(row_data)
+
+                    # Save table to a file
+                    contents.append(Content.from_json(table_data, features=[Feature.metadata({"page": slide_idx})]))
+
         return contents
 
     def sample_input(self) -> Content:
-        req = requests.get("https://raw.githubusercontent.com/tensorlakeai/indexify/main/docs/docs/files/test.pptx")
+        req = requests.get("https://pub-157277cc11d64fb1a11f71cc52c688eb.r2.dev/figures.pptx")
         ppt_data = req.content
         return Content(content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation", data=ppt_data)
 
