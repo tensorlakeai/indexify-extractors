@@ -9,7 +9,7 @@ from indexify_extractor_sdk import Content, Extractor, Feature
 class ChunkExtractionInputParams(BaseModel):
     overlap: int = 0
     chunk_size: int = 100
-    text_splitter: Literal["char", "recursive", "markdown", "html"] = "recursive"
+    text_splitter: Literal["char", "recursive", "markdown", "html", "json"] = "recursive"
     headers_to_split_on: List[str] = []
 
 
@@ -58,6 +58,10 @@ class ChunkExtractor(Extractor):
             return text_splitter.RecursiveCharacterTextSplitter(
                 chunk_size=input_params.chunk_size,
                 chunk_overlap=input_params.overlap,
+            ).split_text
+        elif input_params.text_splitter == "json":
+            return text_splitter.RecursiveJsonSplitter(
+                max_chunk_size=input_params.chunk_size
             ).split_text
         elif input_params.text_splitter == "char":
             return text_splitter.CharacterTextSplitter(
