@@ -17,7 +17,7 @@ class InputParams(BaseModel):
     a: int = 0
     b: str = ""
 
-class MyExtractor(Extractor):
+class WhisperCC(Extractor):
     name = "tensorflake/whisper.cc"
     description = "Description of the extractor goes here."
     system_dependencies = []
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     # You can run the extractor by simply invoking this python file
     # python custom_extractor.py and that would run the extractor
     # with the sample input provided.
-    print(MyExtractor().sample_input().data)
+    print(WhisperCC().sample_input().data)
