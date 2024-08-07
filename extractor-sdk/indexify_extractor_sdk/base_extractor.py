@@ -15,6 +15,8 @@ from typing import (
     get_type_hints,
 )
 
+from .exceptions import IndexifyError, ExtractorError, translate_exception
+from .logging_config import logger
 import requests
 from genson import SchemaBuilder
 from pydantic import BaseModel, Field, Json
@@ -258,11 +260,48 @@ class Extractor(ABC):
         f = open(file_name, "rb")
         return Content(content_type="text/html", data=f.read(), features=features)
 
+    def safe_extract(self, content: Content, params: Any) -> List[Union[Feature, Content]]:
+        """
+        Wrapper method for extract with error handling.
+        """
+        try:
+            return self.extract(content, params)
+        except Exception as e:
+            logger.exception(f"Error in extractor {self.name}")
+            raise translate_exception(e)
 
-def load_extractor(name: str) -> Tuple[Extractor, Type[BaseModel]]:
-    module_name, class_name = name.split(":")
-    wrapper = ExtractorWrapper(module_name, class_name)
-    return (wrapper._instance, wrapper._param_cls)
+    @classmethod
+    def handle_initialization_error(cls, exc: Exception):
+        """
+        Handle errors during extractor initialization.
+        """
+        logger.exception(f"Error initializing extractor {cls.name}")
+        raise translate_exception(exc)
+
+    def validate_input(self, content: Content) -> bool:
+        """
+        Validate that the input content type is supported by this extractor.
+        """
+        if content.content_type not in self.input_mime_types:
+            logger.error(f"Unsupported content type {content.content_type} for extractor {self.name}")
+            return False
+        return True
+
+
+def load_extractor(name: str) -> Type[Extractor]:
+    """
+    Load an extractor by name.
+    """
+    try:
+        module_name, class_name = name.rsplit(':', 1)
+        module = __import__(module_name, fromlist=[class_name])
+        extractor_class = getattr(module, class_name)
+        if not issubclass(extractor_class, Extractor):
+            raise ValueError(f"{name} is not a valid Extractor")
+        return extractor_class
+    except Exception as e:
+        logger.exception(f"Error loading extractor {name}")
+        raise translate_exception(e)
 
 
 class ExtractorWrapper:

@@ -13,6 +13,10 @@ from enum import Enum
 import multiprocessing
 from typing_extensions import Annotated
 
+from indexify_extractor_sdk import indexify_extractor, Content
+from indexify_extractor_sdk.exceptions import IndexifyError, InputValidationError, ExtractorError
+from indexify_extractor_sdk.logging_config import logger
+
 cpu_count = multiprocessing.cpu_count()
 
 typer_app = typer.Typer(
@@ -67,7 +71,35 @@ def run_local(
     text: Optional[str] = typer.Option(None, help="Text to extract from"),
     file: Optional[str] = typer.Option(None, help="File to extract from"),
 ):
-    indexify_extractor.local(extractor, text, file)
+    try:
+        if text and file:
+            raise InputValidationError("You can only pass either text or file, not both.")
+        if not text and not file:
+            raise InputValidationError("You need to pass either text or file")
+
+        indexify_extractor.local(extractor, text, file)
+
+    except InputValidationError as e:
+        logger.error(f"Input Validation Error: {str(e)}")
+        typer.echo(f"Error: {str(e)}", err=True)
+        raise typer.Exit(code=1)
+    except ExtractorError as e:
+        logger.error(f"Extractor Error: {str(e)}")
+        typer.echo(f"Extractor Error: {str(e)}", err=True)
+        raise typer.Exit(code=2)
+    except IndexifyError as e:
+        logger.error(f"Indexify Error: {str(e)}")
+        typer.echo(f"Indexify Error: {str(e)}", err=True)
+        raise typer.Exit(code=3)
+    except Exception as e:
+        logger.exception("Unexpected error occurred")
+        typer.echo(f"An unexpected error occurred: {str(e)}", err=True)
+        raise typer.Exit(code=4)
+
+def get_mime_type(file_path):
+    import mimetypes
+    mime_type, _ = mimetypes.guess_type(file_path)
+    return mime_type or 'application/octet-stream'
 
 
 @typer_app.command(help="Joins the extractors to the coordinator server")
