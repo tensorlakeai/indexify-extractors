@@ -1,3 +1,3 @@
 torch
 transformers
-git+https://github.com/AIWintermuteAI/whispercpp.git
+git+https://github.com/aarnphm/whispercpp.git
