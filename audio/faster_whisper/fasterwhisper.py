@@ -9,7 +9,7 @@ import tempfile
 import argparse
 from transformers.pipelines.audio_utils import ffmpeg_read
 import torch
-from faster_whisper import WhisperModel
+from faster_whisper import WhisperModel,decode_audio
 
 class InputParams(BaseModel):
     model: str = "small"
@@ -35,18 +35,24 @@ class FasterWhisper(Extractor):
         diarizer_inputs = torch.from_numpy(inputs).float()
         print("Diarizer inputs type (before unsqueeze):", diarizer_inputs.dtype)
         print("Diarizer inputs type (before unsqueeze): dim", diarizer_inputs.shape)
-        diarizer_inputs = diarizer_inputs.unsqueeze(0)  # Add batch dimension
+        # diarizer_inputs = diarizer_inputs.unsqueeze(0)  # Add batch dimension
         # Load the Whisper model
         print("Diarizer inputs type (after unsqueeze):", diarizer_inputs.dtype)
         print("Diarizer inputs type (after unsqueeze): dim", diarizer_inputs.shape)
         model = WhisperModel(params.model, device="cpu", compute_type="int8")
 
         # Transcribe the audio using the model
+        right = decode_audio("output.wav", split_stereo=False)
+
+        print("right dtype",right.dtype)
+        print("right shape",right.shape)
+
         segments, info = model.transcribe(diarizer_inputs, beam_size=5)
 
         # Optionally, parse and convert segments to JSON or any other format
         entries = []
         for segment in segments:
+            print(segment.text.strip())
             entries.append({
                 "timestamp": {"start": segment.start, "end": segment.end},
                 "text": segment.text.strip()
