@@ -7,6 +7,8 @@ from faster_whisper import WhisperModel
 
 class InputParams(BaseModel):
     model: str = "small"
+    device: str = "cpu"
+    compute_type: str = "int8"
 
 class FasterWhisper(Extractor):
     name = "tensorflake/fasterWhisper"
@@ -21,7 +23,7 @@ class FasterWhisper(Extractor):
         # Wrap the content data in io.BytesIO
         audio_stream = io.BytesIO(content.data)
     
-        model = WhisperModel(params.model, device="cpu", compute_type="int8")
+        model = WhisperModel(params.model, device=params.device, compute_type=params.compute_type)
 
         segments, info = model.transcribe(audio_stream, beam_size=5)
 
