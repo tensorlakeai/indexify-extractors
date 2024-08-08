@@ -1,0 +1,3 @@
+faster_whisper
+indexify_extractor_sdk
+pydantic
