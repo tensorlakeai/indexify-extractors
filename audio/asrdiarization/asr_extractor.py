@@ -15,15 +15,13 @@ from typing import Optional, Literal, List, Union
 logger = logging.getLogger(__name__)
 
 class ModelSettings(BaseSettings):
-    asr_model: str = "tensorlake/whisper-large-v3"
-    assistant_model: Optional[str] = "tensorlake/distil-large-v3"
+    asr_model: str = "tensorlake/distil-large-v3"
     diarization_model: Optional[str] = "tensorlake/speaker-diarization-3.1"
 
 model_settings = ModelSettings()
 
 class ASRExtractorConfig(BaseModel):
     task: Literal["transcribe", "translate"] = "transcribe"
-    batch_size: int = 1
     chunk_length_s: int = 30
     sampling_rate: int = 16000
     language: Optional[str] = None
@@ -43,18 +41,7 @@ class ASRExtractor(Extractor):
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         torch_dtype = torch.float32 if device.type == "cpu" else torch.float16
         print(f"Using device: {device.type} data_type: {torch_dtype}")
-        print(f"ASR model: {model_settings.asr_model}, Assistant Model: {model_settings.assistant_model}")
-
-        try:
-            self.assistant_model = AutoModelForCausalLM.from_pretrained(
-                model_settings.assistant_model,
-                torch_dtype=torch_dtype,
-                low_cpu_mem_usage=True,
-                use_safetensors=True
-            )
-        except Exception as e:
-            print(f"Error loading assistant model: {str(e)}")
-            raise e
+        print(f"ASR model: {model_settings.asr_model}")
 
         try:
             self.asr_pipeline = pipeline(
@@ -76,14 +63,12 @@ class ASRExtractor(Extractor):
             generate_kwargs = {
                 "task": params.task,
                 "language": params.language,
-                "assistant_model": self.assistant_model
             }
 
             try:
                 asr_outputs = self.asr_pipeline(
                     np.frombuffer(content.data, dtype=np.int8),
                     chunk_length_s=params.chunk_length_s,
-                    batch_size=params.batch_size,
                     generate_kwargs=generate_kwargs,
                     return_timestamps=True,
                 )
