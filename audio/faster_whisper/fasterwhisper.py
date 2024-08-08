@@ -9,7 +9,7 @@ class InputParams(BaseModel):
     model: str = "small"
 
 def save_bytes_to_wav(bytes_payload):
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as wav_file:
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=True) as wav_file:
         wav_file.write(bytes_payload)
         temp_file_name = wav_file.name
     
