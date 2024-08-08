@@ -8,23 +8,23 @@ from pdf2image import convert_from_path
 import tempfile
 import mimetypes
 
-class OAIExtractorConfig(BaseModel):
+class SchemaExtractorConfig(BaseModel):
     model: Optional[str] = Field(default='gpt-4o-2024-08-06')
     api_key: Optional[str] = Field(default=None)
     system_prompt: str = Field(default='Extract the information.')
     user_prompt: Optional[str] = Field(default=None)
     response_format: Optional[BaseModel] = None
 
-class OAIExtractor(Extractor):
+class SchemaExtractor(Extractor):
     name = "tensorlake/schema"
     description = "An extractor that let's you extract JSON from schemas."
     system_dependencies = []
     input_mime_types = ["text/plain", "application/json", "application/pdf", "image/jpeg", "image/png"]
 
     def __init__(self):
-        super(OAIExtractor, self).__init__()
+        super(SchemaExtractor, self).__init__()
 
-    def extract(self, content: Content, params: OAIExtractorConfig) -> List[Union[Feature, Content]]:
+    def extract(self, content: Content, params: SchemaExtractorConfig) -> List[Union[Feature, Content]]:
         contents = []
         model_name = params.model
         key = params.api_key
@@ -130,11 +130,11 @@ if __name__ == "__main__":
 
     prompt = "Extract the event information."
     article = Content.from_text("Alice and Bob are going to a science fair on Friday.")
-    input_params = OAIExtractorConfig(
+    input_params = SchemaExtractorConfig(
         model="gpt-4o-2024-08-06",
         system_prompt=prompt,
         response_format=CalendarEvent
     )
-    extractor = OAIExtractor()
+    extractor = SchemaExtractor()
     results = extractor.extract(article, params=input_params)
     print(results)
