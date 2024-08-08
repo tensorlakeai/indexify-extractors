@@ -2,19 +2,11 @@ from pydantic import BaseModel
 from typing import List
 from indexify_extractor_sdk import Extractor, Content
 import json
-import tempfile
+import io
 from faster_whisper import WhisperModel
 
 class InputParams(BaseModel):
     model: str = "small"
-
-def save_bytes_to_wav(bytes_payload):
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=True) as wav_file:
-        wav_file.write(bytes_payload)
-        temp_file_name = wav_file.name
-    
-    return temp_file_name
-
 
 class FasterWhisper(Extractor):
     name = "tensorflake/fasterWhisper"
@@ -26,11 +18,12 @@ class FasterWhisper(Extractor):
         super().__init__()
 
     def extract(self, content: Content, params: InputParams) -> List[Content]:
-        wavFile = save_bytes_to_wav(content.data)
+        # Wrap the content data in io.BytesIO
+        audio_stream = io.BytesIO(content.data)
     
         model = WhisperModel(params.model, device="cpu", compute_type="int8")
 
-        segments, info = model.transcribe(wavFile, beam_size=5)
+        segments, info = model.transcribe(audio_stream, beam_size=5)
 
         entries = []
         for segment in segments:
@@ -46,7 +39,6 @@ class FasterWhisper(Extractor):
         return [
             Content.from_json(json_output), 
         ]
-     
     
     def sample_input(self) -> Content:
         return self.sample_mp3()
