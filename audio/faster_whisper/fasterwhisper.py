@@ -18,7 +18,7 @@ def save_bytes_to_wav(bytes_payload):
 
 class FasterWhisper(Extractor):
     name = "tensorflake/fasterWhisper"
-    description = "Description of the extractor goes here."
+    description = "fasterWhisper transcripts audio into json with timestamps and text"
     system_dependencies = []
     input_mime_types = ["audio","audio/wav"]
 
