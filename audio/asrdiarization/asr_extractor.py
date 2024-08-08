@@ -1,14 +1,12 @@
 import logging
 import torch
-import tempfile
-import base64
-import os
+import io
+import numpy as np
 
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pyannote.audio import Pipeline
 from transformers import pipeline, AutoModelForCausalLM
 from .diarization_utils import diarize
-from starlette.exceptions import HTTPException
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -26,7 +24,6 @@ model_settings = ModelSettings()
 class ASRExtractorConfig(BaseModel):
     task: Literal["transcribe", "translate"] = "transcribe"
     batch_size: int = 24
-    assisted: bool = False
     chunk_length_s: int = 30
     sampling_rate: int = 16000
     language: Optional[str] = None
@@ -46,47 +43,45 @@ class ASRExtractor(Extractor):
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         torch_dtype = torch.float32 if device.type == "cpu" else torch.float16
         print(f"Using device: {device.type} data_type: {torch_dtype}")
+        print(f"ASR model: {model_settings.asr_model}, Assistant Model: {model_settings.assistant_model}")
 
-        self.assistant_model = AutoModelForCausalLM.from_pretrained(
-            model_settings.assistant_model,
-            torch_dtype=torch_dtype,
-            low_cpu_mem_usage=True,
-            use_safetensors=True
-        ) if model_settings.assistant_model else None
+        try:
+            self.assistant_model = AutoModelForCausalLM.from_pretrained(
+                model_settings.assistant_model,
+                torch_dtype=torch_dtype,
+                low_cpu_mem_usage=True,
+                use_safetensors=True
+            )
+        except Exception as e:
+            print(f"Error loading assistant model: {str(e)}")
+            raise e
 
-        if self.assistant_model:
-            self.assistant_model.to(device)
-
-        self.asr_pipeline = pipeline(
-            "automatic-speech-recognition",
-            model=model_settings.asr_model,
-            torch_dtype=torch_dtype,
-            device=device
-        )
-
-        if model_settings.diarization_model:
+        try:
+            self.asr_pipeline = pipeline(
+                "automatic-speech-recognition",
+                model=model_settings.asr_model,
+                torch_dtype=torch_dtype,
+                device=device
+            )
             self.diarization_pipeline = Pipeline.from_pretrained(
                 checkpoint_path=model_settings.diarization_model,
             )
             self.diarization_pipeline.to(device)
-        else:
-            self.diarization_pipeline = None
+        except Exception as e:
+            print(f"Error loading ASR or diarization model: {str(e)}")
+            raise e
+        print("ASR and diarization models loaded successfully.")
 
     def extract(self, content: Content, params: ASRExtractorConfig) -> List[Union[Feature, Content]]:
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(content.data)
-            file = open(fp.name, "rb").read()
-            logger.info(f"inference params: {params}")
-
             generate_kwargs = {
                 "task": params.task,
                 "language": params.language,
-                "assistant_model": self.assistant_model if params.assisted else None
+                "assistant_model": self.assistant_model
             }
 
             try:
                 asr_outputs = self.asr_pipeline(
-                    file,
+                    np.frombuffer(content.data, dtype=np.int8),
                     chunk_length_s=params.chunk_length_s,
                     batch_size=params.batch_size,
                     generate_kwargs=generate_kwargs,
@@ -101,7 +96,7 @@ class ASRExtractor(Extractor):
 
             if self.diarization_pipeline:
                 try:
-                    transcript = diarize(self.diarization_pipeline, file, params, asr_outputs)
+                    transcript = diarize(self.diarization_pipeline, io.BytesIO(content.data).read(), params, asr_outputs)
                 except RuntimeError as e:
                     logger.error(f"Diarization inference error: {str(e)}")
                     raise RuntimeError(f"Diarization inference error: {str(e)}")
