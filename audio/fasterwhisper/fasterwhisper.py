@@ -14,7 +14,7 @@ class FasterWhisper(Extractor):
     name = "tensorflake/fasterwhisper"
     description = "fasterwhisper transcripts audio into json with timestamps and text"
     system_dependencies = []
-    input_mime_types = ["audio","audio/wav"]
+    input_mime_types = ["audio", "audio/mpeg"]
 
     def __init__(self):
         super().__init__()
