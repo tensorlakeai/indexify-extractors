@@ -23,7 +23,7 @@ model_settings = ModelSettings()
 
 class ASRExtractorConfig(BaseModel):
     task: Literal["transcribe", "translate"] = "transcribe"
-    batch_size: int = 24
+    batch_size: int = 1
     chunk_length_s: int = 30
     sampling_rate: int = 16000
     language: Optional[str] = None
@@ -112,7 +112,7 @@ class ASRExtractor(Extractor):
         return self.sample_mp3()
 
 if __name__ == "__main__":
-    params = ASRExtractorConfig(batch_size=24)
+    params = ASRExtractorConfig(batch_size=1)
     extractor = ASRExtractor()
     results = extractor.extract(extractor.sample_mp3(), params=params)
     print(results)
