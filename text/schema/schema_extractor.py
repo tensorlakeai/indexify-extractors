@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict, Any
 from indexify_extractor_sdk import Content, Extractor, Feature
 from pydantic import BaseModel, Field
 import os
@@ -13,7 +13,7 @@ class SchemaExtractorConfig(BaseModel):
     api_key: Optional[str] = Field(default=None)
     system_prompt: str = Field(default='Extract the information.')
     user_prompt: Optional[str] = Field(default=None)
-    response_format: Optional[BaseModel] = None
+    response_format: Optional[Dict[str, Any]] = None  # Dict for JSON schema
 
 class SchemaExtractor(Extractor):
     name = "tensorlake/schema"
@@ -86,7 +86,14 @@ class SchemaExtractor(Extractor):
             response = client.beta.chat.completions.parse(
                 model=model_name, 
                 messages=messages_content, 
-                response_format=response_format
+                response_format={
+                    "type": "json_schema", 
+                    "json_schema": {
+                        "name": "schema_response",  # Add a required name
+                        "strict": True, 
+                        "schema": response_format
+                    }
+                }
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -105,7 +112,14 @@ class SchemaExtractor(Extractor):
             response = client.beta.chat.completions.parse(
                 model=model_name, 
                 messages=messages_content, 
-                response_format=response_format
+                response_format={
+                    "type": "json_schema", 
+                    "json_schema": {
+                        "name": "schema_response",  # Add a required name
+                        "strict": True, 
+                        "schema": response_format
+                    }
+                }
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -123,17 +137,26 @@ class SchemaExtractor(Extractor):
         return Content.from_text("Alice and Bob are going to a science fair on Friday.")
 
 if __name__ == "__main__":
-    class CalendarEvent(BaseModel):
-        name: str
-        date: str
-        participants: list[str]
+    json_schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "date": {"type": "string"},
+            "participants": {
+                "type": "array",
+                "items": {"type": "string"}
+            }
+        },
+        "required": ["name", "date", "participants"],
+        "additionalProperties": False
+    }
 
     prompt = "Extract the event information."
     article = Content.from_text("Alice and Bob are going to a science fair on Friday.")
     input_params = SchemaExtractorConfig(
         model="gpt-4o-2024-08-06",
         system_prompt=prompt,
-        response_format=CalendarEvent
+        response_format=json_schema  # Use the JSON schema here
     )
     extractor = SchemaExtractor()
     results = extractor.extract(article, params=input_params)
