@@ -13,6 +13,7 @@
   {"type": "audio", "module_name": "whisper-mlx.whisper_extractor:WhisperExtractor", "skip_deploy": true,"name": "tensorlake/whisper-mlx", "path": "audio/whisper-mlx"},
   {"type": "audio", "module_name": "groq.whisper:WhisperExtractor", "skip_deploy": true, "name": "tensorlake/whispergroq", "path": "audio/groq"},
   {"type": "audio", "module_name": "asrdiarization.asr_extractor:ASRExtractor", "with_gpu": true, "name": "tensorlake/asrdiarization", "path": "audio/asrdiarization"},
+  {"type": "audio", "module_name": "fasterwhisper.fasterwhisper:FasterWhisper", "with_gpu": true, "name": "tensorlake/fasterwhisper", "path": "audio/fasterwhisper"},
   {"type": "video", "module_name": "audio-extractor.audio_extractor:AudioExtractor", "name": "tensorlake/audio-extractor", "path": "video/audio-extractor"},
   {"type": "video", "module_name": "face-extractor.face_extractor:FaceExtractor", "skip_deploy": true, "name": "tensorlake/face-extractor", "path": "video/face-extractor"},
   {"type": "video", "module_name": "keyframes.key_frame_extractor:KeyFrameExtractor", "name": "tensorlake/scene-frame-extractor", "path": "video/keyframes"},
